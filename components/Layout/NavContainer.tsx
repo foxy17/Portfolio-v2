@@ -1,13 +1,15 @@
-import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
+import dynamic from 'next/dynamic';
 import NextLink from 'next/link';
 import cn from 'classnames';
 import Seo from '~/components/SEO/seo';
-import Footer from '~/components/Layout/footer';
 import MobileMenu from '~/components/MobileMenu';
 import { useIsMounted } from '~/lib/hooks/userIsMounted';
+
+const Footer = dynamic(() => import('~/components/Layout/footer'), {
+  ssr: false,
+});
 
 interface NavItemProps {
   href: string;
