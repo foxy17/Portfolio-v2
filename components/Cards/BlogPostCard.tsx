@@ -2,6 +2,7 @@ import cn from 'classnames';
 import React from 'react';
 import { Article } from '~/lib/types';
 import ExternalLink from '~/components/ExternalLink';
+import { PenSvg } from '~/components/PenSvg';
 
 type FeaturedPostCardProps = {
   gradient: string;
@@ -34,8 +35,11 @@ export default function BlogPostCard({
               </h4>
             </div>
             <div className="flex items-center text-gray-800 dark:text-gray-200 capsize">
-              <span className="ml-2 align-baseline  flex flex-row capsize">
-                <div></div>
+              <span
+                className="flex flex-row capsize"
+                style={{ alignItems: 'inherit' }}
+              >
+                <PenSvg style="mr-2"/>
 
                 {publishedAt}
               </span>
