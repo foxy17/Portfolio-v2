@@ -29,18 +29,18 @@ export default function BlogLayout({
       <div className="min-h-screen w-full pt-0 px-4 pb-8">
         <h3>On this page</h3>
           <div>
-            {post.headings.map(heading => {
-              return (
-                  <a
-                      className="data-[level=two]:pl-2 data-[level=three]:pl-4"
-                      data-level={heading.level}
-                      href={heading.slug}
-                  >
-                    {heading.text}
-                  </a>
+            {/*{post.headings.map(heading => {*/}
+            {/*  return (*/}
+            {/*      <a*/}
+            {/*          className="data-[level=two]:pl-2 data-[level=three]:pl-4"*/}
+            {/*          data-level={heading.level}*/}
+            {/*          href={heading.slug}*/}
+            {/*      >*/}
+            {/*        {heading.text}*/}
+            {/*      </a>*/}
 
-              )
-            })}
+            {/*  )*/}
+            {/*})}*/}
           </div>
         <div className="w-full max-w-4xl my-0 mx-auto">
           <h1 className="text-3xl sm:text-6xl font-bold sm:font-black mb-8 leading-normal font-sans">
