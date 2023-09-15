@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const cspBuilder = require('content-security-policy-builder');
 const cspHeaders = require('./config/cspHeaders');
+const { withContentlayer } = require('next-contentlayer')
 
 const cspConfig = cspBuilder(cspHeaders);
 
@@ -16,12 +17,26 @@ const rewrites = async () => [
 ];
 
 
-module.exports = {
+module.exports = withContentlayer({
   rewrites,
   swcMinify: true,
   reactStrictMode: true,
   experimental: {
     browsersListForSwc: true,
+  },
+  webpack: function (config, { isServer }) {
+    config.module.rules.push({
+      test: /\.md$/,
+      use: 'raw-loader',
+    })
+
+    config.module.rules.push({
+      test: /\.svg$/i,
+      issuer: /\.[jt]sx?$/,
+      use: ['@svgr/webpack'],
+    })
+
+    return config
   },
   async headers() {
     return [
@@ -31,7 +46,7 @@ module.exports = {
       },
     ];
   },
-};
+});
 
 const securityHeaders = [
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP

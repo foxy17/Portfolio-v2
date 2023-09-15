@@ -94,3 +94,9 @@ h3 {
     transition-timing-function: cubic-bezier(0.19, 1, 0.61, 1.11);
     transition-duration: 0.6s;
 }
+
+@layer utilities {
+    .word-md {
+        word-spacing: 2px;
+    }
+}

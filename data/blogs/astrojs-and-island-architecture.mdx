@@ -1,0 +1,116 @@
+---
+title: 'Why everyone is talking about Astro and island Architecture? 🏝️'
+publishedAt: 'August 18, 2022'
+description: 'Learn how to build a Next.js blog with MDX and Contentlayer!'
+author: 'Arnav Chauhan'
+cover: '/images/blog/astro.webp'
+category: 'Javascript'
+coverWidth: '1411'
+coverHeight: '682'
+---
+
+import StyledWord from '../../components/WordWrapper';
+
+If you love exploring different technologies in the web development ocean
+I am sure **Astro** must have been popping up a lot in your feed since few months.
+Astro's V1.0 got launched recently and a lot of people are testing out its capabilities
+by migrating their blogs or portfolio sites to Astro.
+
+<br/>
+
+
+But there are so frameworks that offer good SEO and lighthouse score so
+why are people still so hyped up about Astro. Well how would you react if
+someone told you that you can ship your simple website with zero <StyledWord word='Javascript'/>.
+When I heard this I was blown away but also had many doubts since there are scenarios where
+
+I need <StyledWord word='Javascript'/> and scenarios where loading <StyledWord word='Javascript'/> in a static pages just slows down the site.
+
+<br/>
+
+To understand more about this lets deep dive into what Astro does differently than
+Next.js one of the widely used framework for static site generation.
+
+<br/>
+
+## Astro is a meta framework 🚀
+
+<br/>
+
+Unlike other frameworks like Gatsby or Next.js which are built
+on top of React , you can use components from React,
+Vue, Svelte and Solid.js directly in Astro. This makes it easy
+to migrate to Astro when you already have components written in this frameworks.
+
+<br/>
+
+## Zero JavaScript for static pages
+
+<br/>
+
+If you load a statically generated Next.js site which does not required any
+<StyledWord word='Javascript'/> based interaction you will still see that in
+the network tab your browser still loads many
+<StyledWord word='Javascript'/> file that are required by the framework as you can see in the image below.
+
+<br/>
+
+<img alt="JavaScript Files Loaded"
+     src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/kwzjo31nbnr4bcf0ecpm.png" width="100%" loading="lazy"
+     className="rounded-lg"/>
+
+<br/>
+
+The main problem with this is that most of the time the <StyledWord word='Javascript'/>
+being loaded is not actually being used. You can see that almost 50%
+of my <StyledWord word='Javascript'/> is unused on my [portfolio website ](https://www.carnav.in/)
+which is made using Next.js.
+
+<br/>
+    <img alt="Unused Javascript" src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ncura93g9yxanlieocov.png"
+         width="100%" loading="lazy" className="rounded-lg"/>
+<br/>
+
+
+Now one may argue that this can be minimized by using suspense and lazy
+loading but even after using those techniques that <StyledWord word='Javascript'/> is still
+loaded later which is not required at all.
+
+**Astro**⚡ by default ships zero <StyledWord word='Javascript'/> to the browser. To achieve
+this Astro renders HTML on the server and strips away any remaining,
+unused <StyledWord word='Javascript'/>. This decreases the sites [Time to interactive](https://web.dev/interactive/)
+resulting in faster load time for content based websites. Here is one example of the decrease in size by using Astro.
+
+<br/>
+
+import {TwitterTweetEmbed} from "react-twitter-embed";
+
+<div className="rounded-xl fl">
+    <TwitterTweetEmbed
+        tweetId={'1437195415439360003'}
+    />
+</div>
+
+<br/>
+## How does Astro 🐱‍🚀 achieve this?
+<br/>
+
+We all know that Next.js also uses static site generation just like Astro but still ships with <StyledWord word='Javascript'/> so how does Astro manager to ship zero <StyledWord word='Javascript'/>. Unlike Next.js which still keeps <StyledWord word='Javascript'/> in the HTML statically rendered. Astro strips all of the <StyledWord word='Javascript'/>. Next.js requires <StyledWord word='Javascript'/> since it runs on top of React and creates a Single Page Application that means <StyledWord word='Javascript'/> is loaded every time when the page changes. On the other hand Astro render a Multiple Page Application that means each route in your Astro site is a different HTML page with only static HTML and CSS.
+<br/>
+But what if we required <StyledWord word='Javascript'/> like in a search bar or image carousel.
+
+This is done by a technique called **[Partial Hydration](https://docs.astro.build/en/concepts/islands/#concept-partial-hydration)** 🐳. Astro allows you to ship <StyledWord word='Javascript'/> explicitly only for those components which you want to run in the browser. Astro lets you hydrate only the required individual component without interrupting the rest of the static site. Other SSG frameworks like Gatsby and Next.js do not this feature as they consider your entire website as a single <StyledWord word='Javascript'/> application.
+<br/>
+## Island Architecture in Astro 🏝️
+<br/>
+Astro uses the idea of Island structure, which is about building entire websites using partial hydration. In frameworks like Next.js a website is built into client-side rendered Html, CSS and <StyledWord word='Javascript'/> bundles which are then shipped to the user. In **island architecture** static HTML pages are rendered on the server and  slots/placeholders are added around highly dynamic areas for interactivity. These slots contain server-rendered HTML output from the corresponding widgets, which are then hydrated on demand at the client side.
+<br/>
+![Astro Arch](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/04x0h8g9meusobbc7qwd.png)
+<br/>
+> Source: [Astro Docs](https://docs.astro.build/en/concepts/islands/)
+
+This pattern isolates each page into separate small islands, any performance issue in one islands won’t cause any direct impact upon other units and also ensures that  faster faster loading and rendering of lightweight components individually without being barred by other heavier components are loaded individually without being barred by other heavier components.
+<br/>
+## Conclusion
+<br/>
+Combination of all the features listed above make Astro a good choice for sites which have a lot of static content like  marketing sites, publishing sites, documentation sites and blogs.
