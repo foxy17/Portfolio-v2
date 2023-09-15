@@ -21,7 +21,7 @@ export default function Footer() {
           </Link>
           <ExternalLink
             style="showSocial:hidden block"
-            href="https://dev.to/foxy17"
+            href="https://www.linkedin.com/in/arnavschauhan/"
           >
             Linkedin
           </ExternalLink>
@@ -38,9 +38,9 @@ export default function Footer() {
 
           <ExternalLink
             style="showSocial:hidden block"
-            href="https://dev.to/foxy17"
+            href="https://www.polywork.com/carnav"
           >
-            Polygon
+            Polywork
           </ExternalLink>
         </div>
 
@@ -48,7 +48,7 @@ export default function Footer() {
           <ExternalLink href="https://arnav40.medium.com/">Medium</ExternalLink>
           <ExternalLink
             style="showSocial:hidden block"
-            href="https://arnav40.medium.com/"
+            href="https://github.com/foxy17"
           >
             Github
           </ExternalLink>
