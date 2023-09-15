@@ -2,6 +2,7 @@ import cn from 'classnames';
 import React from 'react';
 import { Article } from '~/lib/types';
 import ExternalLink from '~/components/ExternalLink';
+import { PenSvg } from '~/components/Cards/PenSvg';
 
 type FeaturedPostCardProps = {
   gradient: string;
@@ -27,15 +28,18 @@ export default function BlogPostCard({
         )}
       >
         <ExternalLink href={url}>
-          <div className="flex flex-col justify-between h-full bg-beige dark:bg-dark-grey rounded-lg p-4">
-            <div className="flex flex-col md:flex-row justify-between">
-              <h4 className="text-lg md:text-lg font-medium mb-6 sm:mb-10 w-full text-gray-900 dark:text-gray-100 tracking-tight">
+          <div className="md:h-48 flex flex-col justify-between h-full bg-beige dark:bg-dark-black rounded-lg p-4">
+            <div className="flex flex-col md:flex-row justify-between md:h-32">
+              <h4 className="line-clamp-3 text-lg font-medium mb-6 sm:mb-10 w-full text-gray-900 dark:text-gray-100 tracking-tight">
                 {title}
               </h4>
             </div>
             <div className="flex items-center text-gray-800 dark:text-gray-200 capsize">
-              <span className="ml-2 align-baseline  flex flex-row capsize">
-                <div></div>
+              <span
+                className="flex flex-row capsize"
+                style={{ alignItems: 'inherit' }}
+              >
+                <PenSvg style="mr-2" />
 
                 {publishedAt}
               </span>

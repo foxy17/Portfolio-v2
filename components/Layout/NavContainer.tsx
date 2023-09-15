@@ -54,7 +54,7 @@ export default function NavContainer(props: any) {
 
   return (
     <div className="min-h-screen bg-beige dark:bg-dark-black">
-      <Seo customMeta />
+      <Seo customMeta={customMeta} />
       <div className="flex flex-col justify-center px-8">
         <nav className="flex items-center justify-between w-full relative max-w-4xl border-gray-200 dark:border-gray-700 mx-auto pt-8 pb-8 sm:pb-[72px] text-gray-900 bg-beige dark:bg-dark-black bg-opacity-60 dark:text-beige">
           <a href="~/components/Layout/NavContainer#skip" className="skip-nav">

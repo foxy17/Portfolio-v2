@@ -17,7 +17,7 @@ const CurrentCompany = ({ name }: CurrentCompanyProps) => {
       className={cn(
         'text-flat-purple dark:text-flat-yellow before:decoration-flat-purple before:dark:decoration-flat-yellow',
         'relative overflow-hidden pb-2 before:text-transparent hover:before:animate-wave',
-        'before:decoration-wavy before:absolute before:whitespace-nowrap',
+        'before:decoration-wavy before:absolute before:whitespace-nowrap max-w-fit',
         'before:content-[attr(data-text)attr(data-text)] before:underline before:underline-offset-4',
       )}
     >
@@ -29,12 +29,13 @@ const CurrentCompany = ({ name }: CurrentCompanyProps) => {
 const ShortDescription = ({ description, name }: DescriptionProps) => {
   return (
     <>
-      <span className="text-xl sm:text-2xl flex flex-row mb-4">
-        <h3 className="text-gray-700 dark:text-gray-200">Frontend developer at &nbsp; </h3>
+      <span className="text-xl sm:text-2xl sm:flex sm:flex-row mb-4">
+        <h3 className="text-gray-700 dark:text-gray-200">Senior Frontend developer at &nbsp; </h3>
         <a
           href="https://www.clootrack.com/"
           target="_blank"
           rel="noopener noreferrer"
+          className='max-w-min'
         >
           <CurrentCompany name={name} />
         </a>

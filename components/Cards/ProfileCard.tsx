@@ -33,7 +33,14 @@ export default function ProfileCard(props: ProfileCard) {
         props.style,
       )}
     >
-      <Image alt="Profile" src={src} quality={100} width={176} height={171} />
+      <Image
+        alt="Profile"
+        src={src}
+        quality={75}
+        width={176}
+        height={171}
+        priority={true}
+      />
       <p className="text-md select-none">
         Yes, I drink a lot of <br /> coffee.
       </p>

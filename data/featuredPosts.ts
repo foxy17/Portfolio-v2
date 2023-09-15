@@ -14,7 +14,7 @@ const featuredPosts = [
   },
   {
     title:
-      'Deploy Nodejs On AWS ECS Fargate using Terraform with support for Blue/Green...',
+      'Deploy Nodejs On AWS ECS Fargate using Terraform with support for Blue/Green Deployment using codedeploy.',
     url: 'https://arnav40.medium.com/deploy-nodejs-on-ecs-fargate-using-terraform-with-support-for-blue-geen-deployment-using-codedeploy-a750c6214153?source=rss-62cc88921110------2',
     categories: [
       'blue-green-deployment',
