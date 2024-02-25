@@ -21,7 +21,6 @@ module.exports = {
   swcMinify: true,
   reactStrictMode: true,
   experimental: {
-    browsersListForSwc: true,
   },
   async headers() {
     return [

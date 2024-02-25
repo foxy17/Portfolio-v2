@@ -1,5 +1,6 @@
 import React from 'react';
 import cn from 'classnames';
+import Link from "next/link";
 
 interface ExternalLinkProps {
   href: string;
@@ -8,14 +9,14 @@ interface ExternalLinkProps {
 }
 
 const ExternalLink = ({ href, children, style }: ExternalLinkProps) => (
-  <a
+  <Link
     className={cn('text-gray-500 hover:text-gray-600 transition w-full', style)}
     target="_blank"
     rel="noopener noreferrer"
     href={href}
   >
     {children}
-  </a>
+  </Link>
 );
 
 export default ExternalLink;
