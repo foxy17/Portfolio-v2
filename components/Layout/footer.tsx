@@ -11,13 +11,11 @@ export default function Footer() {
       <NowPlaying />
       <div className="w-full max-w-4xl grid grid-cols-2 gap-4 pb-16 sm:grid-cols-3">
         <div className="flex flex-col space-y-4">
-          <Link href="/">
-            <a className="text-gray-500 hover:text-gray-600 transition">Home</a>
+          <Link href="/" className="text-gray-500 hover:text-gray-600 transition">
+            Home
           </Link>
-          <Link href="/">
-            <a className="text-gray-500 hover:text-gray-600 transition">
-              About
-            </a>
+          <Link href="/" className="text-gray-500 hover:text-gray-600 transition">
+            About
           </Link>
           <ExternalLink
             style="showSocial:hidden block"

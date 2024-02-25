@@ -1,8 +1,10 @@
+'use client';
+
 import cn from 'classnames';
 import Link from 'next/link';
-import useDelayedRender from 'use-delayed-render';
 import { useState, useEffect } from 'react';
 import styles from 'styles/mobile-menu.module.css';
+import useDelayedRender from '~/lib/hooks/useDelayedRender';
 
 export default function MobileMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -53,26 +55,19 @@ export default function MobileMenu() {
             className="border-b border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 text-sm font-semibold"
             style={{ transitionDelay: '150ms' }}
           >
-            <Link href="/">
-              <a className="flex w-auto pb-4">Home</a>
+            <Link href="/" className="flex w-auto pb-4">
+              Home
             </Link>
-            {/*<Link href="/">*/}
-            {/*  <a className="flex w-auto pb-4">Timeline</a>*/}
-            {/*</Link>*/}
-            {/*<Link href="/">*/}
-            {/*  <a className="flex w-auto pb-4">Projects</a>*/}
-            {/*</Link>*/}
-            <Link href="https://dev.to/foxy17">
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex w-auto pb-4"
-              >
-                Blog
-              </a>
+            <Link
+              href="https://dev.to/foxy17"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex w-auto pb-4"
+            >
+              Blog
             </Link>
-            <Link href="/">
-              <a className="flex w-auto pb-4">About Me</a>
+            <Link href="/" className="flex w-auto pb-4">
+              About Me
             </Link>
           </li>
         </ul>
@@ -81,7 +76,7 @@ export default function MobileMenu() {
   );
 }
 
-function MenuIcon(props: JSX.IntrinsicElements['svg']) {
+function MenuIcon(props: React.JSX.IntrinsicElements['svg']) {
   return (
     <svg
       className="h-5 w-5 absolute text-gray-900 dark:text-gray-100"
@@ -116,7 +111,7 @@ function MenuIcon(props: JSX.IntrinsicElements['svg']) {
   );
 }
 
-function CrossIcon(props: JSX.IntrinsicElements['svg']) {
+function CrossIcon(props: React.JSX.IntrinsicElements['svg']) {
   return (
     <svg
       className="h-5 w-5 absolute text-gray-900 dark:text-gray-100"

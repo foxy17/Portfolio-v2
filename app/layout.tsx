@@ -1,14 +1,30 @@
-import { Html, Head, Main, NextScript } from 'next/document';
+import ClientLayout from './ClientLayout';
+import {Outfit, Paytone_One} from 'next/font/google';
 
-export default function Document() {
+const paytone = Paytone_One({
+    weight: ['400'],
+    style: ['normal'],
+    subsets: ['latin'],
+    display: 'swap',
+    variable: '--font-paytone',
+});
+
+const outfit = Outfit({
+    weight: ['400', '600', '700'],
+    style: ['normal'],
+    subsets: ['latin'],
+    display: 'swap',
+    variable: '--font-outfit',
+})
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <Html lang="en">
-      <Head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Paytone+One&display=swap"
-          rel="stylesheet"
-        />
-
+    <html lang="en" suppressHydrationWarning className={`${outfit.variable} ${paytone.variable}`}>
+      <head>
         <link href="/static/favicon.ico" rel="shortcut icon" />
         <link href="/static/site.webmanifest" rel="manifest" />
         <link
@@ -48,11 +64,10 @@ export default function Document() {
           content="max-snippet:-1, max-image-preview:large, max-video-preview:-1"
           name="robots"
         />
-      </Head>
+      </head>
       <body className="bg-white dark:bg-black text-white dark:text-black">
-        <Main />
-        <NextScript />
+        <ClientLayout>{children}</ClientLayout>
       </body>
-    </Html>
+    </html>
   );
 }

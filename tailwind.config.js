@@ -4,6 +4,7 @@ const { spacing, fontFamily } = require('tailwindcss/defaultTheme');
 module.exports = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
+    './app/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
   ],
   darkMode: 'class',
@@ -67,8 +68,8 @@ module.exports = {
         wave: 'wave 1.5s ease-in-out infinite',
       },
       fontFamily: {
-        paytone: ['Paytone One', 'sans-serif'],
-        sans: ['Outfit', 'sans-serif'],
+        paytone: ['var(--font-paytone)', 'sans-serif'],
+        sans: ['var(--font-outfit)', 'sans-serif'],
       },
     },
   },

@@ -1,23 +1,22 @@
-import type {NextApiRequest, NextApiResponse} from 'next';
-import {getNowPlaying} from 'lib/spotify';
-import { isEmpty } from 'lodash';
-export default async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse
-) {
+import { NextResponse } from "next/server";
+import {getNowPlaying} from "~/lib/spotify";
+import {isEmpty} from "lodash";
+
+// To handle a GET request to /api
+export async function GET(res:Request) {
     const response = await getNowPlaying();
 
     const isNotPlaying = response.status === 204 || response.status > 400;
 
     if (isNotPlaying) {
-        return res.status(200).json({isPlaying: false});
+        return NextResponse.json({isPlaying: false}, { status: 200 });
     }
 
 
     const song = await response.json();
 
     if (isEmpty(song)) {
-        return res.status(200).json({isPlaying: false});
+        return NextResponse.json({isPlaying: false}, { status: 200 });
     }
 
     const isPlaying = song.is_playing;
@@ -27,12 +26,12 @@ export default async function handler(
     const albumImageUrl = song.item.album.images[0].url;
     const songUrl = song.item.external_urls.spotify;
 
-    return res.status(200).json({
+    return NextResponse.json({
         album,
         albumImageUrl,
         artist,
         isPlaying,
         songUrl,
         title
-    });
+    }, { status: 200 });
 }

@@ -1,50 +1,14 @@
-import { useRouter } from 'next/router';
+'use client';
+
 import { useTheme } from 'next-themes';
 import dynamic from 'next/dynamic';
-import NextLink from 'next/link';
-import cn from 'classnames';
-import Seo from '~/components/SEO/seo';
 import MobileMenu from '~/components/MobileMenu';
 import { useIsMounted } from '~/lib/hooks/userIsMounted';
+import {NavItem} from "./NavItem";
 
 const Footer = dynamic(() => import('~/components/Layout/footer'), {
   ssr: false,
 });
-
-interface NavItemProps {
-  href: string;
-  text: string;
-  external?: boolean;
-}
-
-function NavItem({ href, text, external }: NavItemProps) {
-  const router = useRouter();
-  const isActive = router.asPath === href;
-
-  return (
-    <NextLink href={href} passHref={external}>
-      <a
-        {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
-        className={cn(
-          isActive
-            ? 'font-semibold text-gray-800 dark:text-white'
-            : 'font-normal text-gray-600 dark:text-gray-400',
-          'hidden group sm:inline-block p-1 sm:px-3 sm:py-2 duration-300 ease-in-out transition-all',
-        )}
-      >
-        <span
-          className={cn(
-            'capsize',
-            'bg-left-bottom bg-gradient-to-r from-dark-grey to-dark-black dark:from-white dark:to-beige',
-            'bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-500 ease-out',
-          )}
-        >
-          {text}
-        </span>
-      </a>
-    </NextLink>
-  );
-}
 
 export default function NavContainer(props: any) {
   const isMounted = useIsMounted();
@@ -54,14 +18,13 @@ export default function NavContainer(props: any) {
 
   return (
     <div className="min-h-screen bg-beige dark:bg-dark-black">
-      <Seo customMeta={customMeta} />
       <div className="flex flex-col justify-center px-8">
         <nav className="flex items-center justify-between w-full relative max-w-4xl border-gray-200 dark:border-gray-700 mx-auto pt-8 pb-8 sm:pb-[72px] text-gray-900 bg-beige dark:bg-dark-black bg-opacity-60 dark:text-beige">
           <a href="~/components/Layout/NavContainer#skip" className="skip-nav">
             Skip to content
           </a>
           <div className="ml-[-0.60rem]">
-            <MobileMenu />
+            {/*<MobileMenu />*/}
             <NavItem href="/" text="Home" />
             {/*<NavItem href="/timeline" text="Timeline" />*/}
             {/*<NavItem href="/projects" text="Work" />*/}

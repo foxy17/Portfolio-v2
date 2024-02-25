@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useRef } from 'react';
 import { VscGithubAlt } from 'react-icons/vsc';
 import { IconContext } from 'react-icons';
