@@ -1,3 +1,4 @@
+// cz.config.js
 /** @type {import('cz-git').CommitizenGitOptions} */
 module.exports = {
     alias: { fd: 'docs: fix typos' },
@@ -60,4 +61,4 @@ module.exports = {
     defaultIssues: '',
     defaultScope: '',
     defaultSubject: ''
-} 
+}
