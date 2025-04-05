@@ -15,7 +15,7 @@ const CurrentCompany = ({ name }: CurrentCompanyProps) => {
     <h3
       data-text={name}
       className={cn(
-        'text-flat-purple dark:text-flat-yellow before:decoration-flat-purple before:dark:decoration-flat-yellow',
+        'text-flat-purple dark:text-flat-yellow before:decoration-flat-purple dark:before:decoration-flat-yellow',
         'relative overflow-hidden pb-2 before:text-transparent hover:before:animate-wave',
         'before:decoration-wavy before:absolute before:whitespace-nowrap max-w-fit',
         'before:content-[attr(data-text)attr(data-text)] before:underline before:underline-offset-4',

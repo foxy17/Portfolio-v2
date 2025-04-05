@@ -13,9 +13,9 @@
     "commit": "cz"
   },
   "devDependencies": {
-    "turbo": "^1.13.0",
     "commitizen": "^4.3.0",
-    "cz-git": "^1.8.0"
+    "cz-git": "^1.8.0",
+    "turbo": "^1.13.0"
   },
   "config": {
     "commitizen": {
@@ -24,4 +24,4 @@
     }
   },
   "packageManager": "yarn@1.22.19"
-} 
+}

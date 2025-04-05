@@ -27,7 +27,7 @@ export function NavItem({ href, text, external }: NavItemProps) {
       <span
         className={cn(
           'capsize',
-          'bg-left-bottom bg-gradient-to-r from-dark-grey to-dark-black dark:from-white dark:to-beige',
+          'bg-left-bottom bg-linear-to-r from-dark-grey to-dark-black dark:from-white dark:to-beige',
           'bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-500 ease-out',
         )}
       >
