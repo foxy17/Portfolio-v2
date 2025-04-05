@@ -18,7 +18,6 @@ const rewrites = async () => [
 
 module.exports = {
   rewrites,
-  swcMinify: true,
   reactStrictMode: true,
   experimental: {
   },
