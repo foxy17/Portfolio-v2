@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -14,11 +14,11 @@
     "classnames": "^2.5.1",
     "lodash": "^4.17.21",
     "motion": "^10.17.0",
-    "next": "^14.1.0",
+    "next": "15.2.4",
     "next-seo": "^6.5.0",
     "next-themes": "^0.2.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
     "react-icons": "^5.0.1",
     "rough-notation": "^0.5.1",
     "swr": "^2.2.5"
@@ -27,11 +27,11 @@
     "@tailwindcss/typography": "^0.5.10",
     "@types/lodash": "^4.14.202",
     "@types/node": "20.11.20",
-    "@types/react": "18.2.58",
+    "@types/react": "19.1.0",
     "content-security-policy-builder": "^2.1.1",
     "cz-git": "^1.8.0",
     "eslint": "8.57.0",
-    "eslint-config-next": "^14.1.0",
+    "eslint-config-next": "15.2.4",
     "eslint-config-prettier": "^9.1.0",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
@@ -50,5 +50,8 @@
       "eslint --fix",
       "git add"
     ]
+  },
+  "resolutions": {
+    "@types/react": "19.1.0"
   }
 }
