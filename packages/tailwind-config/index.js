@@ -1,5 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 const config = {
+  content: [
+    './src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}',
+    '../../packages/ui/src/**/*.{js,ts,jsx,tsx}',
+    'ui/**/*.{js,ts,jsx,tsx}'
+  ],
   theme: {
     extend: {
       colors: {

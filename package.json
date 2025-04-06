@@ -12,6 +12,8 @@
     "start": "turbo run start",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
+    "preview": "turbo run preview",
+    "build:node": "turbo run build:node",
     "commit": "cz"
   },
   "devDependencies": {
