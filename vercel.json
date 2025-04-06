@@ -1,4 +1,8 @@
 {
-  "cleanUrls": true,
-  "trailingSlash": false
-}
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "buildCommand": "turbo run build",
+  "ignoreCommand": "turbo run lint",
+  "installCommand": "yarn install",
+  "outputDirectory": "./packages/landing/.next"
+} 

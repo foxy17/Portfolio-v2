@@ -1,0 +1,8 @@
+{
+  "buildCommand": "cd ../.. && npx turbo run build --filter=@portfolio/blog",
+  "outputDirectory": "dist",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "installCommand": "cd ../.. && yarn install",
+  "framework": "astro"
+} 
