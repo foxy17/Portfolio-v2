@@ -1,7 +1,7 @@
 import { baseUrl } from '~/config/constants';
-import {Metadata} from "next";
+import { Metadata } from 'next';
 
-const siteMetaDeta: Metadata  = {
+const siteMetaDeta: Metadata = {
   title: 'Arnav Chauhan | Product Engineer | SDE-3',
   description:
     'Arnav is a SDE-3 Front-end developer, JavaScript enthusiast, who specializes in building cross-platform digital experiences. Currently exploring the world of web3, interactive animations, and user experience.',
@@ -25,8 +25,8 @@ const siteMetaDeta: Metadata  = {
     creator: '@arnav_sde',
     site: baseUrl + '/',
     card: 'summary_large_image',
-    siteId:'2336244612',
-    creatorId:'2336244612',
+    siteId: '2336244612',
+    creatorId: '2336244612',
   },
 };
 

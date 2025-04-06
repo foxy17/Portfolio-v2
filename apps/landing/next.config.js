@@ -2,12 +2,12 @@
 const rewrites = async () => [
   {
     destination: 'https://cdn.splitbee.io/sb.js',
-    source: '/sb.js'
+    source: '/sb.js',
   },
   {
     destination: 'https://hive.splitbee.io/:slug',
-    source: '/sb-api/:slug'
-  }
+    source: '/sb-api/:slug',
+  },
 ];
 
 const cspHeader = `
@@ -65,8 +65,7 @@ const securityHeaders = [
 module.exports = {
   rewrites,
   reactStrictMode: true,
-  experimental: {
-  },
+  experimental: {},
   async headers() {
     return [
       {

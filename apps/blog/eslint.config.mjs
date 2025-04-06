@@ -1,12 +1,10 @@
 import { FlatCompat } from '@eslint/eslintrc'
-import js from '@eslint/js'
 
 const compat = new FlatCompat({
   baseDirectory: import.meta.dirname,
 })
 
 const eslintConfig = [
-  js.configs.recommended,
   ...compat.config({
     extends: ['plugin:astro/recommended'],
     overrides: [
@@ -23,6 +21,9 @@ const eslintConfig = [
       },
     ],
   }),
+  {
+    ignores: ['**/node_modules/**', '**/dist/**', '**/build/**', '**/*.d.ts']
+  }
 ]
 
 export default eslintConfig 

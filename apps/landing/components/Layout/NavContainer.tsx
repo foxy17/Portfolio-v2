@@ -4,7 +4,7 @@ import { useTheme } from 'next-themes';
 import dynamic from 'next/dynamic';
 import MobileMenu from '~/components/MobileMenu';
 import { useIsMounted } from '~/lib/hooks/userIsMounted';
-import {NavItem} from "./NavItem";
+import { NavItem } from './NavItem';
 
 const Footer = dynamic(() => import('~/components/Layout/footer'), {
   ssr: false,

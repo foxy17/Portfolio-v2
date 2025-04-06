@@ -1,21 +1,21 @@
 import ClientLayout from './ClientLayout';
-import {Outfit, Paytone_One} from 'next/font/google';
+import { Outfit, Paytone_One } from 'next/font/google';
 
 const paytone = Paytone_One({
-    weight: ['400'],
-    style: ['normal'],
-    subsets: ['latin'],
-    display: 'swap',
-    variable: '--font-paytone',
+  weight: ['400'],
+  style: ['normal'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-paytone',
 });
 
 const outfit = Outfit({
-    weight: ['400', '600', '700'],
-    style: ['normal'],
-    subsets: ['latin'],
-    display: 'swap',
-    variable: '--font-outfit',
-})
+  weight: ['400', '600', '700'],
+  style: ['normal'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-outfit',
+});
 
 export default function RootLayout({
   children,
@@ -23,7 +23,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${outfit.variable} ${paytone.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${outfit.variable} ${paytone.variable}`}
+    >
       <head>
         <link href="/static/favicon.ico" rel="shortcut icon" />
         <link href="/static/site.webmanifest" rel="manifest" />

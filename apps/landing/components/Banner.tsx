@@ -30,12 +30,14 @@ const ShortDescription = ({ description, name }: DescriptionProps) => {
   return (
     <>
       <span className="text-xl sm:text-2xl sm:flex sm:flex-row mb-4">
-        <h3 className="text-gray-700 dark:text-gray-200">Senior Frontend developer at &nbsp; </h3>
+        <h3 className="text-gray-700 dark:text-gray-200">
+          Senior Frontend developer at &nbsp;{' '}
+        </h3>
         <a
           href="https://www.clootrack.com/"
           target="_blank"
           rel="noopener noreferrer"
-          className='max-w-min'
+          className="max-w-min"
         >
           <CurrentCompany name={name} />
         </a>

@@ -7,7 +7,7 @@ import { RiLinkedinLine, RiTwitterLine } from 'react-icons/ri';
 import styles from './SocialLine.module.css';
 import { getElementHeightInView } from '~/lib/getElementHeightInView';
 import { useIsMounted } from '~/lib/hooks/userIsMounted';
-import cn from "classnames";
+import cn from 'classnames';
 
 interface SocialLinkProps {
   icon: React.ReactNode;
