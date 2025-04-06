@@ -1,21 +1,11 @@
 ---
-import { type CollectionEntry, getCollection } from 'astro:content';
-import BlogPost from '../../layouts/BlogPost.astro';
-import { render } from 'astro:content';
+// Redirect from /blog/[slug] to /[slug]
+export const prerender = false;
 
-export async function getStaticPaths() {
-	const posts = await getCollection('blog');
-	return posts.map((post) => ({
-		params: { slug: post.id },
-		props: post,
-	}));
-}
-type Props = CollectionEntry<'blog'>;
-
-const post = Astro.props;
-const { Content } = await render(post);
+const { slug } = Astro.params;
 ---
 
-<BlogPost {...post.data}>
-	<Content />
-</BlogPost>
+<meta http-equiv="refresh" content={`0;url=/${slug}/`} />
+<script define:vars={{ slug }}>
+  window.location.href = `/${slug}/`;
+</script>
