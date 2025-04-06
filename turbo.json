@@ -18,6 +18,10 @@
     "preview": {
       "cache": false,
       "persistent": true
+    },
+    "astro": {
+      "cache": false,
+      "persistent": true
     }
   }
 } 
