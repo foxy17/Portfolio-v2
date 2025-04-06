@@ -3,7 +3,7 @@
 import cn from 'classnames';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import styles from 'styles/mobile-menu.module.css';
+import styles from './mobile-menu.module.css';
 import useDelayedRender from '~/lib/hooks/useDelayedRender';
 
 export default function MobileMenu() {

@@ -46,7 +46,8 @@
 }
 
 .menuRendered li {
-  @apply border-gray-200 dark:border-gray-600 w-full;
+  border-color: var(--color-gray-200, currentcolor);
+  width: 100%;
   transform: translateX(0);
   opacity: 1;
 }

@@ -2,7 +2,7 @@
 
 import { useTheme } from 'next-themes';
 import dynamic from 'next/dynamic';
-import MobileMenu from '~/components/MobileMenu';
+import MobileMenu from '~/src/components/MobileMenu/MobileMenu';
 import { useIsMounted } from '~/lib/hooks/userIsMounted';
 import { NavItem } from './NavItem';
 
@@ -24,7 +24,7 @@ export default function NavContainer(props: any) {
             Skip to content
           </a>
           <div className="ml-[-0.60rem]">
-            {/*<MobileMenu />*/}
+            <MobileMenu />
             <NavItem href="/" text="Home" />
             {/*<NavItem href="/timeline" text="Timeline" />*/}
             {/*<NavItem href="/projects" text="Work" />*/}

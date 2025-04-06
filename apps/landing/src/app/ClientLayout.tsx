@@ -1,6 +1,6 @@
 'use client';
 
-import '../../styles/globals.css';
+import '../styles/globals.css';
 import React, { useEffect } from 'react';
 import splitbee from '@splitbee/web';
 import { ThemeProvider } from 'next-themes';

@@ -30,7 +30,7 @@ export default function BlogPostCard({
         <ExternalLink href={url}>
           <div className="md:h-48 flex flex-col justify-between h-full bg-beige dark:bg-dark-black rounded-lg p-4">
             <div className="flex flex-col md:flex-row justify-between md:h-32">
-              <h4 className="line-clamp-3 text-lg font-medium mb-6 sm:mb-10 w-full text-gray-900 dark:text-gray-100 tracking-tight">
+              <h4 className="line-clamp-3 text-lg font-medium mb-6 sm:mb-10 w-full text-gray-900! dark:text-gray-100! tracking-tight">
                 {title}
               </h4>
             </div>
