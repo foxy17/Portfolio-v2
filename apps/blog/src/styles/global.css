@@ -32,34 +32,6 @@
     @apply w-[720px] max-w-[calc(100%-2em)] mx-auto py-12 px-4;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply m-0 mb-2 text-gray-900 leading-tight;
-  }
-
-  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
-    @apply text-beige;
-  }
-
-  h1 {
-    @apply text-[3.052em];
-  }
-
-  h2 {
-    @apply text-[2.441em];
-  }
-
-  h3 {
-    @apply text-[1.953em];
-  }
-
-  h4 {
-    @apply text-[1.563em];
-  }
-
-  h5 {
-    @apply text-[1.25em];
-  }
-
   strong, b {
     @apply font-bold;
   }
@@ -68,52 +40,8 @@
     @apply text-flat-blue hover:text-flat-blue;
   }
 
-  p {
-    @apply mb-4;
-  }
-
   .prose p {
-    @apply mb-8;
-  }
-
-  textarea {
-    @apply w-full text-base;
-  }
-
-  input {
-    @apply text-base;
-  }
-
-  table {
-    @apply w-full;
-  }
-
-  img {
-    @apply max-w-full h-auto rounded-lg;
-  }
-
-  code {
-    @apply py-0.5 px-1.5 bg-gray-200 rounded;
-  }
-
-  .dark code {
-    @apply bg-dark-grey text-beige;
-  }
-
-  pre {
-    @apply p-6 rounded-lg;
-  }
-
-  pre > code {
-    all: unset;
-  }
-
-  blockquote {
-    @apply border-l-4 border-flat-blue pl-5 m-0 text-[1.333em];
-  }
-
-  hr {
-    @apply border-0 border-t border-gray-200;
+    @apply mb-4 tracking-wide text-lg;
   }
 
   @media (max-width: 720px) {
