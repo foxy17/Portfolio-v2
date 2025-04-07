@@ -1,3 +1,0 @@
-@import 'tailwindcss';
-@import '@portfolio/tailwind-config/components.css';
-@source "../../../../packages/ui/**/*.{ts,tsx}";

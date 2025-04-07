@@ -48,10 +48,6 @@ const config = {
   plugins: [require('@tailwindcss/typography')],
 };
 
-// Export for ESM
-export default config;
-
-// Export for CommonJS
 if (typeof module !== 'undefined') {
   module.exports = config;
 } 

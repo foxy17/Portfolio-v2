@@ -24,7 +24,7 @@ if (process.argv[3] === "--node" || process.argv[4] === "--node") {
 export default defineConfig({
   site: 'https://blog.carnav.in',
   integrations: [mdx(), sitemap(), react()],
-  output: 'server',
+  output: 'static',
   vite: {
     plugins: [tailwindcss()],
   },
