@@ -7,18 +7,26 @@ const { href, class: className, ...props } = Astro.props;
 const pathname = Astro.url.pathname.replace(import.meta.env.BASE_URL, '');
 const subpath = pathname.match(/[^\/]+/g);
 const isActive = href === pathname || href === '/' + (subpath?.[0] || '');
+const baseClasses = 'hidden group sm:inline-block p-1 sm:px-3 sm:py-2 duration-300 ease-in-out transition-all';
+const activeClasses = 'font-semibold text-gray-800 dark:text-white';
+const inactiveClasses = 'font-normal text-gray-600 dark:text-gray-400';
 ---
 
-<a href={href} class:list={[className, { active: isActive }]} {...props}>
-	<slot />
+<a
+  href={href}
+  class:list={[
+    baseClasses,
+    isActive ? activeClasses : inactiveClasses,
+    className,
+  ]}
+  {...props}
+>
+  <span class="capsize bg-left-bottom bg-gradient-to-r from-dark-grey to-dark-black dark:from-white dark:to-beige bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-500 ease-out">
+    <slot />
+  </span>
 </a>
 <style>
-	a {
-		display: inline-block;
-		text-decoration: none;
-	}
-	a.active {
-		font-weight: bolder;
-		text-decoration: underline;
-	}
+        a {
+                @apply text-current no-underline;
+        }
 </style>

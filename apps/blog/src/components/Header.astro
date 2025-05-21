@@ -6,55 +6,26 @@ import { SITE_TITLE } from '../consts';
 ---
 
 <header class="bg-beige dark:bg-dark-black text-gray-700 dark:text-beige">
-	<nav>
-		<div class="internal-links">
-			<HeaderLink href="/">Blog</HeaderLink>
-			<HeaderLink href="/about">About</HeaderLink>
-		</div>
-		<div class="flex items-center">
-			<ThemeToggle />
-		</div>
-	</nav>
+  <div class="flex flex-col justify-center px-8">
+    <nav class="flex items-center justify-between w-full relative max-w-4xl border-gray-200 dark:border-gray-700 mx-auto pt-8 pb-8 sm:pb-[72px] text-gray-900 bg-beige bg-opacity-60 dark:bg-dark-black dark:text-beige">
+      <a href="#skip" class="skip-nav">Skip to content</a>
+      <div class="ml-[-0.60rem]">
+        <HeaderLink href="/">Blog</HeaderLink>
+        <HeaderLink href="https://www.carnav.in/" target="_blank" rel="noopener noreferrer">About</HeaderLink>
+      </div>
+      <div class="flex items-center">
+        <ThemeToggle />
+      </div>
+    </nav>
+  </div>
 </header>
 <style>
-	header {
-		margin: 0;
-		padding: 0 1em;
-	}
-	h2 {
-		margin: 0;
-		font-size: 1em;
-	}
+  header {
+    margin: 0;
+    padding: 0;
+  }
 
-	h2 a,
-	h2 a.active {
-		text-decoration: none;
-	}
-	nav {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-	nav a {
-		padding: 1em 0.5em;
-		color: var(--black);
-		border-bottom: 4px solid transparent;
-		text-decoration: none;
-	}
-	.dark nav a {
-		color: var(--color-flat-blue);
-	}
-	nav a.active {
-		text-decoration: none;
-		border-bottom-color: var(--color-dark-black);
-	}
-	.social-links,
-	.social-links a {
-		display: flex;
-	}
-	@media (max-width: 720px) {
-		.social-links {
-			display: none;
-		}
-	}
+  .skip-nav {
+    @apply absolute px-4 py-3 transition-transform duration-200 transform -translate-y-12 -left-1/4 focus:top-4 focus:translate-y-3 -top-8;
+  }
 </style>
