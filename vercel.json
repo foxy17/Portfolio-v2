@@ -4,5 +4,5 @@
   "buildCommand": "turbo run build",
   "ignoreCommand": "turbo run lint",
   "installCommand": "yarn install",
-  "outputDirectory": "./apps/landing/.next"
+  "outputDirectory": "./packages/landing/.next"
 } 
