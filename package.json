@@ -12,12 +12,15 @@
     "start": "turbo run start",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
+    "preview": "turbo run preview",
+    "build:node": "turbo run build:node",
+    "dev-blog": "turbo run dev-blog",
     "commit": "cz"
   },
   "devDependencies": {
     "commitizen": "^4.3.0",
     "cz-git": "^1.8.0",
-    "turbo": "^1.13.0"
+    "turbo": "^2.5.0"
   },
   "config": {
     "commitizen": {

@@ -1,5 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 const config = {
+  content: [
+    './src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}',
+    '../../packages/ui/src/**/*.{js,ts,jsx,tsx}',
+    'ui/**/*.{js,ts,jsx,tsx}'
+  ],
   theme: {
     extend: {
       colors: {
@@ -7,8 +12,8 @@ const config = {
         'flat-pink': '#f38ba3',
         'flat-green': '#0ba95b',
         beige: '#f9f4da',
-        'beige.200': 'rgba(249,244,218,0.95)',
-        'beige.500': 'rgba(249,244,218,0.9)',
+        'beige-200': 'rgba(249,244,218,0.95)',
+        'beige-500': 'rgba(249,244,218,0.9)',
         'flat-blue': '#12b5e5',
         'flat-orange': '#fc7428',
         'flat-red': '#ed203d',
@@ -38,15 +43,12 @@ const config = {
         'card': '8px 8px rgba(255,255,255,1)',
         'card-dark': '8px 8px rgba(0, 0, 0,1)'
       },
+      
     },
   },
   plugins: [require('@tailwindcss/typography')],
 };
 
-// Export for ESM
-export default config;
-
-// Export for CommonJS
 if (typeof module !== 'undefined') {
   module.exports = config;
 } 
