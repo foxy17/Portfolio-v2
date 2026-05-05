@@ -1,5 +1,6 @@
 import ClientLayout from './ClientLayout';
 import { Outfit, Paytone_One } from 'next/font/google';
+import { themeInitScript } from 'ui';
 
 const paytone = Paytone_One({
   weight: ['400'],
@@ -29,6 +30,7 @@ export default function RootLayout({
       className={`${outfit.variable} ${paytone.variable}`}
     >
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <link href="/static/favicon.ico" rel="shortcut icon" />
         <link href="/static/site.webmanifest" rel="manifest" />
         <link

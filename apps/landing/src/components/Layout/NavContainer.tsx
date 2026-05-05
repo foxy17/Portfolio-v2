@@ -1,6 +1,6 @@
 'use client';
 
-import { useTheme } from 'next-themes';
+import { useTheme } from '~/lib/hooks/useTheme';
 import dynamic from 'next/dynamic';
 import MobileMenu from '~/src/components/MobileMenu/MobileMenu';
 import { useIsMounted } from '~/lib/hooks/userIsMounted';
@@ -13,12 +13,12 @@ const Footer = dynamic(() => import('~/components/Layout/footer'), {
 
 export default function NavContainer(props: any) {
   const isMounted = useIsMounted();
-  const { resolvedTheme, setTheme } = useTheme();
+  const { resolvedTheme, toggleTheme } = useTheme();
 
   const { children, ...customMeta } = props;
 
   const handleToggle = () => {
-    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+    toggleTheme();
   };
 
   return (

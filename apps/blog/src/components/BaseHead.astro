@@ -27,14 +27,20 @@ const { title, description, image = '/blog-placeholder-1.jpg' } = Astro.props;
 />
 <meta name="generator" content={Astro.generator} />
 
-<!-- Theme script -->
+<!-- Theme script: shared cookie-based theme across blog + landing -->
 <script is:inline>
-  // On page load or when changing themes, best to add inline in `head` to avoid FOUC
-  if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    document.documentElement.classList.add('dark');
-  } else {
-    document.documentElement.classList.remove('dark');
-  }
+  (function () {
+    try {
+      var m = document.cookie.match(/(?:^|; )theme=(dark|light)/);
+      var t = m
+        ? m[1]
+        : window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
+      if (t === 'dark') document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+    } catch (e) {}
+  })();
 </script>
 
 <!-- Font preloads -->
