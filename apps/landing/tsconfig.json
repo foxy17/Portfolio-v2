@@ -13,10 +13,10 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "baseUrl": ".",
     "paths": {
@@ -24,7 +24,9 @@
         "./*",
         "./src/*"
       ],
-      "ui": ["../../packages/ui"]
+      "ui": [
+        "../../packages/ui"
+      ]
     },
     "plugins": [
       {
@@ -37,7 +39,8 @@
     "**/*.ts",
     "**/*.tsx",
     "config/cspHeaders.js",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

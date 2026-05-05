@@ -2,7 +2,7 @@
 
 import useSWR from 'swr';
 import { useEffect } from 'react';
-import { animate } from 'motion';
+import { animate } from 'motion/mini';
 
 import fetcher from '~/lib/fetcher';
 import { NowPlayingSong } from '~/lib/types';
@@ -21,7 +21,7 @@ function AnimatedBars() {
       {
         duration: 1.0,
         repeat: Infinity,
-        easing: ['ease-in-out'],
+        ease: 'easeInOut',
       },
     );
     animate(
@@ -37,7 +37,7 @@ function AnimatedBars() {
         delay: 0.2,
         duration: 1.5,
         repeat: Infinity,
-        easing: ['ease-in-out'],
+        ease: 'easeInOut',
       },
     );
     animate(
@@ -53,7 +53,7 @@ function AnimatedBars() {
         delay: 0.3,
         duration: 1.5,
         repeat: Infinity,
-        easing: ['ease-in-out'],
+        ease: 'easeInOut',
       },
     );
   }, []);
