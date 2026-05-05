@@ -12,6 +12,7 @@ import {
   applyThemeClass,
   readThemeCookie,
   resolveInitialTheme,
+  subscribeToThemeCookie,
   writeThemeCookie,
   type Theme,
 } from 'ui';
@@ -32,6 +33,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const initial = readThemeCookie() ?? resolveInitialTheme();
     setThemeState(initial);
     applyThemeClass(initial);
+
+    return subscribeToThemeCookie((next) => {
+      applyThemeClass(next);
+      setThemeState(next);
+    });
   }, []);
 
   const setTheme = useCallback((next: Theme) => {

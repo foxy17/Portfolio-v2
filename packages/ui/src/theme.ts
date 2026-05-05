@@ -35,3 +35,38 @@ export function resolveInitialTheme(): Theme {
 }
 
 export const themeInitScript = `(function(){try{var m=document.cookie.match(/(?:^|; )theme=(dark|light)/);var t=m?m[1]:(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');if(t==='dark')document.documentElement.classList.add('dark');else document.documentElement.classList.remove('dark');}catch(e){}})();`;
+
+export interface ThemeSubscribeOptions {
+  pollMs?: number;
+}
+
+export function subscribeToThemeCookie(
+  onChange: (theme: Theme) => void,
+  options: ThemeSubscribeOptions = {},
+): () => void {
+  if (typeof window === 'undefined') return () => {};
+  const pollMs = options.pollMs ?? 2000;
+  let last = readThemeCookie();
+
+  const check = () => {
+    const next = readThemeCookie();
+    if (next && next !== last) {
+      last = next;
+      onChange(next);
+    }
+  };
+
+  const onVisibility = () => {
+    if (document.visibilityState === 'visible') check();
+  };
+
+  const interval = window.setInterval(check, pollMs);
+  document.addEventListener('visibilitychange', onVisibility);
+  window.addEventListener('focus', check);
+
+  return () => {
+    window.clearInterval(interval);
+    document.removeEventListener('visibilitychange', onVisibility);
+    window.removeEventListener('focus', check);
+  };
+}

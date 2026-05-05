@@ -3,6 +3,7 @@ import {
   ThemeToggle,
   applyThemeClass,
   readThemeCookie,
+  subscribeToThemeCookie,
   writeThemeCookie,
 } from 'ui';
 
@@ -11,6 +12,11 @@ export default function ThemeToggleWrapper() {
 
   useEffect(() => {
     setIsDark(document.documentElement.classList.contains('dark'));
+
+    return subscribeToThemeCookie((next) => {
+      applyThemeClass(next);
+      setIsDark(next === 'dark');
+    });
   }, []);
 
   const handleToggle = () => {
