@@ -27,8 +27,8 @@
   },
   "devDependencies": {
     "@portfolio/shared-config": "*",
-    "@tailwindcss/postcss": "^4.1.3",
-    "@tailwindcss/typography": "^0.5.10",
+    "@tailwindcss/postcss": "^4.2.4",
+    "@tailwindcss/typography": "^0.5.19",
     "@types/lodash": "^4.14.202",
     "@types/node": "20.11.20",
     "@types/react": "19.1.0",
