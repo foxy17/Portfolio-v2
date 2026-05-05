@@ -22,6 +22,10 @@
     "cz-git": "^1.8.0",
     "turbo": "^2.9.9"
   },
+  "resolutions": {
+    "@types/react": "19.1.0",
+    "@types/react-dom": "19.1.0"
+  },
   "config": {
     "commitizen": {
       "path": "node_modules/cz-git",
