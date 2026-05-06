@@ -1,5 +1,92 @@
 ---
-import ThemeToggleWrapper from './ThemeToggleWrapper';
+// Pure-Astro theme toggle — no React, no island hydration.
+// Reads/writes the shared `theme` cookie used across blog + landing.
 ---
-<ThemeToggleWrapper client:only="react" />
 
+<button
+	type="button"
+	id="theme-toggle"
+	aria-label="Toggle dark mode"
+	class="w-9 h-9 cursor-pointer rounded-lg flex items-center justify-center hover:ring-2 ring-gray-300 transition-all bg-gray-200 dark:bg-gray-600"
+>
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		class="w-5 h-5 text-gray-800 dark:text-gray-200 hidden"
+		data-icon="sun"
+		aria-hidden="true"
+	>
+		<path
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			stroke-width="2"
+			d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+		></path>
+	</svg>
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		class="w-5 h-5 text-gray-800 dark:text-gray-200"
+		data-icon="moon"
+		aria-hidden="true"
+	>
+		<path
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			stroke-width="2"
+			d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+		></path>
+	</svg>
+</button>
+
+<script>
+	import {
+		applyThemeClass,
+		readThemeCookie,
+		subscribeToThemeCookie,
+		writeThemeCookie,
+	} from 'ui';
+
+	function syncIcons(isDark: boolean) {
+		document
+			.querySelectorAll<HTMLElement>('[data-icon="sun"]')
+			.forEach((el) => el.classList.toggle('hidden', !isDark));
+		document
+			.querySelectorAll<HTMLElement>('[data-icon="moon"]')
+			.forEach((el) => el.classList.toggle('hidden', isDark));
+	}
+
+	let unsubscribe: (() => void) | null = null;
+
+	function init() {
+		const isDark = document.documentElement.classList.contains('dark');
+		syncIcons(isDark);
+
+		document
+			.querySelectorAll<HTMLButtonElement>('#theme-toggle')
+			.forEach((btn) => {
+				btn.addEventListener('click', () => {
+					const current = readThemeCookie();
+					const nowDark = document.documentElement.classList.contains('dark');
+					const next = current === 'dark' || nowDark ? 'light' : 'dark';
+					applyThemeClass(next);
+					writeThemeCookie(next);
+					syncIcons(next === 'dark');
+				});
+			});
+
+		unsubscribe?.();
+		unsubscribe = subscribeToThemeCookie((next) => {
+			applyThemeClass(next);
+			syncIcons(next === 'dark');
+		});
+	}
+
+	init();
+	// Re-init after Astro view transitions swap the DOM.
+	document.addEventListener('astro:page-load', init);
+</script>

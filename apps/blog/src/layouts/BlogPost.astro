@@ -39,7 +39,20 @@ const socialImage = ogImage ?? heroImage;
                 <main id="skip" class="w-[calc(100%-2em)] max-w-full m-0">
 			<article>
 				<div class="w-full">
-					{heroImage && <img width={1020} height={510} src={heroImage} alt="" class="block mx-auto rounded-xl shadow-card dark:shadow-card-dark" />}
+					{
+						heroImage && (
+							<img
+								width={1020}
+								height={510}
+								src={heroImage}
+								alt={`Cover image for ${title}`}
+								loading="eager"
+								fetchpriority="high"
+								decoding="async"
+								class="block mx-auto rounded-xl shadow-card dark:shadow-card-dark"
+							/>
+						)
+					}
 				</div>
 				<div class="prose dark:prose-invert w-[720px] max-w-[calc(100%-2em)] mx-auto p-4 text-gray-700 dark:text-beige">
 					<div class="mb-4 py-4 text-center">

@@ -28,11 +28,14 @@ const posts = (
 						posts.map((post, index) => (
 							<li class={`${index === 0 ? 'w-full mb-4 text-center' : 'w-[calc(50%-1rem)]'}`}>
 								<a href={`/${post.id}/`} class="block">
-									<img 
-										width={720} 
-										height={360} 
-										src={post.data.heroImage} 
-										alt="" 
+									<img
+										width={720}
+										height={360}
+										src={post.data.heroImage}
+										alt={`Cover image for ${post.data.title}`}
+										loading={index === 0 ? 'eager' : 'lazy'}
+										fetchpriority={index === 0 ? 'high' : 'low'}
+										decoding="async"
 										class={`${index === 0 ? 'w-full' : ''} mb-2 rounded-xl transition-all duration-200 ease-in-out hover:shadow-card dark:hover:shadow-card-dark`}
 									/>
 									<h4 class="title m-0 text-gray-900 dark:text-beige leading-none transition-colors duration-200 ease-in-out hover:text-flat-blue dark:hover:text-flat-blue text-[${index === 0 ? '2.369rem' : 'inherit'}]">

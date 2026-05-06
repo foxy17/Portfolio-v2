@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 import { SITE_TITLE, SITE_AUTHOR } from '../consts';
 import JsonLd from './JsonLd.astro';
 
@@ -43,6 +44,8 @@ const imageURL = new URL(image, Astro.site ?? Astro.url).toString();
 />
 <meta name="generator" content={Astro.generator} />
 
+<ClientRouter />
+
 <!-- Robots: index everything, allow large image previews for AI Overviews -->
 <meta
 	name="robots"
@@ -65,14 +68,20 @@ const imageURL = new URL(image, Astro.site ?? Astro.url).toString();
   })();
 </script>
 
-<!-- Font preloads -->
-<link rel="preload" href="/fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin />
-<link rel="preload" href="/fonts/atkinson-bold.woff" as="font" type="font/woff" crossorigin />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<!-- Font preloads (Atkinson Hyperlegible, self-hosted) -->
 <link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap"
+	rel="preload"
+	href="/fonts/atkinson-regular.woff"
+	as="font"
+	type="font/woff"
+	crossorigin
+/>
+<link
+	rel="preload"
+	href="/fonts/atkinson-bold.woff"
+	as="font"
+	type="font/woff"
+	crossorigin
 />
 
 <!-- Canonical URL -->

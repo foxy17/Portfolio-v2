@@ -48,6 +48,13 @@ export default defineConfig({
     keystatic(),
   ],
   output: 'static',
+  prefetch: {
+    prefetchAll: true,
+    defaultStrategy: 'viewport',
+  },
+  image: {
+    service: { entrypoint: 'astro/assets/services/sharp' },
+  },
   vite: {
     plugins: [tailwindcss()],
   },
