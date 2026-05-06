@@ -3,6 +3,8 @@ title: 'Why everyone is talking about Astro and Island Architecture'
 description: 'A 2026 refresh of the case for Astro: zero-JS by default, partial hydration, and the island architecture pattern that makes content sites fast again.'
 pubDate: '2026-05-05'
 heroImage: '/blog-placeholder-3.jpg'
+tags: ['astro', 'web-performance', 'frontend', 'island-architecture']
+category: 'engineering'
 ---
 
 I first wrote a version of this post back in 2022 when Astro was new and most people building portfolio sites still reached for Next.js out of habit. Four years on, Astro has shipped six major versions, the Vercel team has stopped recommending Edge runtimes, and "ship less JavaScript" has gone from a niche opinion to platform default. Time for a refresh.

@@ -37,6 +37,37 @@ export default config({
 					directory: 'public/heroes',
 					publicPath: '/heroes/',
 				}),
+				ogImage: fields.image({
+					label: 'OG image override',
+					description:
+						'Optional. Custom social card image (1200×630). Falls back to hero image.',
+					directory: 'public/og',
+					publicPath: '/og/',
+				}),
+				tags: fields.array(fields.text({ label: 'Tag' }), {
+					label: 'Tags',
+					itemLabel: (props) => props.value,
+				}),
+				category: fields.select({
+					label: 'Category',
+					options: [
+						{ label: '—', value: '' },
+						{ label: 'Engineering', value: 'engineering' },
+						{ label: 'Notes', value: 'notes' },
+						{ label: 'Essays', value: 'essays' },
+						{ label: 'Links', value: 'links' },
+					],
+					defaultValue: '',
+				}),
+				author: fields.text({
+					label: 'Author',
+					defaultValue: 'Arnav Chauhan',
+				}),
+				draft: fields.checkbox({
+					label: 'Draft',
+					description: 'Drafts are excluded from production builds.',
+					defaultValue: false,
+				}),
 				content: fields.markdoc({
 					label: 'Content',
 					extension: 'md',

@@ -1,0 +1,58 @@
+# https://blog.carnav.in/robots.txt
+# Default: allow all well-behaved crawlers.
+User-agent: *
+Allow: /
+Disallow: /keystatic
+Disallow: /api/
+
+# --- AI training crawlers (block) ---
+# These bots scrape content to train models. Blocked to keep training opt-out.
+User-agent: GPTBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: cohere-ai
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: FacebookBot
+Disallow: /
+
+# --- AI retrieval / search crawlers (allow) ---
+# These bots fetch content to answer user queries with citations.
+# Keeping them allowed lets posts surface in AI search results.
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: https://blog.carnav.in/sitemap-index.xml
