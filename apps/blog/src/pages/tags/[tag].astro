@@ -1,0 +1,79 @@
+---
+import { type CollectionEntry, getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import { SITE_TITLE } from '../../consts';
+
+export async function getStaticPaths() {
+	const posts = await getCollection('blog', ({ data }) =>
+		import.meta.env.PROD ? !data.draft : true,
+	);
+	const tagSet = new Set<string>();
+	for (const post of posts) {
+		for (const tag of post.data.tags ?? []) tagSet.add(tag);
+	}
+	return [...tagSet].map((tag) => ({
+		params: { tag },
+		props: {
+			tag,
+			posts: posts
+				.filter((p) => (p.data.tags ?? []).includes(tag))
+				.sort(
+					(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+				),
+		},
+	}));
+}
+
+interface Props {
+	tag: string;
+	posts: CollectionEntry<'blog'>[];
+}
+
+const { tag, posts } = Astro.props;
+const description = `Posts on ${SITE_TITLE} tagged "${tag}".`;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead
+			title={`#${tag} · ${SITE_TITLE}`}
+			description={description}
+		/>
+	</head>
+	<body>
+		<Header />
+		<main id="skip" class="w-[720px] max-w-[calc(100%-2em)] mx-auto p-4">
+			<nav class="text-sm text-gray-500 dark:text-beige mb-4">
+				<a href="/tags/" class="hover:text-flat-blue">All tags</a>
+				<span class="mx-1">/</span>
+				<span>#{tag}</span>
+			</nav>
+			<h1 class="text-3xl font-bold mb-2 text-gray-900 dark:text-beige">#{tag}</h1>
+			<p class="text-gray-600 dark:text-beige mb-8">
+				{posts.length} {posts.length === 1 ? 'post' : 'posts'}
+			</p>
+			<ul class="list-none m-0 p-0 flex flex-col gap-6">
+				{posts.map((post) => (
+					<li class="border-b border-gray-200 dark:border-dark-grey pb-6 last:border-b-0">
+						<a href={`/${post.id}/`} class="block group">
+							<h2 class="text-xl font-semibold text-gray-900 dark:text-beige group-hover:text-flat-blue transition-colors">
+								{post.data.title}
+							</h2>
+							<p class="text-gray-500 dark:text-beige text-sm mt-1">
+								<FormattedDate date={post.data.pubDate} />
+							</p>
+							<p class="text-gray-700 dark:text-beige mt-2">
+								{post.data.description}
+							</p>
+						</a>
+					</li>
+				))}
+			</ul>
+		</main>
+		<Footer />
+	</body>
+</html>

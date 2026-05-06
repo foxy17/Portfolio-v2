@@ -10,6 +10,24 @@ import tailwindcss from '@tailwindcss/vite';
 
 import vercel from '@astrojs/vercel';
 
+// Lightweight reading-time remark plugin (no external dep).
+// Surfaces `minutesRead` on frontmatter, available via render().remarkPluginFrontmatter.
+function remarkReadingTime() {
+  return function (tree, { data }) {
+    let words = 0;
+    const visit = (node) => {
+      if (node.type === 'text' && typeof node.value === 'string') {
+        words += node.value.split(/\s+/).filter(Boolean).length;
+      }
+      if (Array.isArray(node.children)) node.children.forEach(visit);
+    };
+    visit(tree);
+    const minutes = Math.max(1, Math.round(words / 200));
+    data.astro.frontmatter.minutesRead = `${minutes} min read`;
+    data.astro.frontmatter.wordCount = words;
+  };
+}
+
 let adapter =  vercel({
   webAnalytics: {
     enabled: true,
@@ -47,6 +65,9 @@ export default defineConfig({
     react(),
     keystatic(),
   ],
+  markdown: {
+    remarkPlugins: [remarkReadingTime],
+  },
   output: 'static',
   prefetch: {
     prefetchAll: true,

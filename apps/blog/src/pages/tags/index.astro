@@ -1,0 +1,59 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE } from '../../consts';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog', ({ data }) =>
+	import.meta.env.PROD ? !data.draft : true,
+);
+
+const counts = new Map<string, number>();
+for (const post of posts) {
+	for (const tag of post.data.tags ?? []) {
+		counts.set(tag, (counts.get(tag) ?? 0) + 1);
+	}
+}
+
+const tags = [...counts.entries()].sort((a, b) => {
+	if (b[1] !== a[1]) return b[1] - a[1];
+	return a[0].localeCompare(b[0]);
+});
+
+const description = `Browse posts on ${SITE_TITLE} by tag.`;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Tags · ${SITE_TITLE}`} description={description} />
+	</head>
+	<body>
+		<Header />
+		<main id="skip" class="w-[720px] max-w-[calc(100%-2em)] mx-auto p-4">
+			<h1 class="text-3xl font-bold mb-2 text-gray-900 dark:text-beige">Tags</h1>
+			<p class="text-gray-600 dark:text-beige mb-8">
+				{posts.length} posts · {tags.length} tags
+			</p>
+			{tags.length === 0 ? (
+				<p class="text-gray-500 dark:text-beige">No tags yet.</p>
+			) : (
+				<ul class="flex flex-wrap gap-2 list-none m-0 p-0">
+					{tags.map(([tag, count]) => (
+						<li>
+							<a
+								href={`/tags/${tag}/`}
+								class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-300 dark:border-dark-grey text-gray-700 dark:text-beige hover:text-flat-blue hover:border-flat-blue dark:hover:text-flat-blue dark:hover:border-flat-blue transition-colors"
+							>
+								<span>#{tag}</span>
+								<span class="text-xs text-gray-500 dark:text-gray-400">{count}</span>
+							</a>
+						</li>
+					))}
+				</ul>
+			)}
+		</main>
+		<Footer />
+	</body>
+</html>
