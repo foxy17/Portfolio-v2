@@ -14,8 +14,8 @@ const TITLES = [
   'Probably refactoring something',
 ];
 
-const TITLE_DURATION_S = 5;
-const TOTAL_DURATION_S = TITLE_DURATION_S * TITLES.length; // 50s
+const TITLE_DURATION_S = 10;
+const TOTAL_DURATION_S = TITLE_DURATION_S * TITLES.length; // 100s
 
 export default function Banner() {
   return (
@@ -29,20 +29,25 @@ export default function Banner() {
           >
             <span className="ai-spinner" aria-hidden="true" />
             <span className="ai-title-rotator" aria-hidden="true">
-              {TITLES.map((title, i) => (
-                <span
-                  key={title}
-                  className="ai-title-item"
-                  style={{
-                    animationDelay: `${i * TITLE_DURATION_S}s, 0s`,
-                    animationDuration: `${TOTAL_DURATION_S}s, 8s`,
-                  }}
-                >
-                  {title}
-                </span>
-              ))}
+              {TITLES.map((title, i) => {
+                const text = `${title}…`;
+                return (
+                  <span
+                    key={title}
+                    className="ai-title-item"
+                    style={
+                      {
+                        '--ai-final-w': `${text.length + 1}ch`,
+                        animationDelay: `${i * TITLE_DURATION_S}s, 0s`,
+                        animationDuration: `${TOTAL_DURATION_S}s, 8s`,
+                      } as React.CSSProperties
+                    }
+                  >
+                    {text}
+                  </span>
+                );
+              })}
             </span>
-            <span className="ai-ellipsis ml-0.5" aria-hidden="true">…</span>
           </p>
           <p className="text-lg md:text-xl max-w-xl">
             Building software across the stack. Best on problems that don&apos;t

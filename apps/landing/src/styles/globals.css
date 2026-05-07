@@ -126,24 +126,6 @@ h3 {
     }
 }
 
-/* Shared gradient + shimmer helper (used by spinner, titles, ellipsis). */
-.ai-gradient {
-    background-image: linear-gradient(
-        90deg,
-        #ffb37a 0%,
-        #d97757 25%,
-        #b8552c 50%,
-        #d97757 75%,
-        #ffb37a 100%
-    );
-    background-size: 200% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: aiShimmer 8s ease-in-out infinite;
-}
-
 .ai-shimmer {
     background-image: linear-gradient(
         90deg,
@@ -161,26 +143,35 @@ h3 {
     animation: aiShimmer 8s ease-in-out infinite;
 }
 
-/* Rotating hero subtitles — Claude-Code-style status line.
- * 10 titles, 5s each = 50s loop. Items share a single grid cell so the
- * container hugs the widest title without width jitter. Each item runs
- * the same fade keyframe; staggered animation-delay (i * 5s) makes them
- * cross-fade in sequence.
+/* Rotating hero subtitles — true typewriter effect.
+ * 10 titles, 10s each = 100s loop. Each item gets a staggered
+ * animation-delay (i * 10s). Within its 10% window, the item
+ * types in (steps), holds, then types out.
+ *
+ *   0%–3%   : max-width 0 → final  (type in, ~3s, steps(N))
+ *   3%–7%   : hold full width      (~4s)
+ *   7%–10%  : final → 0            (type out / erase)
+ *   10%–100%: hidden
+ *
+ * Stagger == window width, so only one item is ever non-zero width.
+ * `--ai-final-w` is set per item via inline style based on title length.
  */
-@keyframes aiTitleFade {
+@keyframes aiTypewriter {
     0% {
-        opacity: 0;
-        transform: translateY(6px);
+        max-width: 0;
+        animation-timing-function: steps(40);
     }
-    2%,
-    16% {
-        opacity: 1;
-        transform: translateY(0);
+    3% {
+        max-width: var(--ai-final-w, 32ch);
+        animation-timing-function: linear;
     }
-    20%,
+    7% {
+        max-width: var(--ai-final-w, 32ch);
+        animation-timing-function: steps(40);
+    }
+    10%,
     100% {
-        opacity: 0;
-        transform: translateY(-6px);
+        max-width: 0;
     }
 }
 
@@ -188,6 +179,8 @@ h3 {
     display: inline-grid;
     grid-template-columns: 1fr;
     grid-template-rows: auto;
+    width: max-content;
+    max-width: 100%;
 }
 .ai-title-rotator > * {
     grid-row: 1;
@@ -195,7 +188,9 @@ h3 {
 }
 
 .ai-title-item {
-    opacity: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 0;
     background-image: linear-gradient(
         90deg,
         #ffb37a 0%,
@@ -209,12 +204,12 @@ h3 {
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    animation: aiTitleFade 50s linear infinite,
+    animation: aiTypewriter 100s linear infinite,
         aiShimmer 8s ease-in-out infinite;
-    will-change: opacity, transform;
+    will-change: max-width;
 }
 
-/* Cycling spinner glyph — Claude-Code-style status indicator. */
+/* Cycling spinner glyph — slow, deliberate, Claude-Code-style. */
 .ai-spinner {
     display: inline-block;
     width: 1ch;
@@ -237,7 +232,7 @@ h3 {
 }
 .ai-spinner::before {
     content: '✽';
-    animation: aiSpinner 1.6s steps(1) infinite;
+    animation: aiSpinner 3.2s steps(1) infinite;
 }
 @keyframes aiSpinner {
     0% {
@@ -266,34 +261,18 @@ h3 {
     }
 }
 
-.ai-ellipsis {
-    background-image: linear-gradient(
-        90deg,
-        #ffb37a 0%,
-        #d97757 25%,
-        #b8552c 50%,
-        #d97757 75%,
-        #ffb37a 100%
-    );
-    background-size: 200% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: aiShimmer 8s ease-in-out infinite;
-}
-
 @media (prefers-reduced-motion: reduce) {
     .ai-shimmer,
     .ai-spinner,
-    .ai-ellipsis,
     .ai-title-item {
         animation: none;
     }
     .ai-title-item {
+        max-width: 0;
         opacity: 0;
     }
     .ai-title-item:first-child {
+        max-width: none;
         opacity: 1;
     }
 }
