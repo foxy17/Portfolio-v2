@@ -35,10 +35,17 @@ export default function JsonLd() {
 
   const jsonLd = { '@context': 'https://schema.org', '@graph': graph };
 
+  // Escape characters that could break out of a <script> element or trip up
+  // parsers if the data ever contains `</script>` or U+2028 / U+2029.
+  const safeJson = JSON.stringify(jsonLd).replace(
+    /[<\u2028\u2029]/g,
+    (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`,
+  );
+
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      dangerouslySetInnerHTML={{ __html: safeJson }}
     />
   );
 }
