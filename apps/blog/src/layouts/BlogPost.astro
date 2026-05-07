@@ -86,11 +86,11 @@ const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
 							)
 						}
 						<h1 class="m-0 mb-2">{title}</h1>
-						<hr class="border-t border-gray-200 dark:border-dark-grey" />
+						<hr class="border-t border-blog-border dark:border-blog-dark-border" />
 					</div>
 
 					{tocHeadings.length >= 3 && (
-						<details class="not-prose mb-6 rounded-lg border border-gray-200 dark:border-dark-grey p-4">
+						<details class="not-prose mb-6 rounded-lg border border-blog-border bg-blog-surface dark:border-blog-dark-border dark:bg-blog-dark-surface p-4">
 							<summary class="cursor-pointer font-semibold text-gray-800 dark:text-beige">
 								Table of contents
 							</summary>
@@ -112,14 +112,14 @@ const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
 					<slot />
 
 					{tags.length > 0 && (
-						<div class="not-prose mt-12 pt-6 border-t border-gray-200 dark:border-dark-grey">
+						<div class="not-prose mt-12 pt-6 border-t border-blog-border dark:border-blog-dark-border">
 							<p class="text-sm text-gray-500 dark:text-beige mb-2">Tagged</p>
 							<ul class="flex flex-wrap gap-2 list-none m-0 p-0">
 								{tags.map((tag) => (
 									<li>
 										<a
 											href={`/tags/${tag}/`}
-											class="inline-block px-3 py-1 rounded-full border border-gray-300 dark:border-dark-grey text-sm text-gray-700 dark:text-beige hover:text-flat-blue hover:border-flat-blue dark:hover:text-flat-blue dark:hover:border-flat-blue transition-colors no-underline"
+											class="inline-block px-3 py-1 rounded-full border border-blog-border dark:border-blog-dark-border text-sm text-gray-700 dark:text-beige hover:text-flat-blue hover:border-flat-blue dark:hover:text-flat-blue dark:hover:border-flat-blue transition-colors no-underline"
 										>
 											#{tag}
 										</a>
@@ -131,7 +131,7 @@ const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
 
 					{(prev || next) && (
 						<nav
-							class="not-prose mt-8 pt-6 border-t border-gray-200 dark:border-dark-grey grid grid-cols-2 gap-4"
+							class="not-prose mt-8 pt-6 border-t border-blog-border dark:border-blog-dark-border grid grid-cols-2 gap-4"
 							aria-label="Post navigation"
 						>
 							{prev ? (
@@ -164,7 +164,7 @@ const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
 					)}
 
 					{related.length > 0 && (
-						<aside class="not-prose mt-12 pt-6 border-t border-gray-200 dark:border-dark-grey">
+						<aside class="not-prose mt-12 pt-6 border-t border-blog-border dark:border-blog-dark-border">
 							<h2 class="text-lg font-semibold text-gray-900 dark:text-beige mb-4">
 								Related posts
 							</h2>

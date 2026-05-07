@@ -94,9 +94,10 @@ module.exports = {
 
               // Code
               code: {
-                color: theme('colors.gray.800'), // #222222
+                color: theme('colors.blog.code-inline-fg'),
                 fontWeight: '600',
-                backgroundColor: theme('colors.gray.100'), // #fafafa
+                backgroundColor: theme('colors.blog.code-inline-bg'),
+                borderRadius: '0.125rem',
               },
               'code::before': { content: '"\u00A0"' },
               'code::after': { content: '"\u00A0"' },
@@ -108,8 +109,9 @@ module.exports = {
               'blockquote code': { color: 'inherit' },
               'thead th code': { color: 'inherit' },
               pre: {
-                color: theme('colors.gray.800'), // #222222
-                backgroundColor: theme('colors.gray.100'), // #fafafa
+                color: theme('colors.blog.code-block-fg'),
+                backgroundColor: theme('colors.blog.code-block-bg'),
+                border: `1px solid ${theme('colors.blog.code-block-border')}`,
                 overflowX: 'auto',
                 fontWeight: '400',
               },
@@ -131,7 +133,7 @@ module.exports = {
 
               // Horizontal rules
               hr: {
-                borderColor: theme('colors.gray.300'), // #999999
+                borderColor: theme('colors.blog.border'),
                 borderTopWidth: '1px',
               },
 
@@ -144,7 +146,7 @@ module.exports = {
               },
               thead: {
                 borderBottomWidth: '1px',
-                borderBottomColor: theme('colors.gray.300'), // #999999
+                borderBottomColor: theme('colors.blog.border'),
               },
               'thead th': {
                 color: theme('colors.gray.900'), // #111111
@@ -153,13 +155,13 @@ module.exports = {
               },
               'tbody tr': {
                 borderBottomWidth: '1px',
-                borderBottomColor: theme('colors.gray.200'), // #eaeaea
+                borderBottomColor: theme('colors.blog.code-inline-bg'),
               },
               'tbody tr:last-child': { borderBottomWidth: '0' },
               'tbody td': { verticalAlign: 'baseline' },
               tfoot: {
                 borderTopWidth: '1px',
-                borderTopColor: theme('colors.gray.300'), // #999999
+                borderTopColor: theme('colors.blog.border'),
               },
               'tfoot td': { verticalAlign: 'top' },
               'th, td': { textAlign: 'start' },
@@ -217,15 +219,15 @@ module.exports = {
 
               // Code
               code: {
-                color: theme('colors.flat-orange'), 
+                color: theme('colors.blog.dark-code-inline-fg'),
                 fontWeight: '600',
-                backgroundColor: theme('colors.gray.600'), // #fafafa
+                backgroundColor: theme('colors.blog.dark-code-inline-bg'),
+                borderRadius: '0.125rem',
               },
               pre: {
-                color: theme('colors.beige.200'), // rgba(249,244,218,0.95)
-                backgroundColor: 'transparent', // Remove background
-                padding: '0',
-                border: 'none',
+                color: theme('colors.blog.code-block-fg'),
+                backgroundColor: theme('colors.blog.code-block-bg'),
+                border: `1px solid ${theme('colors.blog.code-block-border')}`,
               },
               'pre code': {
                 backgroundColor: 'transparent',
@@ -247,21 +249,21 @@ module.exports = {
 
               // Horizontal rules
               hr: {
-                borderColor: theme('colors.gray.700'), // #333333
+                borderColor: theme('colors.blog.dark-border'),
               },
 
               // Tables
               thead: {
-                borderBottomColor: theme('colors.gray.700'), // #333333
+                borderBottomColor: theme('colors.blog.dark-border'),
               },
               'thead th': {
                 color: theme('colors.gray.0'), // #fff
               },
               'tbody tr': {
-                borderBottomColor: theme('colors.gray.800'), // #222222
+                borderBottomColor: theme('colors.blog.dark-border'),
               },
               tfoot: {
-                borderTopColor: theme('colors.gray.700'), // #333333
+                borderTopColor: theme('colors.blog.dark-border'),
               },
 
               // Other elements
