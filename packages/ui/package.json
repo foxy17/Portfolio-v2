@@ -3,6 +3,10 @@
   "version": "0.0.0",
   "main": "./index.tsx",
   "types": "./index.tsx",
+  "exports": {
+    ".": "./index.tsx",
+    "./theme": "./src/theme.ts"
+  },
   "license": "MIT",
   "scripts": {
     "lint": "eslint *.ts*"
@@ -21,4 +25,4 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   }
-}   
+}

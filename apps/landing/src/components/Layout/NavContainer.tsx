@@ -33,7 +33,11 @@ export default function NavContainer(props: any) {
             <NavItem href="/" text="Home" />
             {/*<NavItem href="/timeline" text="Timeline" />*/}
             {/*<NavItem href="/projects" text="Work" />*/}
-            <NavItem href="https://dev.to/foxy17" external={true} text="Blog" />
+            <NavItem
+              href="https://blog.carnav.in/"
+              external={true}
+              text="Blog"
+            />
           </div>
           {isMounted && (
             <ThemeToggle

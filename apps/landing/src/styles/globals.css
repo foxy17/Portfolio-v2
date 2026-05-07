@@ -112,3 +112,222 @@ h3 {
     transition-timing-function: cubic-bezier(0.19, 1, 0.61, 1.11);
     transition-duration: 0.6s;
 }
+
+/* AI-themed gradient — Claude-Code orange palette */
+@keyframes aiShimmer {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.ai-shimmer {
+    background-image: linear-gradient(
+        90deg,
+        #ffb37a 0%,
+        #d97757 25%,
+        #b8552c 50%,
+        #d97757 75%,
+        #ffb37a 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: aiShimmer 8s ease-in-out infinite;
+}
+
+/* Rotating hero subtitles — true typewriter effect.
+ * 10 titles, 10s each = 100s loop. Each item gets a staggered
+ * animation-delay (i * 10s). Within its 10% window, the item
+ * types in (steps), holds, then types out.
+ *
+ *   0%–3%   : max-width 0 → final  (type in, ~3s, steps(N))
+ *   3%–7%   : hold full width      (~4s)
+ *   7%–10%  : final → 0            (type out / erase)
+ *   10%–100%: hidden
+ *
+ * Stagger == window width, so only one item is ever non-zero width.
+ * `--ai-final-w` is set per item via inline style based on title length.
+ */
+/*
+ *   0%      : max-width 0
+ *   1.36%   : max-width final  (typed in over ~1.5s)
+ *   8.64%   : max-width final  (held ~8s)
+ *   10%     : max-width 0      (typed out ~1.5s)
+ *   100%    : hidden
+ *
+ * Total slot = 11s, total loop = 110s for 10 titles.
+ */
+@keyframes aiTypewriter {
+    0% {
+        max-width: 0;
+        animation-timing-function: steps(40);
+    }
+    1.36% {
+        max-width: var(--ai-final-w, 32ch);
+        animation-timing-function: linear;
+    }
+    8.64% {
+        max-width: var(--ai-final-w, 32ch);
+        animation-timing-function: steps(40);
+    }
+    10%,
+    100% {
+        max-width: 0;
+    }
+}
+
+.ai-title-rotator {
+    display: inline-grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    width: max-content;
+    max-width: 100%;
+}
+.ai-title-rotator > * {
+    grid-row: 1;
+    grid-column: 1;
+}
+
+.ai-title-item {
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 0;
+    background-image: linear-gradient(
+        90deg,
+        #ffb37a 0%,
+        #d97757 25%,
+        #b8552c 50%,
+        #d97757 75%,
+        #ffb37a 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: aiTypewriter 110s linear infinite,
+        aiShimmer 8s ease-in-out infinite;
+    will-change: max-width;
+}
+
+/* Cycling spinner glyph — slow, deliberate, Claude-Code-style. */
+.ai-spinner {
+    display: inline-block;
+    min-width: 1.5ch;
+    padding-right: 0.15ch;
+    text-align: center;
+    margin-right: 0.5ch;
+    background-image: linear-gradient(
+        90deg,
+        #ffb37a 0%,
+        #d97757 25%,
+        #b8552c 50%,
+        #d97757 75%,
+        #ffb37a 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: aiShimmer 8s ease-in-out infinite;
+}
+.ai-spinner::before {
+    content: '✽';
+    animation: aiSpinner 3.2s steps(1) infinite;
+}
+@keyframes aiSpinner {
+    0% {
+        content: '✽';
+    }
+    12.5% {
+        content: '✱';
+    }
+    25% {
+        content: '✦';
+    }
+    37.5% {
+        content: '✺';
+    }
+    50% {
+        content: '·';
+    }
+    62.5% {
+        content: '✱';
+    }
+    75% {
+        content: '✦';
+    }
+    87.5% {
+        content: '✺';
+    }
+}
+
+/* Bio second paragraph — one-shot reveal on load + tiny status dot. */
+@keyframes bioReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.bio-reveal {
+    animation: bioReveal 0.7s ease-out 0.4s both;
+}
+
+@keyframes bioDotPulse {
+    0%,
+    100% {
+        opacity: 0.4;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.3);
+    }
+}
+
+.bio-dot {
+    display: inline-block;
+    width: 0.45em;
+    height: 0.45em;
+    margin-right: 0.6em;
+    border-radius: 9999px;
+    background-color: #d97757;
+    vertical-align: 0.15em;
+    animation: bioDotPulse 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ai-shimmer,
+    .ai-spinner,
+    .ai-title-item,
+    .bio-reveal,
+    .bio-dot {
+        animation: none;
+    }
+    .ai-title-item {
+        max-width: 0;
+        opacity: 0;
+    }
+    .ai-title-item:first-child {
+        max-width: none;
+        opacity: 1;
+    }
+    .bio-reveal {
+        opacity: 1;
+        transform: none;
+    }
+}

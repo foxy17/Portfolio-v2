@@ -1,16 +1,18 @@
+// Featured posts surfaced on the landing page.
+// New writing lives at https://blog.carnav.in. Older posts are kept here so
+// the section isn't empty until the blog has more entries.
 const featuredPosts = [
   {
-    title: 'Common Engineering mistakes new Software developers make : Part-1',
+    title: 'Why everyone is talking about Astro and Island Architecture',
+    url: 'https://blog.carnav.in/why-everyone-is-talking-about-astro/',
+    categories: ['astro', 'web-performance', 'frontend'],
+    publishedAt: '5 May 2026',
+  },
+  {
+    title: 'Common Engineering mistakes new Software developers make : Part-1',
     url: 'https://dev.to/foxy17/common-engineering-mistakes-new-software-developers-to-make-part-1-3p5b',
     categories: ['software-engineering', 'programming', 'development'],
     publishedAt: '31 Mar 2022',
-  },
-  {
-    title:
-      'Nodejs GraphQl Authentication with JWT, Apollo-server, MySql and Sequelize ORM.',
-    url: 'https://dev.to/foxy17/nodejs-graphql-authentication-with-jwt-apollo-server-mysql-and-sequelize-orm-3af8',
-    categories: ['api', 'authentication', 'mysql', 'nodejs', 'graphql'],
-    publishedAt: '1 Jun 2021',
   },
   {
     title:
