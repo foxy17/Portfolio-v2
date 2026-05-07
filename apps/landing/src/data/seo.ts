@@ -2,7 +2,7 @@ import { baseUrl } from '~/config/constants';
 import { Metadata } from 'next';
 
 const description =
-  "Arnav Chauhan — generalist software engineer. Best on cross-layer problems where the symptom and the fix don't live in the same service.";
+  'Arnav Chauhan — generalist software engineer. Forte: cross-boundary problems where symptom and fix rarely live in the same layer.';
 
 const siteMetaDeta: Metadata = {
   metadataBase: new URL(baseUrl),

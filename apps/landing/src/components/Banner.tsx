@@ -51,11 +51,12 @@ export default function Banner() {
             </span>
           </p>
           <p className="text-lg md:text-xl max-w-xl">
-            Building software across the stack. Best on problems that don&apos;t
-            stay in one layer — the kind where the symptom and the fix
-            don&apos;t live in the same service. Mostly worked at startups, on
-            teams small enough that the title on paper doesn&apos;t match what
-            you do on Tuesday.
+            I work across the stack, from product surfaces to the services
+            underneath them. Problems that cross boundaries are my forte;
+            symptom and fix rarely live in the same layer. Spent the last 6
+            years on small-to-medium teams, where I&apos;ve owned features
+            end-to-end and rotated between frontend, backend, and infra as
+            needed.
           </p>
         </div>
 
