@@ -271,10 +271,51 @@ h3 {
     }
 }
 
+/* Bio second paragraph — one-shot reveal on load + tiny status dot. */
+@keyframes bioReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.bio-reveal {
+    animation: bioReveal 0.7s ease-out 0.4s both;
+}
+
+@keyframes bioDotPulse {
+    0%,
+    100% {
+        opacity: 0.4;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.3);
+    }
+}
+
+.bio-dot {
+    display: inline-block;
+    width: 0.45em;
+    height: 0.45em;
+    margin-right: 0.6em;
+    border-radius: 9999px;
+    background-color: #d97757;
+    vertical-align: 0.15em;
+    animation: bioDotPulse 2.4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .ai-shimmer,
     .ai-spinner,
-    .ai-title-item {
+    .ai-title-item,
+    .bio-reveal,
+    .bio-dot {
         animation: none;
     }
     .ai-title-item {
@@ -284,5 +325,9 @@ h3 {
     .ai-title-item:first-child {
         max-width: none;
         opacity: 1;
+    }
+    .bio-reveal {
+        opacity: 1;
+        transform: none;
     }
 }
