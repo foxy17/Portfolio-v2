@@ -14,8 +14,9 @@ const TITLES = [
   'Probably refactoring something',
 ];
 
-const TITLE_DURATION_S = 10;
-const TOTAL_DURATION_S = TITLE_DURATION_S * TITLES.length; // 100s
+// Per-title slot: 1.5s type-in + 8s hold + 1.5s type-out = 11s
+const TITLE_DURATION_S = 11;
+const TOTAL_DURATION_S = TITLE_DURATION_S * TITLES.length; // 110s
 
 export default function Banner() {
   return (

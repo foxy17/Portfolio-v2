@@ -156,16 +156,25 @@ h3 {
  * Stagger == window width, so only one item is ever non-zero width.
  * `--ai-final-w` is set per item via inline style based on title length.
  */
+/*
+ *   0%      : max-width 0
+ *   1.36%   : max-width final  (typed in over ~1.5s)
+ *   8.64%   : max-width final  (held ~8s)
+ *   10%     : max-width 0      (typed out ~1.5s)
+ *   100%    : hidden
+ *
+ * Total slot = 11s, total loop = 110s for 10 titles.
+ */
 @keyframes aiTypewriter {
     0% {
         max-width: 0;
         animation-timing-function: steps(40);
     }
-    3% {
+    1.36% {
         max-width: var(--ai-final-w, 32ch);
         animation-timing-function: linear;
     }
-    7% {
+    8.64% {
         max-width: var(--ai-final-w, 32ch);
         animation-timing-function: steps(40);
     }
@@ -204,7 +213,7 @@ h3 {
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    animation: aiTypewriter 100s linear infinite,
+    animation: aiTypewriter 110s linear infinite,
         aiShimmer 8s ease-in-out infinite;
     will-change: max-width;
 }
@@ -212,9 +221,10 @@ h3 {
 /* Cycling spinner glyph — slow, deliberate, Claude-Code-style. */
 .ai-spinner {
     display: inline-block;
-    width: 1ch;
+    min-width: 1.5ch;
+    padding-right: 0.15ch;
     text-align: center;
-    margin-right: 0.4ch;
+    margin-right: 0.5ch;
     background-image: linear-gradient(
         90deg,
         #ffb37a 0%,
