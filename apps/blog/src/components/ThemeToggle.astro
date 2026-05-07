@@ -49,7 +49,7 @@
 		readThemeCookie,
 		subscribeToThemeCookie,
 		writeThemeCookie,
-	} from 'ui';
+	} from 'ui/theme';
 
 	function syncIcons(isDark: boolean) {
 		document
@@ -69,6 +69,8 @@
 		document
 			.querySelectorAll<HTMLButtonElement>('#theme-toggle')
 			.forEach((btn) => {
+				if (btn.dataset.themeToggleBound === '1') return;
+				btn.dataset.themeToggleBound = '1';
 				btn.addEventListener('click', () => {
 					const current = readThemeCookie();
 					const nowDark = document.documentElement.classList.contains('dark');
