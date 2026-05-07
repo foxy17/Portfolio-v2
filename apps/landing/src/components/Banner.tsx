@@ -7,9 +7,13 @@ export default function Banner() {
       <div className="flex flex-col-reverse md:flex-row justify-between items-start md:items-center content-center mb-16 max-w-4xl w-full">
         <div className="flex flex-col transition-all">
           <h1 className="mb-4 sm:mb-1">Arnav Chauhan</h1>
-          <h2 className="text-xl sm:text-2xl text-gray-700! dark:text-gray-200! mb-4">
-            Generalist software engineer.
-          </h2>
+          <p
+            className="font-sans! font-medium! text-lg sm:text-xl mb-6 tracking-wide"
+            aria-label="Generalist software engineer"
+          >
+            <span className="ai-shimmer">Generalist software engineer</span>
+            <span className="ai-cursor" aria-hidden="true" />
+          </p>
           <p className="text-lg md:text-xl max-w-xl">
             Building software across the stack. Best on problems that don&apos;t
             stay in one layer — the kind where the symptom and the fix
