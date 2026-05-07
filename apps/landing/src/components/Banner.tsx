@@ -56,7 +56,6 @@ export default function Banner() {
             symptom and fix rarely live in the same layer.
           </p>
           <p className="text-lg md:text-xl max-w-xl bio-reveal">
-            <span className="bio-dot" aria-hidden="true" />
             Spent the last 6 years on small-to-medium teams, where I&apos;ve
             owned features end-to-end and rotated between{' '}
             <span className="ai-shimmer">
