@@ -14,8 +14,8 @@ const TITLES = [
   'Probably refactoring something',
 ];
 
-const TITLE_DURATION_S = 2.5;
-const TOTAL_DURATION_S = TITLE_DURATION_S * TITLES.length; // 25s
+const TITLE_DURATION_S = 5;
+const TOTAL_DURATION_S = TITLE_DURATION_S * TITLES.length; // 50s
 
 export default function Banner() {
   return (
@@ -35,7 +35,7 @@ export default function Banner() {
                   className="ai-title-item"
                   style={{
                     animationDelay: `${i * TITLE_DURATION_S}s, 0s`,
-                    animationDuration: `${TOTAL_DURATION_S}s, 6s`,
+                    animationDuration: `${TOTAL_DURATION_S}s, 8s`,
                   }}
                 >
                   {title}

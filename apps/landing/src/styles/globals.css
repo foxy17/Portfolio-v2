@@ -113,7 +113,7 @@ h3 {
     transition-duration: 0.6s;
 }
 
-/* AI-themed gradient shimmer for hero subtitle */
+/* AI-themed gradient — Claude-Code orange palette */
 @keyframes aiShimmer {
     0% {
         background-position: 0% 50%;
@@ -126,27 +126,46 @@ h3 {
     }
 }
 
-.ai-shimmer {
+/* Shared gradient + shimmer helper (used by spinner, titles, ellipsis). */
+.ai-gradient {
     background-image: linear-gradient(
         90deg,
-        #a855f7 0%,
-        #3b82f6 25%,
-        #06b6d4 50%,
-        #3b82f6 75%,
-        #a855f7 100%
+        #ffb37a 0%,
+        #d97757 25%,
+        #b8552c 50%,
+        #d97757 75%,
+        #ffb37a 100%
     );
     background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    animation: aiShimmer 6s ease-in-out infinite;
+    animation: aiShimmer 8s ease-in-out infinite;
 }
 
-/* Rotating hero subtitles (Claude-Code-style status text).
- * 10 titles, ~2.5s each = 25s loop. Each item gets the same animation
- * but with a staggered animation-delay (i * 2.5s) so only one is
- * visible at a time and adjacent items cross-fade with a tiny slide.
+.ai-shimmer {
+    background-image: linear-gradient(
+        90deg,
+        #ffb37a 0%,
+        #d97757 25%,
+        #b8552c 50%,
+        #d97757 75%,
+        #ffb37a 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: aiShimmer 8s ease-in-out infinite;
+}
+
+/* Rotating hero subtitles — Claude-Code-style status line.
+ * 10 titles, 5s each = 50s loop. Items share a single grid cell so the
+ * container hugs the widest title without width jitter. Each item runs
+ * the same fade keyframe; staggered animation-delay (i * 5s) makes them
+ * cross-fade in sequence.
  */
 @keyframes aiTitleFade {
     0% {
@@ -154,11 +173,11 @@ h3 {
         transform: translateY(6px);
     }
     2%,
-    8% {
+    16% {
         opacity: 1;
         transform: translateY(0);
     }
-    10%,
+    20%,
     100% {
         opacity: 0;
         transform: translateY(-6px);
@@ -168,11 +187,31 @@ h3 {
 .ai-title-rotator {
     display: inline-grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr;
+    grid-template-rows: auto;
 }
 .ai-title-rotator > * {
     grid-row: 1;
     grid-column: 1;
+}
+
+.ai-title-item {
+    opacity: 0;
+    background-image: linear-gradient(
+        90deg,
+        #ffb37a 0%,
+        #d97757 25%,
+        #b8552c 50%,
+        #d97757 75%,
+        #ffb37a 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: aiTitleFade 50s linear infinite,
+        aiShimmer 8s ease-in-out infinite;
+    will-change: opacity, transform;
 }
 
 /* Cycling spinner glyph — Claude-Code-style status indicator. */
@@ -183,22 +222,22 @@ h3 {
     margin-right: 0.4ch;
     background-image: linear-gradient(
         90deg,
-        #a855f7 0%,
-        #3b82f6 25%,
-        #06b6d4 50%,
-        #3b82f6 75%,
-        #a855f7 100%
+        #ffb37a 0%,
+        #d97757 25%,
+        #b8552c 50%,
+        #d97757 75%,
+        #ffb37a 100%
     );
     background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    animation: aiShimmer 6s ease-in-out infinite;
+    animation: aiShimmer 8s ease-in-out infinite;
 }
 .ai-spinner::before {
     content: '✽';
-    animation: aiSpinner 0.9s steps(1) infinite;
+    animation: aiSpinner 1.6s steps(1) infinite;
 }
 @keyframes aiSpinner {
     0% {
@@ -230,44 +269,24 @@ h3 {
 .ai-ellipsis {
     background-image: linear-gradient(
         90deg,
-        #a855f7 0%,
-        #3b82f6 25%,
-        #06b6d4 50%,
-        #3b82f6 75%,
-        #a855f7 100%
+        #ffb37a 0%,
+        #d97757 25%,
+        #b8552c 50%,
+        #d97757 75%,
+        #ffb37a 100%
     );
     background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    animation: aiShimmer 6s ease-in-out infinite;
-}
-
-.ai-title-item {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    background-image: linear-gradient(
-        90deg,
-        #a855f7 0%,
-        #3b82f6 25%,
-        #06b6d4 50%,
-        #3b82f6 75%,
-        #a855f7 100%
-    );
-    background-size: 200% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: aiTitleFade 25s linear infinite,
-        aiShimmer 6s ease-in-out infinite;
-    will-change: opacity, transform;
+    animation: aiShimmer 8s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
     .ai-shimmer,
+    .ai-spinner,
+    .ai-ellipsis,
     .ai-title-item {
         animation: none;
     }
@@ -276,6 +295,5 @@ h3 {
     }
     .ai-title-item:first-child {
         opacity: 1;
-        position: static;
     }
 }
