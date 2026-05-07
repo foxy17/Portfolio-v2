@@ -7,7 +7,15 @@ export default function FeaturedPosts() {
   return (
     <div className="flex flex-col justify-center items-start max-w-4xl mx-auto w-full mb-8 text-dark-grey dark:text-beige">
       <div className="relative flex flex-col justify-between items-start content-center mb-6 md:mb-16 max-w-4xl w-full">
-        <h2 className="mb-4 sm:mb-8">Featured Posts</h2>
+        <div className="w-full flex items-baseline justify-between mb-4 sm:mb-8">
+          <h2 className="m-0">Featured Posts</h2>
+          <a
+            href="https://blog.carnav.in/"
+            className="text-sm sm:text-base text-flat-blue hover:underline"
+          >
+            More on the blog →
+          </a>
+        </div>
         <div className="flex gap-6 flex-col md:flex-row">
           <BlogPostCard
             title={featuredPosts[0].title}

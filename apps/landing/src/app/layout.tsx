@@ -1,6 +1,7 @@
 import ClientLayout from './ClientLayout';
 import { Outfit, Paytone_One } from 'next/font/google';
 import { themeInitScript } from 'ui';
+import JsonLd from '~/components/JsonLd';
 
 const paytone = Paytone_One({
   weight: ['400'],
@@ -70,6 +71,16 @@ export default function RootLayout({
           content="max-snippet:-1, max-image-preview:large, max-video-preview:-1"
           name="robots"
         />
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title="Arnav Chauhan – Blog"
+          href="https://blog.carnav.in/rss.xml"
+        />
+        <link rel="me" href="https://blog.carnav.in/" />
+        <link rel="me" href="https://github.com/foxy17" />
+        <link rel="me" href="https://twitter.com/arnav_sde" />
+        <JsonLd />
       </head>
       <body className="bg-white dark:bg-black text-white dark:text-black">
         <ClientLayout>{children}</ClientLayout>
