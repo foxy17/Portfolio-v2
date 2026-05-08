@@ -2,7 +2,7 @@
 title: "Nodejs GraphQl Authentication with JWT, Apollo-server, MySql and Sequelize ORM."
 description: "For past few years we have witnessed the growth of Microservice architecture at a whole different..."
 pubDate: "2022-07-24"
-heroImage: "/images/blog/devto/nodejs-graphql-authentication-with-jwt-apollo-server-mysql-and-sequelize-orm-3af8/cover.webp"
+heroImage: "./_assets/devto/nodejs-graphql-authentication-with-jwt-apollo-server-mysql-and-sequelize-orm-3af8/cover.webp"
 tags: ["node", "javascript", "mysql", "graphql"]
 category: "engineering"
 ---
@@ -102,7 +102,7 @@ const typeDefs = gql`
 ```
 
 The `gql` template literal tag can be used to concisely write a GraphQL query that is parsed into a standard GraphQL [AST](https://stackoverflow.com/questions/46163036/what-is-ast-in-graphql/46164403). `type` defines a object with its parameters. The `!` mark means that the parameters are compulsory and cannot be undefined or null. There are two distinct types, query and mutation. In simple words the query is SELECT statement and mutation is INSERT Operation.
-![Breaking down a mutaion](/images/blog/devto/nodejs-graphql-authentication-with-jwt-apollo-server-mysql-and-sequelize-orm-3af8/image-1.png)
+![Breaking down a mutaion](./_assets/devto/nodejs-graphql-authentication-with-jwt-apollo-server-mysql-and-sequelize-orm-3af8/image-1.webp)
 
 Apart from scalar types of `String, Int, Float, Boolean, and ID` which we can directly assign as a type to argument or parameter we can have our own defined complex types as input. For that we use the input tag. The `UserFilter` input is a custom input which is being passed to get user list query. The `[User]` means that an array of type Users will be returned.
 

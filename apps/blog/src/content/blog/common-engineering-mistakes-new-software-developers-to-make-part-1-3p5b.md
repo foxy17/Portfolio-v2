@@ -3,7 +3,7 @@ title: "Common Engineering mistakes new Software developers to make: Part-1"
 description: "As new software developers, people tend to think of themselves just as a developer and often forget..."
 pubDate: "2022-08-06"
 updatedDate: "2022-08-10"
-heroImage: "/images/blog/devto/common-engineering-mistakes-new-software-developers-to-make-part-1-3p5b/cover.webp"
+heroImage: "./_assets/devto/common-engineering-mistakes-new-software-developers-to-make-part-1-3p5b/cover.webp"
 tags: ["beginners", "career", "programming"]
 category: "engineering"
 ---
@@ -13,7 +13,7 @@ category: "engineering"
 As new software developers, people tend to think of themselves just as a developer and often forget about the engineering aspect of their profession. Software development involves writing and understand code to build a software. Software engineering means using engineering concepts to develop software that is scalable, extensible, and maintainable in long run.
 
 Many software engineers especially the ones who have just started with development often focus solely on the development problem and thus their software is rarely scalable or maintainable in long run. A lot of developers have a tough time understanding their own code which they would have written a month back which does not scale well when they start working in a team. In a team often others stumble upon your code when they have to use it or refactor it. It would be a big hassle if you have to explain what you have written to someone new every time such a situation arises. Thus when working in a team with senior engineers who review your code new developers often end up with multiple comments and requested changes on their review. Trust me I have been there, my PR once had around 40+ comments on GitHub when I was doing my first internship.
-![My first PR as an inter](/images/blog/devto/common-engineering-mistakes-new-software-developers-to-make-part-1-3p5b/image-1.png)
+![My first PR as an inter](./_assets/devto/common-engineering-mistakes-new-software-developers-to-make-part-1-3p5b/image-1.webp)
 
 So far I have worked in multiple early stage startups and done few freelancing gigs and have seen many new developers struggle with few points that I will share. I recommend developers to read the book **Clean Code : Robert C Martin** as it's more approachable, especially for new developers.
 

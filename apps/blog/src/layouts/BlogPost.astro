@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import type { MarkdownHeading } from 'astro';
+import { Image } from 'astro:assets';
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -29,7 +30,8 @@ const {
 	next = null,
 	related = [],
 } = Astro.props;
-const socialImage = ogImage ?? heroImage;
+const socialImage =
+	ogImage ?? (heroImage ? heroImage.src : undefined);
 const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
 ---
 
@@ -54,15 +56,16 @@ const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
 				<div class="w-full">
 					{
 						heroImage && (
-							<img
-								width={1020}
-								height={510}
+							<Image
 								src={heroImage}
 								alt={`Cover image for ${title}`}
+								widths={[480, 720, 1020, 1440]}
+								sizes="(max-width: 720px) 100vw, 1020px"
+								formats={['avif', 'webp']}
 								loading="eager"
 								fetchpriority="high"
 								decoding="async"
-								class="block mx-auto rounded-xl shadow-card dark:shadow-card-dark"
+								class="block mx-auto rounded-xl shadow-card dark:shadow-card-dark bg-blog-surface dark:bg-blog-dark-surface"
 							/>
 						)
 					}

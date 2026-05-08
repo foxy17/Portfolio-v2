@@ -2,7 +2,7 @@
 title: "Bun 1.0 , is the Hype Justified?"
 description: "Bun.js is a new JavaScript runtime that was released in v1.0 in September 2023. It has been met with..."
 pubDate: "2023-09-15"
-heroImage: "/images/blog/devto/bun-10-is-the-hype-justified-af8/cover.webp"
+heroImage: "./_assets/devto/bun-10-is-the-hype-justified-af8/cover.webp"
 tags: ["bunjs", "webdev", "javascript", "opensource"]
 category: "engineering"
 ---
@@ -13,7 +13,7 @@ Bun.js is a new JavaScript runtime that was released in v1.0 in September 2023. 
 
 I came across Bun.js in a Fireship.io video back in July of 2022 and it read that it was going to be the fastest runtime. I dismissed it at that time as another Javascript framework like Deno without looking much into it. But with version 1.0 out with the benchmarks and a small hands on preview I have defiantly changed my mind. Fun fact [first commit](https://github.com/oven-sh/bun/commit/025fe36defe2468ca1ed224855aa1effa09001ca) to Bun was done on 18 April 2021.
 
-![Bun.js Github repo](/images/blog/devto/bun-10-is-the-hype-justified-af8/image-1.png)
+![Bun.js Github repo](./_assets/devto/bun-10-is-the-hype-justified-af8/image-1.webp)
 
 ## Bun.js Introduction
 
@@ -29,7 +29,7 @@ There are many features Bun provides, but to get started we should take note of 
 - Bun's plugin API is universal, meaning it works for both the bundler and the runtime. 
 
 
-![Bun is Fun](/images/blog/devto/bun-10-is-the-hype-justified-af8/image-2.png)
+![Bun is Fun](./_assets/devto/bun-10-is-the-hype-justified-af8/image-2.webp)
 
 
 ## Where Bun has all the Fun
@@ -68,7 +68,7 @@ Bun.serve({
 ```
 
 
-![Impressed](/images/blog/devto/bun-10-is-the-hype-justified-af8/image-3.png)
+![Impressed](./_assets/devto/bun-10-is-the-hype-justified-af8/image-3.webp)
 
 
 Overall, I am very impressed with Bun.js. It is a promising new JavaScript runtime that has a lot of potential. I believe that it is worth trying out if you are looking for a fast, efficient, and easy-to-use JavaScript runtime.
