@@ -22,7 +22,7 @@ export default function BlogPostCard({
       ></span>
       <div
         className={cn(
-          'transform group-hover:-translate-x-2 group-hover:-translate-y-2 transition-all',
+          'relative z-10 transform group-hover:-translate-x-2 group-hover:-translate-y-2 transition-all',
           'rounded-xl w-full bg-linear-to-r p-1 justify-center items-center',
           gradient,
         )}

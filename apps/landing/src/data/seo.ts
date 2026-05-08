@@ -1,23 +1,40 @@
 import { baseUrl } from '~/config/constants';
 import { Metadata } from 'next';
 
+const description =
+  'Arnav Chauhan — generalist software engineer. Forte: cross-boundary problems where symptom and fix rarely live in the same layer.';
+
 const siteMetaDeta: Metadata = {
-  title: 'Arnav Chauhan | Product Engineer | SDE-3',
-  description:
-    'Arnav is a SDE-3 Front-end developer, JavaScript enthusiast, who specializes in building cross-platform digital experiences. Currently exploring the world of web3, interactive animations, and user experience.',
+  metadataBase: new URL(baseUrl),
+  title: 'Arnav Chauhan | Generalist Software Engineer',
+  description,
+  alternates: {
+    canonical: baseUrl,
+    types: {
+      'application/rss+xml': [
+        {
+          url: 'https://blog.carnav.in/rss.xml',
+          title: 'Arnav Chauhan – Blog',
+        },
+      ],
+    },
+  },
+  authors: [{ name: 'Arnav Chauhan', url: baseUrl }],
+  creator: 'Arnav Chauhan',
+  publisher: 'Arnav Chauhan',
   openGraph: {
     title: 'Arnav Chauhan',
-    description:
-      'Arnav is a SDE-2 Front-end developer who specializes in building cross-platform digital experiences. Currently exploring the world of web3, interactive animations, and user experience.',
+    description,
+    url: baseUrl,
     images: [
       {
         url: `${baseUrl}/static/arnav.png`,
         width: 800,
         height: 600,
-        alt: 'profile picture',
+        alt: 'Arnav Chauhan',
       },
     ],
-    siteName: 'Arnav Chauhan | Product Engineer',
+    siteName: 'Arnav Chauhan',
     type: 'website',
     locale: 'en_IN',
   },

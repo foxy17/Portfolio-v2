@@ -2,7 +2,7 @@
 import React from 'react';
 import cn from 'classnames';
 import Image from 'next/image';
-import { useTheme } from 'next-themes';
+import { useTheme } from '~/lib/hooks/useTheme';
 
 type ProfileCard = {
   style?: string;

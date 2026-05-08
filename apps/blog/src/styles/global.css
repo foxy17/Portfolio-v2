@@ -36,7 +36,7 @@
     @apply font-bold;
   }
 
-  a {
+  .prose a {
     @apply text-flat-blue hover:text-flat-blue;
   }
 

@@ -3,7 +3,7 @@
 import '../styles/globals.css';
 import React, { useEffect } from 'react';
 import splitbee from '@splitbee/web';
-import { ThemeProvider } from 'next-themes';
+import { ThemeProvider } from '~/lib/hooks/useTheme';
 
 export default function ClientLayout({
   children,
@@ -17,5 +17,5 @@ export default function ClientLayout({
     });
   }, []);
 
-  return <ThemeProvider attribute="class">{children} </ThemeProvider>;
+  return <ThemeProvider>{children}</ThemeProvider>;
 }

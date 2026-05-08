@@ -1,0 +1,94 @@
+---
+import { SITE_TITLE, SITE_AUTHOR, SITE_URL } from '../consts';
+
+interface Props {
+	type: 'website' | 'article';
+	title: string;
+	description: string;
+	image: string;
+	canonicalURL: URL;
+	pubDate?: Date;
+	updatedDate?: Date;
+	author?: string;
+	tags?: string[];
+}
+
+const {
+	type,
+	title,
+	description,
+	image,
+	canonicalURL,
+	pubDate,
+	updatedDate,
+	author = SITE_AUTHOR,
+	tags = [],
+} = Astro.props;
+
+const personId = 'https://carnav.in/#person';
+const websiteId = `${SITE_URL}/#website`;
+
+const person = {
+	'@type': 'Person',
+	'@id': personId,
+	name: SITE_AUTHOR,
+	url: 'https://carnav.in/',
+	sameAs: [
+		'https://github.com/foxy17',
+		'https://twitter.com/arnav_sde',
+		'https://www.linkedin.com/in/arnavschauhan/',
+	],
+};
+
+const website = {
+	'@type': 'WebSite',
+	'@id': websiteId,
+	url: SITE_URL,
+	name: SITE_TITLE,
+	description:
+		'Notes on web engineering, frontend performance, and developer tooling.',
+	publisher: { '@id': personId },
+	inLanguage: 'en',
+	potentialAction: {
+		'@type': 'SearchAction',
+		target: `${SITE_URL}/?q={search_term_string}`,
+		'query-input': 'required name=search_term_string',
+	},
+};
+
+const graph: Record<string, unknown>[] = [person, website];
+
+if (type === 'article' && pubDate) {
+	graph.push({
+		'@type': 'BlogPosting',
+		'@id': `${canonicalURL.href}#article`,
+		headline: title,
+		description,
+		image: [image],
+		datePublished: pubDate.toISOString(),
+		dateModified: (updatedDate ?? pubDate).toISOString(),
+		author: { '@id': personId, name: author },
+		publisher: { '@id': personId },
+		mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalURL.href },
+		isPartOf: { '@id': websiteId },
+		keywords: tags.join(', '),
+		inLanguage: 'en',
+		url: canonicalURL.href,
+	});
+}
+
+const jsonLd = { '@context': 'https://schema.org', '@graph': graph };
+
+// Escape characters that could break out of a <script> element or trip up
+// parsers if the data ever contains `</script>` or U+2028 / U+2029.
+const safeJson = JSON.stringify(jsonLd).replace(
+	/[<\u2028\u2029]/g,
+	(c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`,
+);
+---
+
+<script
+	type="application/ld+json"
+	is:inline
+	set:html={safeJson}
+/>

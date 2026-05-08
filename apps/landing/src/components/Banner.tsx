@@ -1,51 +1,22 @@
 import React from 'react';
-import cn from 'classnames';
 import ProfileCard from '~/components/Cards/ProfileCard';
 
-type CurrentCompanyProps = {
-  name: string;
-};
+const TITLES = [
+  'Generalist software engineer',
+  'Full-stack developer',
+  'Cross-stack debugger',
+  'The guy who broke prod',
+  'The guy who fixed prod',
+  'The guy who trained the AI',
+  'Ships features end-to-end',
+  'Reads SQL plans for fun',
+  'TypeScript apologist',
+  'Probably refactoring something',
+];
 
-type DescriptionProps = {
-  description: string;
-} & CurrentCompanyProps;
-
-const CurrentCompany = ({ name }: CurrentCompanyProps) => {
-  return (
-    <h3
-      data-text={name}
-      className={cn(
-        'text-flat-purple! dark:text-flat-yellow! before:decoration-flat-purple dark:before:decoration-flat-yellow',
-        'relative overflow-hidden pb-2 before:text-transparent hover:before:animate-wave',
-        'before:decoration-wavy before:absolute before:whitespace-nowrap max-w-fit',
-        'before:content-[attr(data-text)attr(data-text)] before:underline before:underline-offset-4',
-      )}
-    >
-      {name}
-    </h3>
-  );
-};
-
-const ShortDescription = ({ description, name }: DescriptionProps) => {
-  return (
-    <>
-      <span className="text-xl sm:text-2xl sm:flex sm:flex-row mb-4">
-        <h3 className="text-gray-700! dark:text-gray-200!">
-          Senior Frontend developer at &nbsp;{' '}
-        </h3>
-        <a
-          href="https://www.clootrack.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="max-w-min"
-        >
-          <CurrentCompany name={name} />
-        </a>
-      </span>
-      <h3 className="text-xl md:text-2xl max-w-xl">{description}</h3>
-    </>
-  );
-};
+// Per-title slot: 1.5s type-in + 8s hold + 1.5s type-out = 11s
+const TITLE_DURATION_S = 11;
+const TOTAL_DURATION_S = TITLE_DURATION_S * TITLES.length; // 110s
 
 export default function Banner() {
   return (
@@ -53,11 +24,45 @@ export default function Banner() {
       <div className="flex flex-col-reverse md:flex-row justify-between items-start md:items-center content-center mb-16 max-w-4xl w-full">
         <div className="flex flex-col transition-all">
           <h1 className="mb-4 sm:mb-1">Arnav Chauhan</h1>
-          <ShortDescription
-            name="Clootrack"
-            description="I code beautifully simple products with amazing performance,
-        experiences, and usability."
-          />
+          <p
+            className="font-sans! font-medium! text-lg sm:text-xl mb-6 tracking-wide flex items-baseline"
+            aria-label={TITLES[0]}
+          >
+            <span className="ai-spinner" aria-hidden="true" />
+            <span className="ai-title-rotator" aria-hidden="true">
+              {TITLES.map((title, i) => {
+                const text = `${title}…`;
+                return (
+                  <span
+                    key={title}
+                    className="ai-title-item"
+                    style={
+                      {
+                        '--ai-final-w': `${text.length + 1}ch`,
+                        animationDelay: `${i * TITLE_DURATION_S}s, 0s`,
+                        animationDuration: `${TOTAL_DURATION_S}s, 8s`,
+                      } as React.CSSProperties
+                    }
+                  >
+                    {text}
+                  </span>
+                );
+              })}
+            </span>
+          </p>
+          <p className="text-lg md:text-xl max-w-xl mb-4">
+            I work across the stack, from product surfaces to the services
+            underneath them. Problems that cross boundaries are my forte;
+            symptom and fix rarely live in the same layer.
+          </p>
+          <p className="text-lg md:text-xl max-w-xl bio-reveal">
+            Spent the last 6 years on small-to-medium teams, where I&apos;ve
+            owned features end-to-end and rotated between{' '}
+            <span className="ai-shimmer">
+              frontend, backend, and infra
+            </span>{' '}
+            as needed.
+          </p>
         </div>
 
         <ProfileCard style="mb-12 md:mb-0 " />

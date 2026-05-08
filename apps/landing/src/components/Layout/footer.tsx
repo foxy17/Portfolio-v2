@@ -17,12 +17,23 @@ export default function Footer() {
           >
             Home
           </Link>
-          <Link
-            href="/"
-            className="text-gray-500! hover:text-gray-600! transition"
+          <ExternalLink href="https://blog.carnav.in/">Blog</ExternalLink>
+          <ExternalLink href="https://blog.carnav.in/about/">About</ExternalLink>
+        </div>
+
+        <div className="flex flex-col space-y-4">
+          <ExternalLink
+            style="showSocial:hidden block"
+            href="https://github.com/foxy17"
           >
-            About
-          </Link>
+            Github
+          </ExternalLink>
+          <ExternalLink
+            style="showSocial:hidden block"
+            href="https://twitter.com/arnav_sde"
+          >
+            Twitter
+          </ExternalLink>
           <ExternalLink
             style="showSocial:hidden block"
             href="https://www.linkedin.com/in/arnavschauhan/"
@@ -32,22 +43,13 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col space-y-4">
+          <span className="text-xs uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            Elsewhere
+          </span>
           <ExternalLink href="https://dev.to/foxy17">Dev.to</ExternalLink>
-          <ExternalLink
-            style="showSocial:hidden block"
-            href="https://twitter.com/arnav_sde"
-          >
-            Twitter
-          </ExternalLink>
-        </div>
-
-        <div className="flex flex-col space-y-4">
           <ExternalLink href="https://arnav40.medium.com/">Medium</ExternalLink>
-          <ExternalLink
-            style="showSocial:hidden block"
-            href="https://github.com/foxy17"
-          >
-            Github
+          <ExternalLink href="https://blog.carnav.in/rss.xml">
+            RSS
           </ExternalLink>
         </div>
       </div>
