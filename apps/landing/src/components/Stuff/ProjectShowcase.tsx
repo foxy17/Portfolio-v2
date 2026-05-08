@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import Image from 'next/image';
+import React, { useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import cn from 'classnames';
 import {
-  FiArrowLeft,
   FiArrowRight,
   FiArrowUpRight,
   FiExternalLink,
@@ -13,12 +11,16 @@ import {
   FiX,
 } from 'react-icons/fi';
 
+import { ProjectImageCarousel } from '~/components/Stuff/ProjectImageCarousel';
+import { useFocusTrap } from '~/components/Stuff/useFocusTrap';
+import { useProjectModalController } from '~/components/Stuff/useProjectModalController';
+
 type ProjectImage = {
   src: string;
   alt: string;
 };
 
-type Project = {
+export type Project = {
   title: string;
   description: string;
   why: string;
@@ -175,6 +177,7 @@ function ProjectModal({
 }) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const handleKeyDown = useFocusTrap(modalRef);
 
   useEffect(() => {
     if (project && isVisible) {
@@ -182,33 +185,8 @@ function ProjectModal({
     }
   }, [project, isVisible]);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== 'Tab') return;
-
-    const focusableElements = modalRef.current?.querySelectorAll<HTMLElement>(
-      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
-    );
-    if (!focusableElements?.length) return;
-
-    const firstElement = focusableElements[0];
-    const lastElement = focusableElements[focusableElements.length - 1];
-
-    if (event.shiftKey && document.activeElement === firstElement) {
-      event.preventDefault();
-      lastElement.focus();
-      return;
-    }
-
-    if (!event.shiftKey && document.activeElement === lastElement) {
-      event.preventDefault();
-      firstElement.focus();
-    }
-  };
-
   if (!project) return null;
 
-  const activeImage = project.images[imageIndex];
-  const hasMultipleImages = project.images.length > 1;
   const isLiveExternal = project.liveUrl?.startsWith('http');
 
   return (
@@ -262,57 +240,13 @@ function ProjectModal({
             </button>
           </div>
 
-          <div className="mx-auto mb-6 w-full max-w-md overflow-hidden rounded-xl border-2 border-black bg-white dark:border-white dark:bg-dark-grey">
-            <div className="relative aspect-[16/10] w-full">
-              <Image
-                key={activeImage.src}
-                src={activeImage.src}
-                alt={activeImage.alt}
-                fill
-                sizes="(max-width: 768px) 100vw, 768px"
-                className="object-cover transition-opacity duration-300"
-                priority
-              />
-              {hasMultipleImages && (
-                <div className="absolute inset-x-3 top-1/2 flex -translate-y-1/2 items-center justify-between">
-                  <button
-                    type="button"
-                    onClick={onPreviousImage}
-                    className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-black bg-beige text-black transition hover:-translate-y-0.5 dark:border-white dark:bg-dark-black dark:text-white"
-                    aria-label="Previous project image"
-                  >
-                    <FiArrowLeft />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={onNextImage}
-                    className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-black bg-beige text-black transition hover:-translate-y-0.5 dark:border-white dark:bg-dark-black dark:text-white"
-                    aria-label="Next project image"
-                  >
-                    <FiArrowRight />
-                  </button>
-                </div>
-              )}
-            </div>
-            {hasMultipleImages && (
-              <div className="flex items-center justify-center gap-2 border-t-2 border-black px-4 py-3 dark:border-white">
-                {project.images.map((image, index) => (
-                  <button
-                    key={image.src}
-                    type="button"
-                    onClick={() => onSelectImage(index)}
-                    className={cn(
-                      'h-2.5 rounded-full transition-all',
-                      index === imageIndex
-                        ? 'w-8 bg-flat-purple dark:bg-flat-yellow'
-                        : 'w-2.5 bg-gray-300 dark:bg-gray-600',
-                    )}
-                    aria-label={`Show project image ${index + 1}`}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+          <ProjectImageCarousel
+            images={project.images}
+            imageIndex={imageIndex}
+            onNext={onNextImage}
+            onPrevious={onPreviousImage}
+            onSelect={onSelectImage}
+          />
 
           <div className="mb-6 grid gap-4">
             <section>
@@ -398,69 +332,15 @@ function ProjectModal({
 }
 
 export default function ProjectShowcase() {
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [selectedStack, setSelectedStack] = useState('All');
-  const [isVisible, setIsVisible] = useState(false);
-  const [imageIndex, setImageIndex] = useState(0);
-  const activeTriggerRef = useRef<HTMLElement | null>(null);
+  const [selectedStack, setSelectedStack] = React.useState('All');
+  const { selectedItem, isVisible, imageIndex, setImageIndex, open, close, nextImage, previousImage } =
+    useProjectModalController<Project>();
 
   const filteredProjects = useMemo(() => {
     if (selectedStack === 'All') return projects;
 
     return projects.filter((project) => project.stack.includes(selectedStack));
   }, [selectedStack]);
-
-  const closeProject = useCallback(() => {
-    setIsVisible(false);
-    window.setTimeout(() => {
-      setSelectedProject(null);
-      activeTriggerRef.current?.focus();
-    }, 180);
-  }, []);
-
-  useEffect(() => {
-    if (!selectedProject) return undefined;
-
-    const showTimer = window.setTimeout(() => {
-      setIsVisible(true);
-    }, 20);
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        closeProject();
-      }
-    };
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.clearTimeout(showTimer);
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [closeProject, selectedProject]);
-
-  const openProject = (project: Project) => {
-    activeTriggerRef.current = document.activeElement as HTMLElement | null;
-    setImageIndex(0);
-    setSelectedProject(project);
-  };
-
-  const nextImage = () => {
-    if (!selectedProject) return;
-    setImageIndex((currentIndex) =>
-      currentIndex === selectedProject.images.length - 1 ? 0 : currentIndex + 1,
-    );
-  };
-
-  const previousImage = () => {
-    if (!selectedProject) return;
-    setImageIndex((currentIndex) =>
-      currentIndex === 0 ? selectedProject.images.length - 1 : currentIndex - 1,
-    );
-  };
 
   return (
     <>
@@ -507,17 +387,17 @@ export default function ProjectShowcase() {
           <ProjectCard
             key={project.title}
             project={project}
-            onOpen={openProject}
+            onOpen={open}
           />
         ))}
       </div>
       <ProjectModal
-        project={selectedProject}
+        project={selectedItem}
         imageIndex={imageIndex}
         isVisible={isVisible}
-        onClose={closeProject}
-        onNextImage={nextImage}
-        onPreviousImage={previousImage}
+        onClose={close}
+        onNextImage={() => nextImage(selectedItem?.images.length ?? 0)}
+        onPreviousImage={() => previousImage(selectedItem?.images.length ?? 0)}
         onSelectImage={setImageIndex}
       />
     </>
