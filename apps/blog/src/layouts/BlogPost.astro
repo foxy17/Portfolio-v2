@@ -53,19 +53,19 @@ const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
 		<Header />
 		<main id="skip" class="w-[calc(100%-2em)] max-w-full m-0">
 			<article>
-				<div class="w-full">
+				<div class="w-[720px] max-w-[calc(100%-2em)] mx-auto">
 					{
 						heroImage && (
 							<Image
 								src={heroImage}
 								alt={`Cover image for ${title}`}
-								widths={[480, 720, 1020, 1440]}
-								sizes="(max-width: 720px) 100vw, 1020px"
+								widths={[480, 720, 1080]}
+								sizes="(max-width: 720px) 100vw, 720px"
 								formats={['avif', 'webp']}
 								loading="eager"
 								fetchpriority="high"
 								decoding="async"
-								class="block mx-auto rounded-xl shadow-card dark:shadow-card-dark bg-blog-surface dark:bg-blog-dark-surface"
+								class="block w-full h-auto rounded-xl shadow-card dark:shadow-card-dark bg-blog-surface dark:bg-blog-dark-surface"
 							/>
 						)
 					}
