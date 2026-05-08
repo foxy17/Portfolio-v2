@@ -11,7 +11,7 @@ category: "engineering"
 
 Bun.js is a new JavaScript runtime that was released in v1.0 in September 2023. It has been met with a lot of hype, with some people calling it the "future of JavaScript." But is the hype justified?
 
-I came across Bun.js in a Fireship.io video back in July of 2022 and it read that it was going to be the fastest runtime. I dismissed it at that time as another Javascript framework like Deno without looking much into it. But with version 1.0 out with the benchmarks and a small hands on preview I have defiantly changed my mind. Fun fact [first commit](https://github.com/oven-sh/bun/commit/025fe36defe2468ca1ed224855aa1effa09001ca) to Bun was done on 18 April 2021.
+I came across Bun.js in a Fireship.io video back in July of 2022 and it read that it was going to be the fastest runtime. I dismissed it at that time as another JavaScript framework like Deno without looking much into it. But with version 1.0 out with the benchmarks and a small hands on preview I have definitely changed my mind. Fun fact [first commit](https://github.com/oven-sh/bun/commit/025fe36defe2468ca1ed224855aa1effa09001ca) to Bun was done on 18 April 2021.
 
 ![Bun.js Github repo](./_assets/devto/bun-10-is-the-hype-justified-af8/image-1.webp)
 
@@ -21,7 +21,7 @@ Fundamentally, Bun.js is a server-side JavaScript runtime similar to Node. A bun
 
 There are many features Bun provides, but to get started we should take note of the following features(taken from official documentation):
 
-- In `bun.js`, every file is transpiled. TypeScript & JSX are simple to use out of the box without any configration
+- In `bun.js`, every file is transpiled. TypeScript & JSX are simple to use out of the box without any configuration
 - `bun.js` automatically loads environment variables from .env files
 - Web APIs like fetch, WebSocket, and ReadableStream are builtin
 - Node-API bun.js implements most of Node-API (N-API). Many Node.js native modules work out of the box.
@@ -35,7 +35,7 @@ There are many features Bun provides, but to get started we should take note of 
 ## Where Bun has all the Fun
 
 1. Rapid startup: Bun.js starts up incredibly quickly, usually in less than one millisecond. This makes it perfect for applications that require responsiveness and for running on low-powered devices. 
-2. Better DX : Another thing we need to talk about though is the bun package manager that's up to 25 times faster than NPM. And it's actually a standalone tool that can be used in any no Js project today.
+2. Better DX: Another thing we need to talk about though is the bun package manager that's up to 25 times faster than NPM. And it's actually a standalone tool that can be used in any Node.js project today.
 
 3. Small memory footprint: The memory footprint of Bun.js is typically 10MB or less. It is therefore perfect for programs that must be memory-efficient.
 
@@ -43,9 +43,9 @@ There are many features Bun provides, but to get started we should take note of 
 
 5. Bun.js's support for WebAssembly enables it to execute code that has been compiled into native machine code. This can dramatically boost some applications' performance.
 
-## Bun Developer expirience
+## Bun Developer experience
 
-Developer experience plays a big role in any framework or library that is out there. And I was shocked at how simple it is to work with bun, and how is support JSX out of the box.
+Developer experience plays a big role in any framework or library that is out there. And I was shocked at how simple it is to work with bun, and how it supports JSX out of the box.
 
 Here is an example code for a simple JSX preview hello world website.
 

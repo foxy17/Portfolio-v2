@@ -9,15 +9,15 @@ category: "engineering"
 
 > Originally published on [Dev.to](https://dev.to/foxy17/nodejs-graphql-authentication-with-jwt-apollo-server-mysql-and-sequelize-orm-3af8).
 
-For past few years we have witnessed the growth of Microservice architecture at a whole different level.It focuses on developing software systems that tries to focus on building single-function modules with well-defined interfaces and operations. Along with it we have also seen a massive growth of Agile, Devops and APIs. Until few years back REST APIs were the industry standard and hot topic but in 2015 Facebook introduced GraphQL and in 2018 they released the first stable version of it.
+For the past few years we have witnessed the growth of microservice architecture at a whole different level. It focuses on developing software systems that try to focus on building single-function modules with well-defined interfaces and operations. Along with it we have also seen a massive growth of Agile, DevOps and APIs. Until a few years back REST APIs were the industry standard and hot topic but in 2015 Facebook introduced GraphQL and in 2018 they released the first stable version of it.
 
 Github Repo - [GraphQL Authentication](https://github.com/foxy17/GraphQl-Authentication)
 
-In this article, we’ll focus on local authentication with JWT token.For database you can use any MySql database.Apollo-server is an open-source GraphQL server that is compatible with any kind of GraphQL client.I will use apollo to expose the API insted of express.
+In this article, we’ll focus on local authentication with a JWT token. For the database you can use any MySQL database. Apollo Server is an open-source GraphQL server that is compatible with any kind of GraphQL client. I will use Apollo to expose the API instead of Express.
 
 We will be making a simple authentication in which a user will have a first name, last name, email, password, company and unique employeeId. Company will be stored on another table so that we can explore fetching associations with GraphQL. Lets install the necessary packages first:
 
-`npm i apollo-server bcrpytjs dotenv jsonwebtoken sequelize mysql2 graphql`
+`npm i apollo-server bcryptjs dotenv jsonwebtoken sequelize mysql2 graphql`
 
 `npm i -D sequelize-cli nodemon`
 
@@ -34,7 +34,7 @@ const getUser = token => {
 }
 ```
 
-This is the first line after the imports, this is how we have defined out JWT middle-ware which will verify if our JWT token is valid.
+This is the first line after the imports, this is how we have defined our JWT middleware which will verify if our JWT token is valid.
 
 ```
 const server = new ApolloServer({
@@ -57,11 +57,11 @@ server.listen({ port: PORT || 8080 }).then(({ url }) => {
 
 After this we define our Apollo server which we have to pass an object which contains:
 
-1. *typeDefs*: which is the schema for the graphQL API, it defined the query and mutations we can call on the API.
+1. *typeDefs*: the schema for the GraphQL API; it defines the queries and mutations we can call on the API.
 
 2. *resolvers*: these are functions which are responsible for returning a result for respective API calls.
 
-3. *context*: it is an object shared by all the resolvers of a specific execution.This is where we retrieve the JWT token from header and run the getUser function we defined earlier to check if its valid and store the result in user variable which can be accessed by any resolver.
+3. *context*: it is an object shared by all the resolvers of a specific execution. This is where we retrieve the JWT token from header and run the getUser function we defined earlier to check if it's valid and store the result in user variable which can be accessed by any resolver.
 
 4. *introspection*: it defines whether we can query the schema for information about what queries it supports and their structure.(usually false in production)
 
@@ -102,7 +102,7 @@ const typeDefs = gql`
 ```
 
 The `gql` template literal tag can be used to concisely write a GraphQL query that is parsed into a standard GraphQL [AST](https://stackoverflow.com/questions/46163036/what-is-ast-in-graphql/46164403). `type` defines a object with its parameters. The `!` mark means that the parameters are compulsory and cannot be undefined or null. There are two distinct types, query and mutation. In simple words the query is SELECT statement and mutation is INSERT Operation.
-![Breaking down a mutaion](./_assets/devto/nodejs-graphql-authentication-with-jwt-apollo-server-mysql-and-sequelize-orm-3af8/image-1.webp)
+![Breaking down a mutation](./_assets/devto/nodejs-graphql-authentication-with-jwt-apollo-server-mysql-and-sequelize-orm-3af8/image-1.webp)
 
 Apart from scalar types of `String, Int, Float, Boolean, and ID` which we can directly assign as a type to argument or parameter we can have our own defined complex types as input. For that we use the input tag. The `UserFilter` input is a custom input which is being passed to get user list query. The `[User]` means that an array of type Users will be returned.
 
@@ -157,7 +157,7 @@ module.exports = (sequelize, DataTypes) => {
   };
 ```
 
-`beforeCreate` is a hook is called when create query is being called. The hook contains logic to hash the password with a salt so that we don’t store un-encrypted password in database. `beforeUpdate` this hook is called when update query is being called on user table. Just as before it hashesh the updated password. `User.validPassword` is a class Methods which users bcrypt to compare the hash stored in db against a string to check if both are same. `User.associate` is one-to-one association with company table with employeeId foreign key.`Timestamp:false` by default sequelize includes a `createdAt` and `updateAt` record in SQL table but this sets that to false. `freezeTableName` by defaults sequelize makes the table name plural which results in errors unless we have them set like that by default. Since I am not doing that `freezeTableName` helps me keep the table names exactly what I have defined and not changed the **User to Users** or **Company to Companies**. Index.js is just the default seqelize files to connect to database. It also takes all the models defined in the models folder, and it applies them to the “db” object.
+`beforeCreate` is a hook called when the create query is being called. The hook contains logic to hash the password with a salt so that we don’t store unencrypted passwords in the database. `beforeUpdate` is called when the update query is being called on the user table. Just as before it hashes the updated password. `User.validPassword` is a class method which uses bcrypt to compare the hash stored in db against a string to check if both are the same. `User.associate` is one-to-one association with company table with employeeId foreign key. `timestamps: false` — by default sequelize includes `createdAt` and `updatedAt` records in the SQL table but this sets that to false. `freezeTableName` — by default sequelize makes the table name plural which results in errors unless we have them set like that by default. Since I am not doing that `freezeTableName` helps me keep the table names exactly what I have defined and not change **User to Users** or **Company to Companies**. Index.js is just the default sequelize file to connect to the database. It also takes all the models defined in the models folder, and it applies them to the “db” object.
 
 ```
 const resolvers = {
@@ -238,7 +238,7 @@ const resolvers = {
                 }
 
                 return {
-                    token, user:createdUser, message: "Registration succesfull"
+                    token, user:createdUser, message: "Registration successful"
                 }
             } catch (error) {
                 throw new Error(error.message)

@@ -1,5 +1,5 @@
 ---
-title: "Common Engineering mistakes new Software developers to make: Part-1"
+title: "Common engineering mistakes new software developers make: Part 1"
 description: "As new software developers, people tend to think of themselves just as a developer and often forget..."
 pubDate: "2022-08-06"
 updatedDate: "2022-08-10"
@@ -10,10 +10,10 @@ category: "engineering"
 
 > Originally published on [Dev.to](https://dev.to/foxy17/common-engineering-mistakes-new-software-developers-to-make-part-1-3p5b).
 
-As new software developers, people tend to think of themselves just as a developer and often forget about the engineering aspect of their profession. Software development involves writing and understand code to build a software. Software engineering means using engineering concepts to develop software that is scalable, extensible, and maintainable in long run.
+As new software developers, people tend to think of themselves just as a developer and often forget about the engineering aspect of their profession. Software development involves writing and understanding code to build software. Software engineering means using engineering concepts to develop software that is scalable, extensible, and maintainable in the long run.
 
 Many software engineers especially the ones who have just started with development often focus solely on the development problem and thus their software is rarely scalable or maintainable in long run. A lot of developers have a tough time understanding their own code which they would have written a month back which does not scale well when they start working in a team. In a team often others stumble upon your code when they have to use it or refactor it. It would be a big hassle if you have to explain what you have written to someone new every time such a situation arises. Thus when working in a team with senior engineers who review your code new developers often end up with multiple comments and requested changes on their review. Trust me I have been there, my PR once had around 40+ comments on GitHub when I was doing my first internship.
-![My first PR as an inter](./_assets/devto/common-engineering-mistakes-new-software-developers-to-make-part-1-3p5b/image-1.webp)
+![My first PR as an intern](./_assets/devto/common-engineering-mistakes-new-software-developers-to-make-part-1-3p5b/image-1.webp)
 
 So far I have worked in multiple early stage startups and done few freelancing gigs and have seen many new developers struggle with few points that I will share. I recommend developers to read the book **Clean Code : Robert C Martin** as it's more approachable, especially for new developers.
 
@@ -46,7 +46,7 @@ You would expect the end result of this line to be double of whatever number is 
 
 Supposed if the function name would have been `doubleMultipleOfThree` you would have easily figured out by the name itself what the function does and would not have to go to the function definition to understand it. Same principle applies to naming variables in your code.
 
-## Mistake 2 - Not understand GIT
+## Mistake 2 - Not understanding Git
 
 Two main advantages of using Git at software development:
 
@@ -58,7 +58,7 @@ Most of the people are proficient with using GIT to achieve the first point, the
 
 - Since in teams many people are working on the same code there may be cases that changes in same files are made by two people. Which create merge conflicts. 
 - Sometimes you may need to rebase a branch instead of merging to it to keep the GIT history clean. 
-- You may need to stash your changes so that you can quicky switch to other branch without losing your changes.
+- You may need to stash your changes so that you can quickly switch to other branch without losing your changes.
 
 These are few of the many scenarios that happen in team. So one need to have at least basic understanding of commands like :- 
 

@@ -387,7 +387,7 @@ function ProjectModal({
                 className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-black bg-flat-yellow px-4 py-3 font-semibold text-black transition hover:-translate-y-0.5 dark:border-white dark:bg-flat-purple dark:text-white"
               >
                 Live
-                <FiExternalLink />
+                {isLiveExternal ? <FiExternalLink /> : <FiArrowRight />}
               </Link>
             )}
           </div>
