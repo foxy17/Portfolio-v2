@@ -12,9 +12,10 @@ import cn from 'classnames';
 interface SocialLinkProps {
   icon: React.ReactNode;
   href: string;
+  label: string;
 }
 
-const SocialLink = ({ href, icon }: SocialLinkProps) => {
+const SocialLink = ({ href, icon, label }: SocialLinkProps) => {
   return (
     <li className="last:mb-4 text-dark-black dark:text-white">
       <a
@@ -22,6 +23,7 @@ const SocialLink = ({ href, icon }: SocialLinkProps) => {
         className="block p-3 group "
         target="_blank"
         rel="noreferrer noopener"
+        aria-label={label}
       >
         {icon}
       </a>
@@ -72,19 +74,23 @@ const SocialsLine = () => {
         >
           <SocialLink
             href="https://github.com/foxy17"
+            label="GitHub profile"
             icon={<VscGithubAlt />}
           />
 
           <SocialLink
             href="https://www.linkedin.com/in/arnavschauhan/"
+            label="LinkedIn profile"
             icon={<RiLinkedinLine />}
           />
           <SocialLink
             href="https://twitter.com/arnav_sde"
+            label="Twitter profile"
             icon={<RiTwitterLine />}
           />
           <SocialLink
             href="https://www.polywork.com/foxy17"
+            label="Polywork profile"
             icon={
               <svg
                 viewBox="0 0 250 250"

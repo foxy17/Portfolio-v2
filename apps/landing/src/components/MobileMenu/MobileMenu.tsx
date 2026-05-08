@@ -58,6 +58,9 @@ export default function MobileMenu() {
             <Link href="/" className="flex w-auto pb-4">
               Home
             </Link>
+            <Link href="/stuff" className="flex w-auto pb-4">
+              Stuff
+            </Link>
             <Link
               href="https://blog.carnav.in/"
               target="_blank"

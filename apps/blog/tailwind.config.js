@@ -84,11 +84,12 @@ module.exports = {
               blockquote: {
                 fontWeight: '500',
                 fontStyle: 'italic',
-                color: theme('colors.gray.200'), // #444444
+                color: theme('colors.gray.700'), // readable on beige
                 borderInlineStartWidth: '0.25rem',
                 borderInlineStartColor: theme('colors.flat-green'), // #0ba95b
                 quotes: '"\\201C""\\201D""\\2018""\\2019"',
               },
+              'blockquote p': { color: 'inherit' },
               'blockquote p:first-of-type::before': { content: 'open-quote', color: theme('colors.flat-green') },
               'blockquote p:last-of-type::after': { content: 'close-quote' , color: theme('colors.flat-green')},
 
@@ -216,6 +217,7 @@ module.exports = {
                 color: theme('colors.beige.200'), // rgba(249,244,218,0.95)
                 borderInlineStartColor: theme('colors.flat-green'), // #0ba95b
               },
+              'blockquote p': { color: 'inherit' },
 
               // Code
               code: {

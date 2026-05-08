@@ -33,6 +33,7 @@ export default function NavContainer(props: any) {
             <NavItem href="/" text="Home" />
             {/*<NavItem href="/timeline" text="Timeline" />*/}
             {/*<NavItem href="/projects" text="Work" />*/}
+            <NavItem href="/stuff" text="Stuff" />
             <NavItem
               href="https://blog.carnav.in/"
               external={true}

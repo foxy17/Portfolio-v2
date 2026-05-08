@@ -17,7 +17,7 @@ export default function BlogPostCard({
   return (
     <div className="rounded-xl block group relative w-full md:w-1/3 h-full">
       <span
-        className="absolute inset-0 border-2 border-black dark:border-white w-full border-dashed rounded-xl"
+        className="absolute inset-0 z-0 border-2 border-black dark:border-white w-full border-dashed rounded-xl"
         aria-hidden="true"
       ></span>
       <div

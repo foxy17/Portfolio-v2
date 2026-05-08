@@ -61,3 +61,13 @@
   clip: rect(1px, 1px, 1px, 1px);
   clip-path: inset(50%);
 }
+
+.prose blockquote,
+.prose blockquote p {
+  color: #333333;
+}
+
+.dark .prose blockquote,
+.dark .prose blockquote p {
+  color: rgba(249, 244, 218, 0.95);
+}
