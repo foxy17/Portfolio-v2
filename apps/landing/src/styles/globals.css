@@ -56,6 +56,104 @@ h3 {
     @apply absolute px-4 py-3 transition-transform duration-200 transform -translate-y-12 -left-1/4 focus:top-4 focus:translate-y-3 -top-8;
 }
 
+.stuff-page-shell {
+    width: calc(100vw - 4rem);
+    max-width: 56rem;
+}
+
+@media (min-width: 640px) {
+    .stuff-page-shell {
+        width: 100%;
+    }
+}
+
+.not-found-meme {
+    animation: notFoundFloat 3.5s ease-in-out infinite;
+}
+
+.not-found-loader {
+    animation: notFoundLoader 1.4s ease-in-out infinite alternate;
+}
+
+.not-found-sticker {
+    animation: notFoundSticker 1.2s steps(2, end) infinite;
+}
+
+.stuff-modal-scroll {
+    scrollbar-gutter: stable;
+    scrollbar-color: #7b5ea7 #f4eed7;
+    scrollbar-width: thin;
+}
+
+.stuff-modal-scroll::-webkit-scrollbar {
+    width: 14px;
+}
+
+.stuff-modal-scroll::-webkit-scrollbar-track {
+    background: #f4eed7;
+    border-left: 2px solid #000;
+}
+
+.stuff-modal-scroll::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #f9ba22, #7b5ea7, #12b5e5);
+    border: 3px solid #f4eed7;
+    border-radius: 999px;
+}
+
+.stuff-modal-scroll::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #f9ba22, #5b3f8f, #12b5e5);
+}
+
+.dark .stuff-modal-scroll {
+    scrollbar-color: #f9ba22 #1f1b1d;
+}
+
+.dark .stuff-modal-scroll::-webkit-scrollbar-track {
+    background: #1f1b1d;
+    border-left-color: #fff;
+}
+
+.dark .stuff-modal-scroll::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #f9ba22, #5b3f8f, #12b5e5);
+    border-color: #1f1b1d;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .not-found-meme,
+    .not-found-loader,
+    .not-found-sticker {
+        animation: none;
+    }
+}
+
+@keyframes notFoundFloat {
+    0%,
+    100% {
+        transform: translateY(0) rotate(-1deg);
+    }
+    50% {
+        transform: translateY(-8px) rotate(1deg);
+    }
+}
+
+@keyframes notFoundLoader {
+    from {
+        transform: translateX(-55%);
+    }
+    to {
+        transform: translateX(110%);
+    }
+}
+
+@keyframes notFoundSticker {
+    0% {
+        transform: rotate(6deg) scale(1);
+    }
+    50% {
+        transform: rotate(-7deg) scale(1.08);
+    }
+}
+
 @-webkit-keyframes wordSlider {
     0%,
     16% {

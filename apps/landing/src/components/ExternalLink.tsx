@@ -11,7 +11,7 @@ interface ExternalLinkProps {
 const ExternalLink = ({ href, children, style }: ExternalLinkProps) => (
   <Link
     className={cn(
-      'text-gray-500! hover:text-gray-600! transition w-full',
+      'w-full text-gray-700! transition hover:text-gray-900! dark:text-gray-300! dark:hover:text-white!',
       style,
     )}
     target="_blank"

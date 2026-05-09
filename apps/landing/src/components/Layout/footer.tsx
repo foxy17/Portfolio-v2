@@ -13,7 +13,7 @@ export default function Footer() {
         <div className="flex flex-col space-y-4">
           <Link
             href="/"
-            className="text-gray-500! hover:text-gray-600! transition"
+            className="text-gray-700! transition hover:text-gray-900! dark:text-gray-300! dark:hover:text-white!"
           >
             Home
           </Link>

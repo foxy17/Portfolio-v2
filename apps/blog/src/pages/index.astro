@@ -4,6 +4,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import FormattedDate from '../components/FormattedDate.astro';
 
 const posts = (
@@ -28,16 +29,27 @@ const posts = (
 						posts.map((post, index) => (
 							<li class={`${index === 0 ? 'w-full mb-4 text-center' : 'w-[calc(50%-1rem)]'}`}>
 								<a href={`/${post.id}/`} class="block">
-									<img
-										width={720}
-										height={360}
-										src={post.data.heroImage}
-										alt={`Cover image for ${post.data.title}`}
-										loading={index === 0 ? 'eager' : 'lazy'}
-										fetchpriority={index === 0 ? 'high' : 'low'}
-										decoding="async"
-										class={`${index === 0 ? 'w-full' : ''} mb-2 rounded-xl transition-all duration-200 ease-in-out hover:shadow-card dark:hover:shadow-card-dark`}
-									/>
+									{post.data.heroImage && (
+										<Image
+											src={post.data.heroImage}
+											alt={`Cover image for ${post.data.title}`}
+											widths={
+												index === 0
+													? [480, 720, 960, 1280]
+													: [240, 360, 480, 720]
+											}
+											sizes={
+												index === 0
+													? '(max-width: 720px) 100vw, 960px'
+													: '(max-width: 720px) 100vw, 460px'
+											}
+											formats={['avif', 'webp']}
+											loading={index === 0 ? 'eager' : 'lazy'}
+											fetchpriority={index === 0 ? 'high' : 'auto'}
+											decoding="async"
+											class={`${index === 0 ? 'w-full' : ''} mb-2 rounded-xl bg-blog-surface dark:bg-blog-dark-surface transition-all duration-200 ease-in-out hover:shadow-card dark:hover:shadow-card-dark`}
+										/>
+									)}
 									<h4 class="title m-0 text-gray-900 dark:text-beige leading-none transition-colors duration-200 ease-in-out hover:text-flat-blue dark:hover:text-flat-blue text-[${index === 0 ? '2.369rem' : 'inherit'}]">
 										{post.data.title}
 									</h4>
