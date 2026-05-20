@@ -33,6 +33,17 @@ const {
 const socialImage =
 	ogImage ?? (heroImage ? heroImage.src : undefined);
 const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const tocTree = tocHeadings.reduce<
+	(MarkdownHeading & { children: MarkdownHeading[] })[]
+>((items, heading) => {
+	if (heading.depth === 2 || items.length === 0) {
+		items.push({ ...heading, children: [] });
+		return items;
+	}
+
+	items[items.length - 1].children.push(heading);
+	return items;
+}, []);
 ---
 
 <html lang="en">
@@ -92,24 +103,44 @@ const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
 						<hr class="border-t border-blog-border dark:border-blog-dark-border" />
 					</div>
 
-					{tocHeadings.length >= 3 && (
-						<details class="not-prose mb-6 rounded-lg border border-blog-border bg-blog-surface dark:border-blog-dark-border dark:bg-blog-dark-surface p-4">
-							<summary class="cursor-pointer font-semibold text-gray-800 dark:text-beige">
-								Table of contents
-							</summary>
-							<ul class="mt-3 list-none pl-0 m-0 flex flex-col gap-1.5">
-								{tocHeadings.map((h) => (
-									<li class={h.depth === 3 ? 'pl-4' : ''}>
-										<a
-											href={`#${h.slug}`}
-											class="text-gray-700 dark:text-beige hover:text-flat-blue dark:hover:text-flat-blue no-underline"
-										>
-											{h.text}
-										</a>
-									</li>
-								))}
-							</ul>
-						</details>
+					{tocHeadings.length >= 2 && (
+						<div class="not-prose mb-8" data-toc-wrapper>
+							<details
+								class="toc-card rounded-lg border border-blog-border bg-blog-surface p-4 dark:border-blog-dark-border dark:bg-blog-dark-surface"
+								open
+								data-toc
+							>
+								<summary class="cursor-pointer text-sm font-bold uppercase tracking-[0.14em] text-gray-600 transition-colors hover:text-flat-blue dark:text-gray-400 dark:hover:text-flat-blue">
+									Table of contents
+								</summary>
+								<ul class="m-0 mt-3 flex list-none flex-col gap-2 p-0 text-sm leading-6">
+									{tocTree.map((h) => (
+										<li>
+											<a
+												href={`#${h.slug}`}
+												class="text-gray-700 no-underline transition-colors hover:text-flat-blue dark:text-beige dark:hover:text-flat-blue"
+											>
+												{h.text}
+											</a>
+											{h.children.length > 0 && (
+												<ul class="mt-1 flex list-none flex-col gap-1 border-l border-blog-border pl-3 dark:border-blog-dark-border">
+													{h.children.map((child) => (
+														<li>
+															<a
+																href={`#${child.slug}`}
+																class="text-gray-500 no-underline transition-colors hover:text-flat-blue dark:text-gray-400 dark:hover:text-flat-blue"
+															>
+																{child.text}
+															</a>
+														</li>
+													))}
+												</ul>
+											)}
+										</li>
+									))}
+								</ul>
+							</details>
+						</div>
 					)}
 
 					<slot />
@@ -192,5 +223,128 @@ const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
 			</article>
 		</main>
 		<Footer />
+		<script>
+			function initFloatingToc() {
+				if (typeof window.__blogTocCleanup === 'function') {
+					window.__blogTocCleanup();
+				}
+
+				const wrapper = document.querySelector('[data-toc-wrapper]');
+				const toc = document.querySelector('[data-toc]');
+
+				if (!wrapper || !toc) {
+					window.__blogTocCleanup = null;
+					return;
+				}
+
+				let docked = toc.dataset.docked === 'true';
+				let ticking = false;
+
+				function hasRightGutter() {
+					const contentWidth = 720;
+					const tocWidth = 256;
+					const gap = 32;
+					return (window.innerWidth - contentWidth) / 2 >= tocWidth + gap;
+				}
+
+				function animateToState(nextDocked) {
+					if (nextDocked === docked) return;
+
+					const first = toc.getBoundingClientRect();
+					wrapper.style.minHeight = `${wrapper.offsetHeight}px`;
+					toc.dataset.docked = nextDocked ? 'true' : 'false';
+					docked = nextDocked;
+					const last = toc.getBoundingClientRect();
+					const deltaX = first.left - last.left;
+					const deltaY = first.top - last.top;
+
+					toc.style.transition = 'none';
+					toc.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+
+					requestAnimationFrame(() => {
+						toc.style.transition = '';
+						toc.style.transform = '';
+					});
+				}
+
+				function updateToc() {
+					ticking = false;
+					const shouldDock =
+						hasRightGutter() && wrapper.getBoundingClientRect().bottom <= 96;
+
+					if (!shouldDock && !docked) {
+						wrapper.style.minHeight = '';
+					}
+
+					animateToState(shouldDock);
+				}
+
+				function requestUpdate() {
+					if (ticking) return;
+					ticking = true;
+					requestAnimationFrame(updateToc);
+				}
+
+				window.addEventListener('scroll', requestUpdate, { passive: true });
+				window.addEventListener('resize', requestUpdate);
+				updateToc();
+
+				window.__blogTocCleanup = () => {
+					window.removeEventListener('scroll', requestUpdate);
+					window.removeEventListener('resize', requestUpdate);
+				};
+			}
+
+			window.__blogInitFloatingToc = initFloatingToc;
+
+			if (!window.__blogTocPageLoadBound) {
+				window.__blogTocPageLoadBound = true;
+				document.addEventListener('astro:page-load', () => {
+					window.__blogInitFloatingToc?.();
+				});
+			}
+
+			initFloatingToc();
+		</script>
 	</body>
 </html>
+
+<style>
+	.toc-card {
+		transition:
+			transform 280ms ease,
+			box-shadow 200ms ease,
+			opacity 200ms ease;
+	}
+
+	.toc-card[data-docked='true'] {
+		position: fixed;
+		top: 6rem;
+		right: calc((100vw - 720px) / 2 - 18rem);
+		z-index: 30;
+		width: 16rem;
+		max-height: calc(100vh - 8rem);
+		overflow: auto;
+		box-shadow: 0 18px 45px rgba(15, 13, 14, 0.16);
+	}
+
+	:global(.dark) .toc-card[data-docked='true'] {
+		box-shadow: 0 18px 45px rgba(0, 0, 0, 0.36);
+	}
+
+	@media (max-width: 1279px) {
+		.toc-card[data-docked='true'] {
+			position: static;
+			width: auto;
+			max-height: none;
+			overflow: visible;
+			box-shadow: none;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.toc-card {
+			transition: none;
+		}
+	}
+</style>

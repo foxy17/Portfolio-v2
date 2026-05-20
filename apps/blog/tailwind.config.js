@@ -214,10 +214,16 @@ module.exports = {
 
               // Blockquotes
               blockquote: {
-                color: theme('colors.beige.200'), // rgba(249,244,218,0.95)
+                color: '#D7CEB2',
+                backgroundColor: 'rgba(249, 244, 218, 0.035)',
                 borderInlineStartColor: theme('colors.flat-green'), // #0ba95b
+                paddingTop: '0.75rem',
+                paddingBottom: '0.75rem',
+                paddingInlineEnd: '1rem',
               },
               'blockquote p': { color: 'inherit' },
+              'blockquote p:first-of-type::before': { color: theme('colors.flat-green') },
+              'blockquote p:last-of-type::after': { color: theme('colors.flat-green') },
 
               // Code
               code: {
