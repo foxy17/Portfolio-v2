@@ -2,9 +2,9 @@ import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { FiArrowUpRight } from 'react-icons/fi';
-import cn from 'classnames';
 
 import ProjectShowcase from '~/components/Stuff/ProjectShowcase';
+import ProjectShaderCanvas from '~/components/Stuff/ProjectShaderCanvas';
 import NavContainer from '~/components/Layout/NavContainer';
 import SocialsLine from '~/components/SocialLine/SocialLine';
 import { baseUrl } from '~/config/constants';
@@ -79,24 +79,6 @@ const structuredData = {
   },
 };
 
-const notes = [
-  {
-    title: 'Fast',
-    description: 'Fast enough to feel invisible',
-    accent: 'bg-flat-green',
-  },
-  {
-    title: 'Plain',
-    description: 'Plain enough to keep maintaining',
-    accent: 'bg-flat-blue',
-  },
-  {
-    title: 'Playful',
-    description: 'Playful enough to remember',
-    accent: 'bg-flat-yellow',
-  },
-] as const;
-
 export default function StuffPage() {
   return (
     <NavContainer>
@@ -124,35 +106,17 @@ export default function StuffPage() {
               href="https://github.com/foxy17"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex w-fit items-center gap-2 rounded-lg border-2 border-black bg-flat-yellow px-4 py-3 font-semibold text-black drop-shadow-card-dark transition duration-300 hover:-translate-x-1 hover:-translate-y-1 dark:border-white dark:bg-flat-purple dark:text-white dark:drop-shadow-card"
+              className="group relative inline-flex w-fit items-center gap-2 overflow-hidden rounded-lg border-2 border-black bg-flat-yellow px-4 py-3 font-semibold text-black drop-shadow-card-dark transition duration-300 hover:-translate-x-1 hover:-translate-y-1 dark:border-white dark:bg-flat-purple dark:text-white dark:drop-shadow-card"
             >
-              GitHub
-              <FiArrowUpRight className="transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              <ProjectShaderCanvas
+                variant="button"
+                className="opacity-80 mix-blend-multiply transition-opacity duration-300 group-hover:opacity-100 dark:mix-blend-screen"
+              />
+              <span className="absolute inset-0 bg-white/20 dark:bg-black/10" />
+              <span className="relative z-10">GitHub</span>
+              <FiArrowUpRight className="relative z-10 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </Link>
           </div>
-        </div>
-
-        <div className="mb-16 grid gap-4 md:grid-cols-3">
-          {notes.map((note) => (
-            <div
-              key={note.title}
-              className="relative min-w-0 overflow-hidden rounded-lg border-2 border-black bg-beige-200 p-4 dark:border-white dark:bg-dark-grey"
-            >
-              <span
-                className={cn(
-                  'absolute left-0 top-0 h-full w-2',
-                  note.accent,
-                )}
-                aria-hidden="true"
-              />
-              <p className="mb-1 pl-3 text-sm font-semibold uppercase tracking-[0.16em] text-gray-600 dark:text-gray-300">
-                {note.title}
-              </p>
-              <p className="pl-3 text-base font-semibold text-gray-900 dark:text-gray-100">
-                {note.description}
-              </p>
-            </div>
-          ))}
         </div>
 
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">

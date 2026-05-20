@@ -62,18 +62,39 @@ const imageURL = new URL(image, Astro.site ?? Astro.url).toString();
 
 <!-- Theme script: shared cookie-based theme across blog + landing -->
 <script is:inline>
-  (function () {
-    try {
-      var m = document.cookie.match(/(?:^|; )theme=(dark|light)/);
-      var t = m
-        ? m[1]
-        : window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light';
-      if (t === 'dark') document.documentElement.classList.add('dark');
-      else document.documentElement.classList.remove('dark');
-    } catch (e) {}
-  })();
+	(function () {
+		function getTheme() {
+			var m = document.cookie.match(/(?:^|; )theme=(dark|light)/);
+			return m
+				? m[1]
+				: window.matchMedia('(prefers-color-scheme: dark)').matches
+					? 'dark'
+					: 'light';
+		}
+
+		function applyTheme(root) {
+			try {
+				var target = root || document.documentElement;
+				var isDark = getTheme() === 'dark';
+				target.classList.toggle('dark', isDark);
+			} catch (e) {}
+		}
+
+		applyTheme();
+
+		if (!window.__blogThemeTransitionBound) {
+			window.__blogThemeTransitionBound = true;
+			document.addEventListener('astro:before-swap', function (event) {
+				applyTheme(event.newDocument && event.newDocument.documentElement);
+			});
+			document.addEventListener('astro:after-swap', function () {
+				applyTheme();
+			});
+			document.addEventListener('astro:page-load', function () {
+				applyTheme();
+			});
+		}
+	})();
 </script>
 
 <!-- Font preloads (Atkinson Hyperlegible, self-hosted) -->

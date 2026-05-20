@@ -12,6 +12,7 @@ import {
 } from 'react-icons/fi';
 
 import { ProjectImageCarousel } from '~/components/Stuff/ProjectImageCarousel';
+import ProjectShaderCanvas from '~/components/Stuff/ProjectShaderCanvas';
 import { useFocusTrap } from '~/components/Stuff/useFocusTrap';
 import { useProjectModalController } from '~/components/Stuff/useProjectModalController';
 
@@ -125,10 +126,15 @@ function ProjectCard({
         <button
           type="button"
           onClick={() => onOpen(project)}
-          className="flex h-full min-h-72 w-full cursor-pointer flex-col justify-between rounded-lg bg-beige p-5 text-left text-dark-grey outline-hidden transition focus-visible:ring-4 focus-visible:ring-flat-blue dark:bg-dark-black dark:text-beige"
+          className="relative flex h-full min-h-72 w-full cursor-pointer flex-col justify-between overflow-hidden rounded-lg bg-beige p-5 text-left text-dark-grey outline-hidden transition focus-visible:ring-4 focus-visible:ring-flat-blue dark:bg-dark-black dark:text-beige"
           aria-haspopup="dialog"
         >
-          <div>
+          <ProjectShaderCanvas
+            variant="card"
+            className="opacity-55 transition-opacity duration-300 group-hover:opacity-95 dark:opacity-75 dark:group-hover:opacity-100"
+          />
+          <div className="absolute inset-0 bg-linear-to-br from-beige via-beige/85 to-beige/70 dark:from-dark-black dark:via-dark-black/82 dark:to-dark-black/68" />
+          <div className="relative z-10">
             <div className="mb-5 flex items-center justify-between gap-4">
               <span className="rounded-md border-2 border-black bg-white px-3 py-1 text-sm font-semibold text-dark-grey dark:border-white dark:bg-dark-grey dark:text-beige">
                 {project.status}
@@ -142,11 +148,11 @@ function ProjectCard({
               {project.description}
             </p>
           </div>
-          <ul className="mt-8 flex flex-wrap gap-2">
+          <ul className="relative z-10 mt-8 flex flex-wrap gap-2">
             {project.details.map((detail) => (
               <li
                 key={detail}
-                className="rounded-md bg-white px-3 py-1 text-sm font-semibold text-gray-700 dark:bg-dark-grey dark:text-gray-200"
+                className="rounded-md bg-white/90 px-3 py-1 text-sm font-semibold text-gray-700 backdrop-blur-sm dark:bg-dark-grey/90 dark:text-gray-200"
               >
                 {detail}
               </li>
@@ -213,10 +219,15 @@ function ProjectModal({
         )}
         onKeyDown={handleKeyDown}
       >
-        <div
-          className={cn('h-2 shrink-0 rounded-t-xl bg-linear-to-r', project.accent)}
+        <ProjectShaderCanvas
+          variant="modal"
+          className="opacity-90 dark:opacity-100"
         />
-        <div className="stuff-modal-scroll overflow-y-auto p-5 pb-28 sm:p-6 sm:pb-28">
+        <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-transparent via-beige/78 to-beige/95 dark:via-dark-black/76 dark:to-dark-black/95" />
+        <div
+          className={cn('relative z-10 h-2 shrink-0 rounded-t-xl bg-linear-to-r', project.accent)}
+        />
+        <div className="stuff-modal-scroll relative z-10 overflow-y-auto p-5 pb-28 sm:p-6 sm:pb-28">
           <div className="mb-5 flex items-start justify-between gap-4">
             <div>
               <p className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-flat-purple dark:text-flat-yellow">
@@ -302,7 +313,7 @@ function ProjectModal({
           </div>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 border-t-2 border-black bg-beige/95 p-4 backdrop-blur dark:border-white dark:bg-dark-black/95">
+        <div className="absolute inset-x-0 bottom-0 z-20 border-t-2 border-black bg-beige/95 p-4 backdrop-blur dark:border-white dark:bg-dark-black/95">
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link
               href={project.githubUrl}

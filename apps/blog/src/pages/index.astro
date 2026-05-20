@@ -4,7 +4,6 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { getCollection } from 'astro:content';
-import { Image } from 'astro:assets';
 import FormattedDate from '../components/FormattedDate.astro';
 
 const posts = (
@@ -13,6 +12,8 @@ const posts = (
 	)
 ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
+const featuredPost = posts[0];
+const archivePosts = posts.slice(1);
 ---
 
 <!doctype html>
@@ -22,72 +23,172 @@ const posts = (
 	</head>
 	<body>
 		<Header />
-                <main id="skip" class="w-[960px]">
-			<section>
-				<ul class="flex flex-wrap gap-8 list-none m-0 p-0">
-					{
-						posts.map((post, index) => (
-							<li class={`${index === 0 ? 'w-full mb-4 text-center' : 'w-[calc(50%-1rem)]'}`}>
-								<a href={`/${post.id}/`} class="block">
-									{post.data.heroImage && (
-										<Image
-											src={post.data.heroImage}
-											alt={`Cover image for ${post.data.title}`}
-											widths={
-												index === 0
-													? [480, 720, 960, 1280]
-													: [240, 360, 480, 720]
-											}
-											sizes={
-												index === 0
-													? '(max-width: 720px) 100vw, 960px'
-													: '(max-width: 720px) 100vw, 460px'
-											}
-											formats={['avif', 'webp']}
-											loading={index === 0 ? 'eager' : 'lazy'}
-											fetchpriority={index === 0 ? 'high' : 'auto'}
-											decoding="async"
-											class={`${index === 0 ? 'w-full' : ''} mb-2 rounded-xl bg-blog-surface dark:bg-blog-dark-surface transition-all duration-200 ease-in-out hover:shadow-card dark:hover:shadow-card-dark`}
-										/>
-									)}
-									<h4 class="title m-0 text-gray-900 dark:text-beige leading-none transition-colors duration-200 ease-in-out hover:text-flat-blue dark:hover:text-flat-blue text-[${index === 0 ? '2.369rem' : 'inherit'}]">
-										{post.data.title}
-									</h4>
-									<p class="date m-0 text-gray-500 dark:text-beige transition-colors duration-200 ease-in-out hover:text-flat-blue dark:hover:text-flat-blue">
-										<FormattedDate date={post.data.pubDate} />
-									</p>
+		<main
+			id="skip"
+			class="w-[880px] max-w-[calc(100%-2rem)] mx-auto px-3 py-6 sm:px-4 sm:py-10"
+		>
+			{
+				featuredPost ? (
+					<section class="mb-12 sm:mb-16" aria-labelledby="featured-post">
+						<article class="rounded-lg border border-blog-border bg-blog-surface p-5 dark:border-blog-dark-border dark:bg-blog-dark-surface sm:p-6">
+							<div class="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
+								<span
+									id="featured-post"
+									class="font-bold uppercase tracking-[0.14em] text-flat-green"
+								>
+									Featured
+								</span>
+								<span aria-hidden="true">/</span>
+								<FormattedDate date={featuredPost.data.pubDate} />
+								{featuredPost.data.category && (
+									<>
+										<span aria-hidden="true">/</span>
+										<span>{featuredPost.data.category}</span>
+									</>
+								)}
+							</div>
+							<h2 class="m-0 text-[2rem] leading-tight font-bold text-gray-900 dark:text-beige sm:text-[2.6rem]">
+								<a
+									href={`/${featuredPost.id}/`}
+									class="hover:text-flat-blue dark:hover:text-flat-blue"
+								>
+									{featuredPost.data.title}
 								</a>
-							</li>
-						))
-					}
-				</ul>
-			</section>
+							</h2>
+							<p class="mb-0 mt-4 max-w-[680px] text-lg leading-8 text-gray-700 dark:text-beige">
+								{featuredPost.data.description}
+							</p>
+							{featuredPost.data.tags.length > 0 && (
+								<ul class="mt-5 flex list-none flex-wrap gap-2 p-0">
+									{featuredPost.data.tags.slice(0, 4).map((tag) => (
+										<li>
+											<a
+												href={`/tags/${tag}/`}
+												class="inline-flex rounded-full border border-blog-border px-3 py-1 text-sm text-gray-600 transition-colors hover:border-flat-blue hover:text-flat-blue dark:border-blog-dark-border dark:text-beige dark:hover:border-flat-blue dark:hover:text-flat-blue"
+											>
+												#{tag}
+											</a>
+										</li>
+									))}
+								</ul>
+							)}
+						</article>
+					</section>
+				) : (
+					<p class="text-gray-500 dark:text-beige">No posts published yet.</p>
+				)
+			}
+
+			{
+				archivePosts.length > 0 && (
+					<section aria-labelledby="list-title">
+						<div class="mb-4 flex flex-col gap-4 border-b border-blog-border pb-4 dark:border-blog-dark-border sm:flex-row sm:items-end sm:justify-between">
+							<div>
+								<h2
+									id="list-title"
+									class="m-0 text-sm font-bold uppercase tracking-[0.14em] text-gray-600 dark:text-beige"
+								>
+									List
+								</h2>
+							</div>
+							<label class="w-full sm:w-[18rem]">
+								<span class="sr-only">Search posts</span>
+								<input
+									type="search"
+									placeholder="Search posts"
+									autocomplete="off"
+									data-post-search
+									class="w-full rounded-lg border border-blog-border bg-transparent px-3 py-2 text-base text-gray-900 outline-none transition-colors placeholder:text-gray-500 focus:border-flat-blue dark:border-blog-dark-border dark:text-beige dark:placeholder:text-gray-400"
+								/>
+							</label>
+						</div>
+						<ul class="list-none divide-y divide-blog-border border-t border-blog-border p-0 dark:divide-blog-dark-border dark:border-blog-dark-border">
+							{archivePosts.map((post) => (
+								<li
+									data-post-search-item
+									data-post-search-text={[
+										post.data.title,
+										post.data.description,
+										post.data.category,
+										...(post.data.tags ?? []),
+									]
+										.filter(Boolean)
+										.join(' ')
+										.toLowerCase()}
+								>
+									<article class="grid gap-3 py-6 sm:grid-cols-[9rem_1fr] sm:gap-6">
+										<div class="text-sm text-gray-500 dark:text-gray-400">
+											<FormattedDate date={post.data.pubDate} />
+										</div>
+										<div>
+											<h3 class="m-0 text-[1.45rem] leading-tight font-bold text-gray-900 dark:text-beige">
+												<a
+													href={`/${post.id}/`}
+													class="hover:text-flat-blue dark:hover:text-flat-blue"
+												>
+													{post.data.title}
+												</a>
+											</h3>
+											<p class="mb-0 mt-2 text-base leading-7 text-gray-600 dark:text-beige">
+												{post.data.description}
+											</p>
+											{post.data.tags.length > 0 && (
+												<ul class="mt-3 flex list-none flex-wrap gap-x-3 gap-y-1 p-0 text-sm">
+													{post.data.tags.slice(0, 3).map((tag) => (
+														<li>
+															<a
+																href={`/tags/${tag}/`}
+																class="text-gray-500 hover:text-flat-blue dark:text-gray-400 dark:hover:text-flat-blue"
+															>
+																#{tag}
+															</a>
+														</li>
+													))}
+												</ul>
+											)}
+										</div>
+									</article>
+								</li>
+							))}
+						</ul>
+						<p
+							class="hidden border-t border-blog-border py-6 text-gray-500 dark:border-blog-dark-border dark:text-gray-400"
+							data-post-search-empty
+						>
+							No posts found.
+						</p>
+					</section>
+				)
+			}
 		</main>
 		<Footer />
+		<script>
+			function initPostSearch() {
+				const input = document.querySelector('[data-post-search]');
+				if (!input || input.dataset.postSearchBound === '1') return;
+
+				input.dataset.postSearchBound = '1';
+				input.addEventListener('input', () => {
+					const items = Array.from(
+						document.querySelectorAll('[data-post-search-item]'),
+					);
+					const empty = document.querySelector('[data-post-search-empty]');
+					const query = input.value.trim().toLowerCase();
+					let visibleCount = 0;
+
+					for (const item of items) {
+						const text = item.getAttribute('data-post-search-text') ?? '';
+						const isVisible = text.includes(query);
+						item.toggleAttribute('hidden', !isVisible);
+						if (isVisible) visibleCount += 1;
+					}
+
+					empty?.classList.toggle('hidden', visibleCount !== 0);
+				});
+			}
+
+			initPostSearch();
+			document.addEventListener('astro:page-load', initPostSearch);
+		</script>
 	</body>
 </html>
-
-<style>
-	@reference "../styles/global.css";
-	@media (max-width: 720px) {
-		main {
-			width: 100% !important;
-		}
-		
-		ul {
-			@apply gap-2;
-		}
-		
-		ul li {
-			@apply w-full text-center;
-		}
-		
-		ul li:first-child {
-			@apply mb-0;
-		}
-		
-		ul li:first-child .title {
-			@apply text-[1.563em];
-		}
-	}
-</style>
