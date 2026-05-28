@@ -1,6 +1,6 @@
 ---
 title: "Nodejs GraphQl Authentication with JWT, Apollo-server, MySql and Sequelize ORM."
-description: "For past few years we have witnessed the growth of Microservice architecture at a whole different..."
+description: "Build local GraphQL authentication in Node.js with JWT, Apollo Server, MySQL, and Sequelize ORM — a step-by-step guide to signup, login, password hashing, and protecting resolvers."
 pubDate: "2022-07-24"
 heroImage: "./_assets/devto/nodejs-graphql-authentication-with-jwt-apollo-server-mysql-and-sequelize-orm-3af8/cover.webp"
 tags: ["node", "javascript", "mysql", "graphql"]

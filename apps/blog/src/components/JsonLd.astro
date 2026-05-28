@@ -11,6 +11,8 @@ interface Props {
 	updatedDate?: Date;
 	author?: string;
 	tags?: string[];
+	wordCount?: number;
+	category?: string;
 }
 
 const {
@@ -23,6 +25,8 @@ const {
 	updatedDate,
 	author = SITE_AUTHOR,
 	tags = [],
+	wordCount,
+	category,
 } = Astro.props;
 
 const personId = 'https://carnav.in/#person';
@@ -33,6 +37,21 @@ const person = {
 	'@id': personId,
 	name: SITE_AUTHOR,
 	url: 'https://carnav.in/',
+	image: 'https://www.carnav.in/static/arnav.png',
+	jobTitle: 'Software Engineer',
+	description:
+		'Software engineer focused on web platforms, frontend performance, and developer tooling.',
+	knowsAbout: [
+		'Web Performance',
+		'Frontend Engineering',
+		'JavaScript',
+		'TypeScript',
+		'React',
+		'Astro',
+		'Node.js',
+		'GraphQL',
+		'Developer Tooling',
+	],
 	sameAs: [
 		'https://github.com/foxy17',
 		'https://twitter.com/arnav_sde',
@@ -59,7 +78,7 @@ const website = {
 const graph: Record<string, unknown>[] = [person, website];
 
 if (type === 'article' && pubDate) {
-	graph.push({
+	const article: Record<string, unknown> = {
 		'@type': 'BlogPosting',
 		'@id': `${canonicalURL.href}#article`,
 		headline: title,
@@ -74,6 +93,34 @@ if (type === 'article' && pubDate) {
 		keywords: tags.join(', '),
 		inLanguage: 'en',
 		url: canonicalURL.href,
+	};
+
+	if (wordCount && wordCount > 0) {
+		article.wordCount = wordCount;
+		article.timeRequired = `PT${Math.max(1, Math.round(wordCount / 200))}M`;
+	}
+	if (category) article.articleSection = category;
+
+	graph.push(article);
+
+	// Breadcrumb trail helps search/AI engines understand site hierarchy.
+	graph.push({
+		'@type': 'BreadcrumbList',
+		'@id': `${canonicalURL.href}#breadcrumb`,
+		itemListElement: [
+			{
+				'@type': 'ListItem',
+				position: 1,
+				name: 'Home',
+				item: `${SITE_URL}/`,
+			},
+			{
+				'@type': 'ListItem',
+				position: 2,
+				name: title,
+				item: canonicalURL.href,
+			},
+		],
 	});
 }
 

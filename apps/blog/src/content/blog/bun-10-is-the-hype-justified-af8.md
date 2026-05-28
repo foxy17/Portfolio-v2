@@ -1,6 +1,6 @@
 ---
 title: "Bun 1.0 , is the Hype Justified?"
-description: "Bun.js is a new JavaScript runtime that was released in v1.0 in September 2023. It has been met with..."
+description: "A hands-on look at Bun 1.0 — the JavaScriptCore runtime, bundler, and package manager. Where it beats Node.js on startup speed, memory, and DX, and whether the hype holds up."
 pubDate: "2023-09-15"
 heroImage: "./_assets/devto/bun-10-is-the-hype-justified-af8/cover.webp"
 tags: ["bunjs", "webdev", "javascript", "opensource"]

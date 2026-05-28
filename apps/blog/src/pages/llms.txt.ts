@@ -20,9 +20,30 @@ export const GET: APIRoute = async () => {
 	lines.push('');
 	for (const post of posts) {
 		const url = `${SITE_URL}/${post.id}/`;
-		lines.push(`- [${post.data.title}](${url}): ${post.data.description}`);
+		const date = post.data.pubDate.toISOString().slice(0, 10);
+		const tags = (post.data.tags ?? []).join(', ');
+		const meta = [`published ${date}`, tags && `tags: ${tags}`]
+			.filter(Boolean)
+			.join('; ');
+		lines.push(
+			`- [${post.data.title}](${url}): ${post.data.description} (${meta})`,
+		);
 	}
 	lines.push('');
+
+	const tagSet = new Set<string>();
+	for (const post of posts) {
+		for (const tag of post.data.tags ?? []) tagSet.add(tag);
+	}
+	if (tagSet.size > 0) {
+		lines.push('## Topics');
+		lines.push('');
+		for (const tag of [...tagSet].sort()) {
+			lines.push(`- [#${tag}](${SITE_URL}/tags/${tag}/)`);
+		}
+		lines.push('');
+	}
+
 	lines.push('## Optional');
 	lines.push('');
 	lines.push(`- [RSS feed](${SITE_URL}/rss.xml): Subscribe via RSS.`);

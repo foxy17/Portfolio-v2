@@ -4,7 +4,7 @@ import BaseHead from '../../components/BaseHead.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
-import { SITE_TITLE } from '../../consts';
+import { SITE_TITLE, SITE_URL, SITE_AUTHOR } from '../../consts';
 
 export async function getStaticPaths() {
 	const posts = await getCollection('blog', ({ data }) =>
@@ -33,7 +33,38 @@ interface Props {
 }
 
 const { tag, posts } = Astro.props;
-const description = `Posts on ${SITE_TITLE} tagged "${tag}".`;
+const description = `${posts.length} ${
+	posts.length === 1 ? 'article' : 'articles'
+} tagged "${tag}" — notes on web engineering, frontend performance, and developer tooling by ${SITE_AUTHOR}.`;
+
+// CollectionPage + ItemList lets search/AI engines treat each tag as a
+// browsable topic with an explicit, ordered list of relevant articles.
+const tagURL = `${SITE_URL}/tags/${tag}/`;
+const collectionJsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'CollectionPage',
+	'@id': `${tagURL}#collection`,
+	url: tagURL,
+	name: `#${tag}`,
+	description,
+	inLanguage: 'en',
+	isPartOf: { '@id': `${SITE_URL}/#website` },
+	about: { '@type': 'Thing', name: tag },
+	mainEntity: {
+		'@type': 'ItemList',
+		numberOfItems: posts.length,
+		itemListElement: posts.map((post, index) => ({
+			'@type': 'ListItem',
+			position: index + 1,
+			url: `${SITE_URL}/${post.id}/`,
+			name: post.data.title,
+		})),
+	},
+};
+const safeCollectionJson = JSON.stringify(collectionJsonLd).replace(
+	/[<\u2028\u2029]/g,
+	(c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`,
+);
 ---
 
 <!doctype html>
@@ -42,6 +73,11 @@ const description = `Posts on ${SITE_TITLE} tagged "${tag}".`;
 		<BaseHead
 			title={`#${tag} · ${SITE_TITLE}`}
 			description={description}
+		/>
+		<script
+			type="application/ld+json"
+			is:inline
+			set:html={safeCollectionJson}
 		/>
 	</head>
 	<body>

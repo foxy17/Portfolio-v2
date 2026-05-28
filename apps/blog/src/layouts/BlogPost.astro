@@ -10,6 +10,7 @@ import FormattedDate from '../components/FormattedDate.astro';
 type Props = CollectionEntry<'blog'>['data'] & {
 	headings?: MarkdownHeading[];
 	minutesRead?: string;
+	wordCount?: number;
 	prev?: CollectionEntry<'blog'> | null;
 	next?: CollectionEntry<'blog'> | null;
 	related?: CollectionEntry<'blog'>[];
@@ -23,9 +24,11 @@ const {
 	heroImage,
 	tags = [],
 	author,
+	category,
 	ogImage,
 	headings = [],
 	minutesRead,
+	wordCount,
 	prev = null,
 	next = null,
 	related = [],
@@ -57,6 +60,8 @@ const tocTree = tocHeadings.reduce<
 			updatedDate={updatedDate}
 			author={author}
 			tags={tags}
+			wordCount={wordCount}
+			category={category}
 		/>
 	</head>
 

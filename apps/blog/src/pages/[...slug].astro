@@ -52,6 +52,7 @@ const { Content, headings, remarkPluginFrontmatter } = await render(post);
 	{...post.data}
 	headings={headings}
 	minutesRead={remarkPluginFrontmatter.minutesRead}
+	wordCount={remarkPluginFrontmatter.wordCount}
 	prev={prev}
 	next={next}
 	related={related}
