@@ -3225,6 +3225,13 @@
   resolved "https://registry.yarnpkg.com/@unrs/resolver-binding-win32-x64-msvc/-/resolver-binding-win32-x64-msvc-1.3.3.tgz#eee226e5b4c4d91c862248afd24452c8698ed542"
   integrity sha512-GraLbYqOJcmW1qY3osB+2YIiD62nVf2/bVLHZmrb4t/YSUwE03l7TwcDJl08T/Tm3SVhepX8RQkpzWbag/Sb4w==
 
+"@upstash/redis@^1.38.0":
+  version "1.38.0"
+  resolved "https://registry.yarnpkg.com/@upstash/redis/-/redis-1.38.0.tgz#f83416bcaceb8fe97a371900aa0debc0ca70eeb0"
+  integrity sha512-wu+dZBptlLy0+MCUEoHmzrY/TnmgDey3+c7EbIGwrLqAvkP8yi5MWZHYGIFtAygmL4Bkz2TdFu+eU0vFPncIcg==
+  dependencies:
+    uncrypto "^0.1.3"
+
 "@urql/core@^5.0.4", "@urql/core@^5.1.1", "@urql/core@^5.1.2":
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/@urql/core/-/core-5.2.0.tgz#77ee41e192e261fea30c2ca6c2f340410b45d214"

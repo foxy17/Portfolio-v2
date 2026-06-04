@@ -7,8 +7,10 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import TableOfContents from '../components/TableOfContents.astro';
+import ViewCounter from '../components/ViewCounter.astro';
 
 type Props = CollectionEntry<'blog'>['data'] & {
+	slug?: string;
 	headings?: MarkdownHeading[];
 	minutesRead?: string;
 	wordCount?: number;
@@ -27,6 +29,7 @@ const {
 	author,
 	category,
 	ogImage,
+	slug,
 	headings = [],
 	minutesRead,
 	wordCount,
@@ -95,6 +98,18 @@ const tocTree = tocHeadings.reduce<
 								<>
 									<span aria-hidden="true">·</span>
 									<span>{minutesRead}</span>
+								</>
+							)}
+							{slug && (
+								<>
+									<span aria-hidden="true">·</span>
+									<span data-view-counter data-slug={slug}>
+										<ViewCounter slug={slug} server:defer>
+											<span slot="fallback" class="opacity-50">
+												👁 —
+											</span>
+										</ViewCounter>
+									</span>
 								</>
 							)}
 						</div>
@@ -252,6 +267,50 @@ const tocTree = tocHeadings.reduce<
 			}
 
 			initBlogToc();
+		</script>
+		<script>
+			// Record one view per visitor per day. The localStorage flag skips the
+			// POST entirely on repeat same-day loads (0 Redis calls); the server
+			// still dedupes via the seen: gate as a cross-device backstop.
+			function recordBlogView() {
+				const host = document.querySelector('[data-view-counter]');
+				const slug = host?.getAttribute('data-slug');
+				if (!host || !slug) return;
+
+				const day = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+				const key = `viewed:${slug}:${day}`;
+				try {
+					if (localStorage.getItem(key)) return;
+				} catch {
+					// localStorage blocked (private mode) — fall through and let the
+					// server-side gate handle dedupe.
+				}
+
+				fetch(`/api/view?slug=${encodeURIComponent(slug)}`, {
+					method: 'POST',
+					keepalive: true,
+				})
+					.then((r) => (r.ok ? r.json() : null))
+					.then((data) => {
+						try {
+							localStorage.setItem(key, '1');
+						} catch {
+							/* ignore */
+						}
+						if (data && typeof data.views === 'number') {
+							const num = host.querySelector('[data-view-count]');
+							if (num) num.textContent = data.views.toLocaleString();
+						}
+					})
+					.catch(() => {});
+			}
+
+			if (!window.__blogViewBound) {
+				window.__blogViewBound = true;
+				document.addEventListener('astro:page-load', recordBlogView);
+			}
+
+			recordBlogView();
 		</script>
 	</body>
 </html>
