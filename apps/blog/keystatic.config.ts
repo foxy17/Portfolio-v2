@@ -56,8 +56,13 @@ export default config({
 				updatedDate: fields.date({ label: 'Updated date' }),
 				heroImage: fields.image({
 					label: 'Hero image',
-					directory: `${repoDir}public/heroes`,
-					publicPath: '/heroes/',
+					// Stored in src/assets so Astro's image() optimizes it. The
+					// publicPath is relative to the post .md (src/content/blog/*),
+					// matching existing `../../assets/blog/...` hero values so they
+					// render in the editor. Relative path is repo-layout agnostic,
+					// so no repoDir prefix here.
+					directory: `${repoDir}src/assets/blog`,
+					publicPath: '../../assets/blog/',
 				}),
 				ogImage: fields.image({
 					label: 'OG image override',
@@ -94,9 +99,12 @@ export default config({
 					label: 'Content',
 					extension: 'md',
 					options: {
+						// Body images share the hero store: src/assets/blog with a
+						// post-relative publicPath, so existing `![](../../assets/blog/..)`
+						// images show in the editor and new uploads stay Astro-optimized.
 						image: {
-							directory: `${repoDir}public/heroes`,
-							publicPath: '/heroes/',
+							directory: `${repoDir}src/assets/blog`,
+							publicPath: '../../assets/blog/',
 						},
 					},
 				}),
