@@ -3,20 +3,36 @@ import { Redis } from '@upstash/redis';
 let client: Redis | null = null;
 let resolved = false;
 
+// Read the first defined value across import.meta.env (build/SSR) and
+// process.env (runtime) for any of the given names.
+function readEnv(names: string[]): string | undefined {
+	const sources: Record<string, string | undefined>[] = [
+		import.meta.env as unknown as Record<string, string | undefined>,
+		process.env,
+	];
+	for (const name of names) {
+		for (const source of sources) {
+			const value = source?.[name];
+			if (value) return value;
+		}
+	}
+	return undefined;
+}
+
 /**
  * Lazily build the Upstash client. Returns null when env vars are absent
  * (local dev, previews without secrets) so callers degrade to a no-op
  * instead of throwing.
+ *
+ * Accepts both auto-provisioned naming schemes: the native Upstash
+ * integration (`UPSTASH_REDIS_REST_*`) and the Vercel Marketplace / KV-style
+ * integration (`KV_REST_API_*`). Whatever Vercel injected is picked up.
  */
 function getClient(): Redis | null {
 	if (resolved) return client;
 	resolved = true;
-	const url =
-		import.meta.env.UPSTASH_REDIS_REST_URL ??
-		process.env.UPSTASH_REDIS_REST_URL;
-	const token =
-		import.meta.env.UPSTASH_REDIS_REST_TOKEN ??
-		process.env.UPSTASH_REDIS_REST_TOKEN;
+	const url = readEnv(['UPSTASH_REDIS_REST_URL', 'KV_REST_API_URL']);
+	const token = readEnv(['UPSTASH_REDIS_REST_TOKEN', 'KV_REST_API_TOKEN']);
 	if (!url || !token) return null;
 	client = new Redis({ url, token });
 	return client;
