@@ -86,10 +86,9 @@ export default config({
 					],
 					defaultValue: '',
 				}),
-				author: fields.text({
-					label: 'Author',
-					defaultValue: 'Arnav Chauhan',
-				}),
+				// Author is always the site owner. Omitted from the dashboard so
+				// there's no field to set; content.config.ts defaults every post's
+				// `author` to 'Arnav Chauhan' at read time.
 				draft: fields.checkbox({
 					label: 'Draft',
 					description: 'Drafts are excluded from production builds.',
