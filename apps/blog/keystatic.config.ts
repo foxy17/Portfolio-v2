@@ -1,12 +1,26 @@
 import { config, fields, collection, singleton } from '@keystatic/core';
 
-// Local filesystem in dev (edits write straight to ./src/content), GitHub in
-// production so the deployed /keystatic dashboard commits drafts + posts to the
-// repo. GitHub mode needs the KEYSTATIC_* env vars (see apps/blog/.env.example);
-// connect the GitHub App once via the deployed dashboard to generate them.
-const storage = import.meta.env.DEV
-	? ({ kind: 'local' } as const)
-	: ({ kind: 'github', repo: 'foxy17/Portfolio-v2' } as const);
+// Storage resolution (must match on server + client, so read it from
+// import.meta.env which Astro exposes to both):
+// - production build -> GitHub (the deployed /keystatic commits to the repo)
+// - local dev        -> local filesystem (edits write straight to ./src/content)
+// - PUBLIC_KEYSTATIC_STORAGE=github -> force GitHub mode anywhere, including
+//   localhost. Needed once to run the "Connect to GitHub" app-creation wizard,
+//   which Keystatic only renders on localhost — a deployed domain just shows a
+//   "Log in with GitHub" button that dead-ends until the KEYSTATIC_* env exist.
+const storageKind =
+	import.meta.env.PUBLIC_KEYSTATIC_STORAGE ??
+	(import.meta.env.DEV ? 'local' : 'github');
+const storage =
+	storageKind === 'github'
+		? ({ kind: 'github', repo: 'foxy17/Portfolio-v2' } as const)
+		: ({ kind: 'local' } as const);
+
+// In a monorepo, GitHub storage reads paths relative to the repo root, while
+// local storage reads them relative to cwd (apps/blog). Prefix every
+// repo-relative path with the app dir in GitHub mode so the dashboard finds
+// content; leave it empty locally. publicPath URLs are unaffected.
+const repoDir = storageKind === 'github' ? 'apps/blog/' : '';
 
 export default config({
 	storage,
@@ -17,7 +31,7 @@ export default config({
 		posts: collection({
 			label: 'Blog posts',
 			slugField: 'title',
-			path: 'src/content/blog/*',
+			path: `${repoDir}src/content/blog/*`,
 			format: { contentField: 'content' },
 			entryLayout: 'content',
 			columns: ['title', 'pubDate'],
@@ -42,14 +56,14 @@ export default config({
 				updatedDate: fields.date({ label: 'Updated date' }),
 				heroImage: fields.image({
 					label: 'Hero image',
-					directory: 'public/heroes',
+					directory: `${repoDir}public/heroes`,
 					publicPath: '/heroes/',
 				}),
 				ogImage: fields.image({
 					label: 'OG image override',
 					description:
 						'Optional. Custom social card image (1200×630). Falls back to hero image.',
-					directory: 'public/og',
+					directory: `${repoDir}public/og`,
 					publicPath: '/og/',
 				}),
 				tags: fields.array(fields.text({ label: 'Tag' }), {
@@ -81,7 +95,7 @@ export default config({
 					extension: 'md',
 					options: {
 						image: {
-							directory: 'public/heroes',
+							directory: `${repoDir}public/heroes`,
 							publicPath: '/heroes/',
 						},
 					},
@@ -92,7 +106,7 @@ export default config({
 	singletons: {
 		site: singleton({
 			label: 'Site settings',
-			path: 'src/content/site/',
+			path: `${repoDir}src/content/site/`,
 			schema: {
 				title: fields.text({ label: 'Site title' }),
 				description: fields.text({
