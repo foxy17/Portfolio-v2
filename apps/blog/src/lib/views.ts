@@ -7,8 +7,11 @@ let resolved = false;
 // process.env (runtime) for any of the given names.
 function readEnv(names: string[]): string | undefined {
 	const sources: Record<string, string | undefined>[] = [
-		import.meta.env as unknown as Record<string, string | undefined>,
-		process.env,
+		(import.meta.env ?? {}) as unknown as Record<string, string | undefined>,
+		// `process` is undefined in edge runtimes; guard so module eval can't throw.
+		typeof process !== 'undefined'
+			? (process.env as Record<string, string | undefined>)
+			: {},
 	];
 	for (const name of names) {
 		for (const source of sources) {

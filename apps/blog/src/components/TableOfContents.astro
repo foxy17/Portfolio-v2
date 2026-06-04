@@ -7,7 +7,15 @@ interface Props {
 
 const { items } = Astro.props;
 
-const letter = (n: number) => String.fromCharCode(97 + (n % 26));
+// Spreadsheet-style labels: a, b, … z, aa, ab, … — strictly increasing, so
+// sections beyond 26 children don't loop back to "a".
+const letter = (n: number) => {
+	let label = '';
+	for (let i = n; i >= 0; i = Math.floor(i / 26) - 1) {
+		label = String.fromCharCode(97 + (i % 26)) + label;
+	}
+	return label;
+};
 ---
 
 <ol class="m-0 flex list-none flex-col gap-0.5 p-0 text-[13px] leading-snug">
