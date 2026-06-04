@@ -2,7 +2,7 @@
 title: 'Why everyone is talking about Astro and Island Architecture'
 description: 'A 2026 refresh of the case for Astro: zero-JS by default, partial hydration, and the island architecture pattern that makes content sites fast again.'
 pubDate: '2026-05-05'
-heroImage: '../../assets/blog/astro-island-architecture-hero.webp'
+heroImage: '../../assets/blog/why-everyone-is-talking-about-astro/astro-island-architecture-hero.webp'
 tags: ['astro', 'web-performance', 'frontend', 'island-architecture']
 category: 'engineering'
 ---

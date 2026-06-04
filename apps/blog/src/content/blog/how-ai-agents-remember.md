@@ -2,10 +2,10 @@
 title: 'How AI Agents Remember'
 description: 'AI agent memory explained: the write/read/forget model, working vs episodic vs semantic memory, vectors vs temporal graphs, pgvector, and how to evaluate it.'
 pubDate: '2026-06-12'
-heroImage: '../../assets/blog/mem-hero.png'
+heroImage: '../../assets/blog/how-ai-agents-remember/mem-hero.png'
 tags: ['ai', 'agents', 'agent-memory', 'llm', 'memory', 'rag', 'vector-database', 'pgvector', 'knowledge-graph', 'context-engineering']
 category: 'engineering'
-ogImage: '/og/how-ai-agents-remember.png'
+ogImage: '/og/how-ai-agents-remember/how-ai-agents-remember.png'
 ---
 
 Most "AI memory" tutorials hand you a vector database on page one. Then your agent still forgets things, retrieves nonsense, or uses a fact that stopped being true last week. The storage was never the hard part.
@@ -33,7 +33,7 @@ Across all four, the operations are three verbs ([Nick Lawson](https://towardsda
 
 Almost every "my agent forgot" bug is a broken Read that fetched the wrong thing, or a missing Forget that let a stale fact win.
 
-![A hand-drawn cycle showing the three jobs of agent memory: write, read, and forget, looping into each other](../../assets/blog/mem-three-jobs.png)
+![A hand-drawn cycle showing the three jobs of agent memory: write, read, and forget, looping into each other](../../assets/blog/how-ai-agents-remember/mem-three-jobs.png)
 
 ## The simplest memory that works
 
@@ -84,7 +84,7 @@ ORDER BY embedding <=> $query_embedding
 LIMIT 5;
 ```
 
-![A hand-drawn pipeline: a note splits into chunks, each chunk becomes an embedding, embeddings go into a store, a query embedding pulls the nearest matches, and a reranker reorders them](../../assets/blog/mem-retrieval-pipeline.png)
+![A hand-drawn pipeline: a note splits into chunks, each chunk becomes an embedding, embeddings go into a store, a query embedding pulls the nearest matches, and a reranker reorders them](../../assets/blog/how-ai-agents-remember/mem-retrieval-pipeline.png)
 
 > **Going deeper.** Top-k similarity ranks by closeness, which can skip the chunk you wanted, because nearest is not most useful. Hybrid retrieval runs keyword search beside vector search so exact terms like an error code or a surname still land, and a reranker re-scores the shortlist with a model that reads query and chunk together. Budget for the real cost too: an embedding on every write, an extraction call to decide what to store, the reranker, prompt tokens on read, and the evals that keep it honest. "Storage plus a lookup" hides most of the bill.
 
@@ -108,7 +108,7 @@ Picture this: "what did the person who reviewed my PR last month suggest about a
 (Comment 88) --about------> (Auth)
 ```
 
-![A hand-drawn split image: on the left a loose cloud of dots labeled similarity, on the right named boxes joined by labeled arrows showing a multi-hop path](../../assets/blog/mem-vectors-vs-graph.png)
+![A hand-drawn split image: on the left a loose cloud of dots labeled similarity, on the right named boxes joined by labeled arrows showing a multi-hop path](../../assets/blog/how-ai-agents-remember/mem-vectors-vs-graph.png)
 
 The sharper win is time. Facts expire, and "prefer the newest row" is a blunt rule. [Zep's Graphiti](https://help.getzep.com/graphiti) graph is bi-temporal: it records when an event happened and when you learned it, and when a new edge contradicts an old one it marks the old fact invalid rather than deleting it. The agent can answer "what was the shipping status on Tuesday" and "what is it now" from one store.
 
@@ -120,7 +120,7 @@ The sharper win is time. Facts expire, and "prefer the newest row" is a blunt ru
 
 The exception is memory your app does not already store: a user's learned preferences, an agent's procedural notes, a running summary of past sessions. Those want their own memory tables and an event log, grounded against your source of truth but kept out of business tables.
 
-![A hand-drawn contrast: one tidy database feeding the agent, versus an app database and a separate vector copy drifting apart, with a crossed-out stale row](../../assets/blog/mem-one-source-of-truth.png)
+![A hand-drawn contrast: one tidy database feeding the agent, versus an app database and a separate vector copy drifting apart, with a crossed-out stale row](../../assets/blog/how-ai-agents-remember/mem-one-source-of-truth.png)
 
 > **Going deeper.** Beyond write policy, mature agents consolidate. [Generative Agents](https://arxiv.org/abs/2304.03442) kept a memory stream, retrieved by a blend of recency, importance, and relevance, and synthesized higher-level reflections from raw observations. Summarization is a form of forgetting: you compress many episodic rows into one semantic fact and drop the noise. Decide who writes, how you dedupe, and how you reflect before you turn any of it on.
 
