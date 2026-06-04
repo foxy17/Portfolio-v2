@@ -1,0 +1,35 @@
+---
+// Read-only server island. Renders the current view total for `slug`.
+// Recording is done client-side via /api/view (localStorage day-gated), so
+// this fragment carries no per-visitor data and is safe to cache at the edge.
+import { getViews } from '../lib/views';
+
+interface Props {
+	slug: string;
+}
+const { slug } = Astro.props;
+
+const views = await getViews(slug);
+
+// Short shared cache: the deferred fragment isn't a DB hit on every render,
+// and the client POST refreshes the number after recording.
+Astro.response.headers.set(
+	'Cache-Control',
+	'public, s-maxage=30, stale-while-revalidate=120',
+);
+---
+
+{
+	views !== null && (
+		<span class="inline-flex items-center gap-2">
+			<span aria-hidden="true">·</span>
+			<span class="inline-flex items-center gap-1">
+				<span aria-hidden="true">👁</span>
+				<span data-view-count class="tabular-nums">
+					{views.toLocaleString()}
+				</span>
+				<span>views</span>
+			</span>
+		</span>
+	)
+}

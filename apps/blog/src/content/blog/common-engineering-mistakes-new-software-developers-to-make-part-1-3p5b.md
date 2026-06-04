@@ -1,6 +1,6 @@
 ---
 title: "Common engineering mistakes new software developers make: Part 1"
-description: "As new software developers, people tend to think of themselves just as a developer and often forget..."
+description: "Common mistakes new software developers make — poor naming, weak Git habits, and code that doesn't scale. Practical lessons from real code reviews and the Clean Code mindset."
 pubDate: "2022-08-06"
 updatedDate: "2022-08-10"
 heroImage: "./_assets/devto/common-engineering-mistakes-new-software-developers-to-make-part-1-3p5b/cover.webp"

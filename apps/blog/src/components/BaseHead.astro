@@ -13,6 +13,8 @@ interface Props {
 	updatedDate?: Date;
 	author?: string;
 	tags?: string[];
+	wordCount?: number;
+	category?: string;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -26,6 +28,8 @@ const {
 	updatedDate,
 	author = SITE_AUTHOR,
 	tags = [],
+	wordCount,
+	category,
 } = Astro.props;
 
 const imageURL = new URL(image, Astro.site ?? Astro.url).toString();
@@ -174,4 +178,6 @@ const imageURL = new URL(image, Astro.site ?? Astro.url).toString();
 	updatedDate={updatedDate}
 	author={author}
 	tags={tags}
+	wordCount={wordCount}
+	category={category}
 />
