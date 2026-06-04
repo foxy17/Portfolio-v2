@@ -1,0 +1,48 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+	items: (MarkdownHeading & { children: MarkdownHeading[] })[];
+}
+
+const { items } = Astro.props;
+
+const letter = (n: number) => String.fromCharCode(97 + (n % 26));
+---
+
+<ol class="m-0 flex list-none flex-col gap-0.5 p-0 text-[13px] leading-snug">
+	{
+		items.map((h, i) => (
+			<li>
+				<a
+					href={`#${h.slug}`}
+					data-toc-link
+					class="group flex items-baseline gap-2 rounded px-2 py-0.5 font-medium text-gray-700 no-underline transition-colors hover:bg-black/5 hover:text-flat-blue dark:text-beige dark:hover:bg-white/5 dark:hover:text-flat-blue"
+				>
+					<span class="w-5 shrink-0 text-right tabular-nums text-gray-400 transition-colors group-hover:text-flat-blue dark:text-gray-500">
+						{i + 1}
+					</span>
+					<span class="min-w-0">{h.text}</span>
+				</a>
+				{h.children.length > 0 && (
+					<ol class="m-0 mt-0.5 mb-1 flex list-none flex-col gap-0.5 border-l border-blog-border p-0 pl-3 dark:border-blog-dark-border">
+						{h.children.map((child, j) => (
+							<li>
+								<a
+									href={`#${child.slug}`}
+									data-toc-link
+									class="group flex items-baseline gap-2 rounded px-2 py-0.5 text-[12px] text-gray-500 no-underline transition-colors hover:bg-black/5 hover:text-flat-blue dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-flat-blue"
+								>
+									<span class="w-4 shrink-0 text-right tabular-nums text-gray-400 transition-colors group-hover:text-flat-blue dark:text-gray-500">
+										{letter(j)}
+									</span>
+									<span class="min-w-0">{child.text}</span>
+								</a>
+							</li>
+						))}
+					</ol>
+				)}
+			</li>
+		))
+	}
+</ol>

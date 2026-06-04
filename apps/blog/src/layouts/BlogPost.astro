@@ -6,6 +6,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
+import TableOfContents from '../components/TableOfContents.astro';
 
 type Props = CollectionEntry<'blog'>['data'] & {
 	headings?: MarkdownHeading[];
@@ -109,43 +110,33 @@ const tocTree = tocHeadings.reduce<
 					</div>
 
 					{tocHeadings.length >= 2 && (
-						<div class="not-prose mb-8" data-toc-wrapper>
+						<div class="not-prose mb-8">
 							<details
-								class="toc-card rounded-lg border border-blog-border bg-blog-surface p-4 dark:border-blog-dark-border dark:bg-blog-dark-surface"
+								class="rounded-lg border border-blog-border bg-blog-surface px-3 py-1.5 dark:border-blog-dark-border dark:bg-blog-dark-surface"
 								open
-								data-toc
+								data-toc-inline
 							>
-								<summary class="cursor-pointer text-sm font-bold uppercase tracking-[0.14em] text-gray-600 transition-colors hover:text-flat-blue dark:text-gray-400 dark:hover:text-flat-blue">
-									Table of contents
+								<summary class="cursor-pointer select-none text-[11px] font-bold uppercase tracking-[0.14em] text-gray-500 transition-colors hover:text-flat-blue dark:text-gray-400 dark:hover:text-flat-blue">
+									Contents
 								</summary>
-								<ul class="m-0 mt-3 flex list-none flex-col gap-2 p-0 text-sm leading-6">
-									{tocTree.map((h) => (
-										<li>
-											<a
-												href={`#${h.slug}`}
-												class="text-gray-700 no-underline transition-colors hover:text-flat-blue dark:text-beige dark:hover:text-flat-blue"
-											>
-												{h.text}
-											</a>
-											{h.children.length > 0 && (
-												<ul class="mt-1 flex list-none flex-col gap-1 border-l border-blog-border pl-3 dark:border-blog-dark-border">
-													{h.children.map((child) => (
-														<li>
-															<a
-																href={`#${child.slug}`}
-																class="text-gray-500 no-underline transition-colors hover:text-flat-blue dark:text-gray-400 dark:hover:text-flat-blue"
-															>
-																{child.text}
-															</a>
-														</li>
-													))}
-												</ul>
-											)}
-										</li>
-									))}
-								</ul>
+								<div class="mt-1.5">
+									<TableOfContents items={tocTree} />
+								</div>
 							</details>
 						</div>
+					)}
+
+					{tocHeadings.length >= 2 && (
+						<nav
+							class="toc-fixed not-prose"
+							aria-label="Table of contents"
+							data-toc-fixed
+						>
+							<p class="mb-1.5 px-2 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-500">
+								On this page
+							</p>
+							<TableOfContents items={tocTree} />
+						</nav>
 					)}
 
 					<slot />
@@ -229,127 +220,77 @@ const tocTree = tocHeadings.reduce<
 		</main>
 		<Footer />
 		<script>
-			function initFloatingToc() {
-				if (typeof window.__blogTocCleanup === 'function') {
-					window.__blogTocCleanup();
+			function initBlogToc() {
+				const inline = document.querySelector('[data-toc-inline]');
+				const fixed = document.querySelector('[data-toc-fixed]');
+				if (!fixed || !inline) return;
+
+				if (window.__blogTocObserver) {
+					window.__blogTocObserver.disconnect();
 				}
 
-				const wrapper = document.querySelector('[data-toc-wrapper]');
-				const toc = document.querySelector('[data-toc]');
+				// Fade the fixed sidebar in only once the inline TOC has scrolled
+				// completely out of view above the viewport.
+				const observer = new IntersectionObserver(
+					(entries) => {
+						const entry = entries[0];
+						if (!entry) return;
+						const goneAbove =
+							!entry.isIntersecting && entry.boundingClientRect.top < 0;
+						fixed.classList.toggle('is-visible', goneAbove);
+					},
+					{ threshold: 0 },
+				);
 
-				if (!wrapper || !toc) {
-					window.__blogTocCleanup = null;
-					return;
-				}
-
-				let docked = toc.dataset.docked === 'true';
-				let ticking = false;
-
-				function hasRightGutter() {
-					const contentWidth = 720;
-					const tocWidth = 256;
-					const gap = 32;
-					return (window.innerWidth - contentWidth) / 2 >= tocWidth + gap;
-				}
-
-				function animateToState(nextDocked) {
-					if (nextDocked === docked) return;
-
-					const first = toc.getBoundingClientRect();
-					wrapper.style.minHeight = `${wrapper.offsetHeight}px`;
-					toc.dataset.docked = nextDocked ? 'true' : 'false';
-					docked = nextDocked;
-					const last = toc.getBoundingClientRect();
-					const deltaX = first.left - last.left;
-					const deltaY = first.top - last.top;
-
-					toc.style.transition = 'none';
-					toc.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-
-					requestAnimationFrame(() => {
-						toc.style.transition = '';
-						toc.style.transform = '';
-					});
-				}
-
-				function updateToc() {
-					ticking = false;
-					const shouldDock =
-						hasRightGutter() && wrapper.getBoundingClientRect().bottom <= 96;
-
-					if (!shouldDock && !docked) {
-						wrapper.style.minHeight = '';
-					}
-
-					animateToState(shouldDock);
-				}
-
-				function requestUpdate() {
-					if (ticking) return;
-					ticking = true;
-					requestAnimationFrame(updateToc);
-				}
-
-				window.addEventListener('scroll', requestUpdate, { passive: true });
-				window.addEventListener('resize', requestUpdate);
-				updateToc();
-
-				window.__blogTocCleanup = () => {
-					window.removeEventListener('scroll', requestUpdate);
-					window.removeEventListener('resize', requestUpdate);
-				};
+				observer.observe(inline);
+				window.__blogTocObserver = observer;
 			}
 
-			window.__blogInitFloatingToc = initFloatingToc;
-
-			if (!window.__blogTocPageLoadBound) {
-				window.__blogTocPageLoadBound = true;
-				document.addEventListener('astro:page-load', () => {
-					window.__blogInitFloatingToc?.();
-				});
+			if (!window.__blogTocBound) {
+				window.__blogTocBound = true;
+				document.addEventListener('astro:page-load', initBlogToc);
 			}
 
-			initFloatingToc();
+			initBlogToc();
 		</script>
 	</body>
 </html>
 
 <style>
-	.toc-card {
-		transition:
-			transform 280ms ease,
-			box-shadow 200ms ease,
-			opacity 200ms ease;
-	}
-
-	.toc-card[data-docked='true'] {
+	.toc-fixed {
+		display: none;
 		position: fixed;
 		top: 6rem;
 		right: calc((100vw - 720px) / 2 - 18rem);
-		z-index: 30;
 		width: 16rem;
-		max-height: calc(100vh - 8rem);
-		overflow: auto;
-		box-shadow: 0 18px 45px rgba(15, 13, 14, 0.16);
+		max-height: calc(100vh - 9rem);
+		overflow-y: auto;
+		opacity: 0;
+		transform: translateY(6px);
+		pointer-events: none;
+		transition:
+			opacity 240ms ease,
+			transform 240ms ease;
+		z-index: 30;
 	}
 
-	:global(.dark) .toc-card[data-docked='true'] {
-		box-shadow: 0 18px 45px rgba(0, 0, 0, 0.36);
+	.toc-fixed.is-visible {
+		opacity: 1;
+		transform: none;
+		pointer-events: auto;
 	}
 
-	@media (max-width: 1279px) {
-		.toc-card[data-docked='true'] {
-			position: static;
-			width: auto;
-			max-height: none;
-			overflow: visible;
-			box-shadow: none;
+	/* Only dock into the gutter when there is real room beside the 720px column. */
+	@media (min-width: 1296px) {
+		.toc-fixed {
+			display: block;
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.toc-card {
-			transition: none;
+		.toc-fixed {
+			transition: opacity 240ms ease;
+			transform: none;
 		}
 	}
 </style>

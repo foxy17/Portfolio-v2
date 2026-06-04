@@ -13,7 +13,7 @@ const posts = (
 ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 const featuredPost = posts[0];
-const archivePosts = posts.slice(1);
+const archivePosts = posts;
 
 // Machine-readable catalog of every post — gives search/AI engines the full
 // post list, topics, and dates from a single crawl of the home page.
