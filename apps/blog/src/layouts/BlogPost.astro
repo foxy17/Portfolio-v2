@@ -101,16 +101,13 @@ const tocTree = tocHeadings.reduce<
 								</>
 							)}
 							{slug && (
-								<>
-									<span aria-hidden="true">·</span>
-									<span data-view-counter data-slug={slug}>
-										<ViewCounter slug={slug} server:defer>
-											<span slot="fallback" class="opacity-50">
-												👁 —
-											</span>
-										</ViewCounter>
-									</span>
-								</>
+								<span data-view-counter data-slug={slug}>
+									<ViewCounter slug={slug} server:defer>
+										<span slot="fallback" class="opacity-50">
+											· 👁 —
+										</span>
+									</ViewCounter>
+								</span>
 							)}
 						</div>
 						{
