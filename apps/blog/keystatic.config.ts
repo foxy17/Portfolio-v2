@@ -1,7 +1,15 @@
 import { config, fields, collection, singleton } from '@keystatic/core';
 
+// Local filesystem in dev (edits write straight to ./src/content), GitHub in
+// production so the deployed /keystatic dashboard commits drafts + posts to the
+// repo. GitHub mode needs the KEYSTATIC_* env vars (see apps/blog/.env.example);
+// connect the GitHub App once via the deployed dashboard to generate them.
+const storage = import.meta.env.DEV
+	? ({ kind: 'local' } as const)
+	: ({ kind: 'github', repo: 'foxy17/Portfolio-v2' } as const);
+
 export default config({
-	storage: { kind: 'local' },
+	storage,
 	ui: {
 		brand: { name: 'Arnav Chauhan' },
 	},
