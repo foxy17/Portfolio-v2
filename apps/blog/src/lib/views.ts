@@ -1,16 +1,8 @@
-// Per-post view count, read from a self-hosted Umami instance.
-//
-// Umami's own tracking script (loaded in BaseHead.astro) records pageviews and
-// dedupes visitors itself — a daily-rotating hash of IP + user-agent, no
-// cookies. This module only READS: it asks Umami for the pageview count of each
-// post's path and returns it for the inline "👁 N views" counter.
-//
-// Returns null whenever the Umami env is absent (local dev, previews without
-// secrets) or the API errors, so callers hide the counter instead of throwing.
+// Read-only per-post view count from a self-hosted Umami instance. Recording and
+// visitor dedupe live in Umami's tracking script (BaseHead.astro); this only reads.
 
-// Read the first defined value across import.meta.env (build/SSR) and
-// process.env (runtime) for any of the given names. PUBLIC_* are inlined at
-// build; secrets resolve from process.env at runtime on Vercel.
+// First defined value across import.meta.env (PUBLIC_*, inlined at build) and
+// process.env (secrets, resolved at runtime on Vercel).
 function readEnv(...names: string[]): string | undefined {
 	const sources: Record<string, string | undefined>[] = [
 		(import.meta.env ?? {}) as unknown as Record<string, string | undefined>,
@@ -27,15 +19,13 @@ function readEnv(...names: string[]): string | undefined {
 	return undefined;
 }
 
-// Public: also embedded in the client tracking script tag, so not secret.
 const HOST = readEnv('PUBLIC_UMAMI_HOST')?.replace(/\/+$/, '');
 const WEBSITE_ID = readEnv('PUBLIC_UMAMI_WEBSITE_ID');
-// Server-only: a (read-only) Umami account used to mint an API token.
 const API_USER = readEnv('UMAMI_API_USER');
 const API_PASSWORD = readEnv('UMAMI_API_PASSWORD');
 
-const METRICS_TTL = 60_000; // serve one /metrics call to all posts for a minute
-const TOKEN_TTL = 30 * 60_000; // re-login well before Umami's token expiry
+const METRICS_TTL = 60_000;
+const TOKEN_TTL = 30 * 60_000;
 
 let tokenCache: { token: string; at: number } | null = null;
 let metricsCache: { map: Map<string, number>; at: number } | null = null;
@@ -60,7 +50,7 @@ async function getToken(): Promise<string | null> {
 	}
 }
 
-// Fetch pageview counts per URL path for the whole site in one call, cached.
+// Pageview counts per path for the whole site in one cached call.
 async function getMetrics(): Promise<Map<string, number> | null> {
 	if (!HOST || !WEBSITE_ID) return null;
 	const now = Date.now();
@@ -70,7 +60,7 @@ async function getMetrics(): Promise<Map<string, number> | null> {
 	if (!token) return null;
 	try {
 		const url = new URL(`${HOST}/api/websites/${WEBSITE_ID}/metrics`);
-		url.searchParams.set('type', 'url');
+		url.searchParams.set('type', 'path');
 		url.searchParams.set('startAt', '0');
 		url.searchParams.set('endAt', String(now));
 		const res = await fetch(url, {
@@ -80,8 +70,8 @@ async function getMetrics(): Promise<Map<string, number> | null> {
 		const rows = (await res.json()) as { x: string; y: number }[];
 		const map = new Map<string, number>();
 		for (const row of rows) {
-			// Collapse trailing slashes so /slug and /slug/ count together.
-			const key = row.x.replace(/\/+$/, '') || '/';
+			// Strip query/hash/trailing-slash so /slug, /slug/ and /slug/#anchor merge.
+			const key = row.x.split(/[?#]/)[0].replace(/\/+$/, '') || '/';
 			map.set(key, (map.get(key) ?? 0) + (Number(row.y) || 0));
 		}
 		metricsCache = { map, at: now };
@@ -91,7 +81,6 @@ async function getMetrics(): Promise<Map<string, number> | null> {
 	}
 }
 
-/** Read the pageview count for `slug`. Null when Umami is unconfigured / errors. */
 export async function getViews(slug: string): Promise<number | null> {
 	const map = await getMetrics();
 	if (!map) return null;
