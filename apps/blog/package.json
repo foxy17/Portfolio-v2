@@ -23,7 +23,6 @@
     "@keystatic/core": "^0.5.50",
     "@portfolio/tailwind-config": "*",
     "@tailwindcss/vite": "^4.2.4",
-    "@upstash/redis": "^1.38.0",
     "astro": "^6.2.2",
     "astro-expressive-code": "^0.42.0",
     "react": "19.1.0",
