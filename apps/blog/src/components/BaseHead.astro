@@ -33,6 +33,11 @@ const {
 } = Astro.props;
 
 const imageURL = new URL(image, Astro.site ?? Astro.url).toString();
+
+// Self-hosted Umami analytics. Both values are public (they ship in the script
+// tag anyway); the tag is omitted entirely when unset so dev/previews stay clean.
+const umamiHost = import.meta.env.PUBLIC_UMAMI_HOST?.replace(/\/+$/, '');
+const umamiWebsiteId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
 ---
 
 <!-- Global Metadata -->
@@ -55,6 +60,18 @@ const imageURL = new URL(image, Astro.site ?? Astro.url).toString();
 	href={new URL('rss.xml', Astro.site)}
 />
 <meta name="generator" content={Astro.generator} />
+
+<!-- Self-hosted Umami analytics (privacy-friendly, no cookies) -->
+{
+	umamiHost && umamiWebsiteId && (
+		<script
+			is:inline
+			defer
+			src={`${umamiHost}/script.js`}
+			data-website-id={umamiWebsiteId}
+		/>
+	)
+}
 
 <ClientRouter />
 

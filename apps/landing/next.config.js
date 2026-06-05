@@ -8,6 +8,18 @@ const rewrites = async () => [
     destination: 'https://hive.splitbee.io/:slug',
     source: '/sb-api/:slug',
   },
+  // Umami analytics, proxied first-party so it stays within CSP `default-src
+  // 'self'` and survives ad-blockers (same trick as the Splitbee proxy above).
+  // The script loads from /u.js (origin = this domain), so it POSTs back to
+  // /api/send here, which we forward to the self-hosted Umami instance.
+  {
+    destination: 'https://analytics.carnav.in/script.js',
+    source: '/u.js',
+  },
+  {
+    destination: 'https://analytics.carnav.in/api/send',
+    source: '/api/send',
+  },
 ];
 
 const cspHeader = `
