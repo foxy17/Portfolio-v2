@@ -24,6 +24,10 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Self-hosted Umami analytics, loaded via the first-party /u.js proxy (see
+  // next.config.js). Omitted entirely when the website ID isn't configured.
+  const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
+
   return (
     <html
       lang="en"
@@ -32,6 +36,9 @@ export default function RootLayout({
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        {umamiWebsiteId && (
+          <script defer src="/u.js" data-website-id={umamiWebsiteId} />
+        )}
         <link href="/static/favicon.ico" rel="shortcut icon" />
         <link href="/static/site.webmanifest" rel="manifest" />
         <link
