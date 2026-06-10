@@ -159,31 +159,13 @@ For a sense of the upside, [mem0](https://arxiv.org/abs/2504.19413) reports on i
 
 Match the store to the question. Read top to bottom, stop at the first row that fits.
 
-{% table %}
-- Your agent needs
-- Use
-- Why
----
-- a few stable facts
-- a table plus keyword search
-- retrieval adds nothing yet
----
-- semantic recall over docs or chats
-- vectors, add a reranker if recall is weak
-- meaning beats exact words
----
-- answers about how things relate
-- a graph, or a graph beside vectors
-- edges you can walk
----
-- facts that change over time
-- a bi-temporal graph or versioned rows
-- currentness, with history
----
-- facts already in your database
-- ground there and add pgvector
-- one source of truth
-{% /table %}
+| Your agent needs | Use | Why |
+| --- | --- | --- |
+| a few stable facts | a table plus keyword search | retrieval adds nothing yet |
+| semantic recall over docs or chats | vectors, add a reranker if recall is weak | meaning beats exact words |
+| answers about how things relate | a graph, or a graph beside vectors | edges you can walk |
+| facts that change over time | a bi-temporal graph or versioned rows | currentness, with history |
+| facts already in your database | ground there and add pgvector | one source of truth |
 
 Storage is one axis. Weigh the query shape, how fast facts go stale, who may write, and whether you can audit what was stored.
 
