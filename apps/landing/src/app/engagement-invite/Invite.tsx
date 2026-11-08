@@ -32,7 +32,9 @@ const PHOTOS = [
 
 const IMG = '/images/engagement';
 const CABINS = 8;
-const CABIN_COLORS = 4; // cabin-0..3.png, pre-tinted
+const CABIN_COLORS = 4; // cabin-0..3.webp, pre-tinted
+// Ferris wheel only appears once every part has loaded: wheel + stand + one per cabin.
+const WHEEL_PARTS = 2 + CABINS;
 const HERO_SVH = 120;
 const PHOTO_SVH_EACH = 90;
 
@@ -106,7 +108,7 @@ function Floaty({ src, className }: { src: string; className: string }) {
       animate={{ y: [0, -10, 0], rotate: [-4, 4, -4] }}
       transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
     >
-      <Image src={src} alt="" width={160} height={160} className="h-full w-full" />
+      <Image src={src} alt="" width={160} height={160} unoptimized className="h-full w-full" />
     </motion.div>
   );
 }
@@ -150,20 +152,35 @@ function Sparkles() {
 }
 
 // Cloud that drifts with scroll (CSS class from HERO_CSS) and also bobs gently on its own.
+// Fades in once loaded so it never pops in half-drawn.
 function Cloud({ src, className }: { src: string; className: string }) {
+  const [loaded, setLoaded] = useState(false);
   return (
-    <div aria-hidden className={`pointer-events-none absolute will-change-transform ${className}`}>
+    <div
+      aria-hidden
+      className={`pointer-events-none absolute will-change-transform transition-opacity duration-700 ${loaded ? '' : 'opacity-0!'} ${className}`}
+    >
       <motion.div
         animate={{ x: [0, 12, 0], y: [0, -4, 0] }}
         transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
       >
-        <Image src={src} alt="" width={800} height={350} className="h-auto w-full" />
+        <Image
+          src={src}
+          alt=""
+          width={1200}
+          height={525}
+          unoptimized
+          loading="eager"
+          onLoad={() => setLoaded(true)}
+          onError={() => setLoaded(true)}
+          className="h-auto w-full"
+        />
       </motion.div>
     </div>
   );
 }
 
-function Cabin({ index }: { index: number }) {
+function Cabin({ index, onDone }: { index: number; onDone: () => void }) {
   const angle = (index / CABINS) * Math.PI * 2;
   return (
     <div
@@ -175,11 +192,14 @@ function Cabin({ index }: { index: number }) {
       }}
     >
       <Image
-        src={`${IMG}/cabin-${index % CABIN_COLORS}.png`}
+        src={`${IMG}/cabin-${index % CABIN_COLORS}.webp`}
         alt=""
         width={128}
         height={128}
         unoptimized
+        loading="eager"
+        onLoad={onDone}
+        onError={onDone}
         className="h-auto w-full [image-rendering:pixelated]"
       />
     </div>
@@ -244,53 +264,83 @@ const HERO_CSS = `
 `;
 
 function Hero() {
+  const [skyLoaded, setSkyLoaded] = useState(false);
+  const [wheelParts, setWheelParts] = useState(0);
+  const partDone = () => setWheelParts((n) => n + 1);
+  // Safety net: never leave the wheel hidden if a load event goes missing.
+  useEffect(() => {
+    const t = setTimeout(() => setWheelParts((n) => Math.max(n, WHEEL_PARTS)), 4000);
+    return () => clearTimeout(t);
+  }, []);
+  const wheelReady = wheelParts >= WHEEL_PARTS;
+
   return (
     <section className="hero-tl relative" style={{ height: `${HERO_SVH}svh` }}>
       <style>{HERO_CSS}</style>
       <SnapStop top="0" />
-      <div className="sticky top-0 h-svh overflow-hidden">
-        <div className="sky-drift absolute inset-0 scale-110 will-change-transform">
+      {/* Gradient stands in for the sky image until it arrives, so the screen is never blank. */}
+      <div className="sticky top-0 h-svh overflow-hidden bg-gradient-to-b from-[#A99BEB] via-[#7EC4F2] to-[#F7B6E6]">
+        <div
+          className={`sky-drift absolute inset-0 scale-110 transition-opacity duration-500 will-change-transform ${skyLoaded ? '' : 'opacity-0'}`}
+        >
+          {/* Load order: sky (preloaded in <head>) → wheel (high) → the other hero layers (eager)
+              → everything below the fold (lazy, Next's default). */}
           <Image
-            src={`${IMG}/sky.png`}
+            src={`${IMG}/sky.webp`}
             alt=""
             fill
-            priority
-            sizes="(max-width: 448px) 100vw, 448px"
+            preload
+            unoptimized
+            onLoad={() => setSkyLoaded(true)}
+            onError={() => setSkyLoaded(true)}
             className="object-cover"
           />
         </div>
         <Sparkles />
 
-        <Cloud src={`${IMG}/cloud-2.png`} className="cloud-back left-[5%] top-[38%] w-[95%] opacity-80" />
-        <Cloud src={`${IMG}/cloud-1.png`} className="cloud-top -left-[25%] top-[6%] w-[75%]" />
+        <Cloud src={`${IMG}/cloud-2.webp`} className="cloud-back left-[5%] top-[38%] w-[95%] opacity-80" />
+        <Cloud src={`${IMG}/cloud-1.webp`} className="cloud-top -left-[25%] top-[6%] w-[75%]" />
 
         {/* Ferris wheel: stand stays put, wheel turns continuously, cabins counter-rotate to hang upright. */}
         <div
           aria-hidden
           className="wheel-rise absolute left-[22%] top-[40%] aspect-square w-[115%] will-change-transform"
         >
-          <Image
-            src={`${IMG}/stand.png`}
-            alt=""
-            width={600}
-            height={600}
-            className="absolute left-[12%] top-1/2 h-auto w-[76%] [image-rendering:pixelated]"
-          />
-          <div className="wheel-spin absolute inset-0 will-change-transform">
+          {/* Whole wheel fades/pops in together once all its parts are loaded. */}
+          <div
+            className={`absolute inset-0 transition-[opacity,scale] duration-700 ease-out ${wheelReady ? '' : 'scale-90 opacity-0'}`}
+          >
             <Image
-              src={`${IMG}/wheel.png`}
+              src={`${IMG}/stand.webp`}
               alt=""
-              fill
-              sizes="520px"
-              className="[image-rendering:pixelated]"
+              width={768}
+              height={768}
+              unoptimized
+              loading="eager"
+              onLoad={partDone}
+              onError={partDone}
+              className="absolute left-[12%] top-1/2 h-auto w-[76%] [image-rendering:pixelated]"
             />
-            {Array.from({ length: CABINS }, (_, i) => (
-              <Cabin key={i} index={i} />
-            ))}
+            <div className="wheel-spin absolute inset-0 will-change-transform">
+              <Image
+                src={`${IMG}/wheel.webp`}
+                alt=""
+                fill
+                unoptimized
+                loading="eager"
+                fetchPriority="high"
+                onLoad={partDone}
+                onError={partDone}
+                className="[image-rendering:pixelated]"
+              />
+              {Array.from({ length: CABINS }, (_, i) => (
+                <Cabin key={i} index={i} onDone={partDone} />
+              ))}
+            </div>
           </div>
         </div>
 
-        <Cloud src={`${IMG}/cloud-1.png`} className="cloud-front -right-[20%] -bottom-[4%] w-[70%]" />
+        <Cloud src={`${IMG}/cloud-1.webp`} className="cloud-front -right-[20%] -bottom-[4%] w-[70%]" />
 
         {/* Blend the sky into the page gradient below the hero. */}
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#AFC6EE]" />
@@ -410,7 +460,7 @@ function Photos() {
         <SnapStop key={p.src} top={`${(i * pinnedSvh) / (PHOTOS.length - 1)}svh`} />
       ))}
       <div className="sticky top-0 flex h-svh flex-col justify-center overflow-hidden">
-        <Floaty src={`${IMG}/hearts.png`} className="right-3 top-[4%] z-10 h-16 w-16" />
+        <Floaty src={`${IMG}/hearts.webp`} className="right-3 top-[4%] z-10 h-16 w-16" />
         <h2
           className={`${heading} mb-8 px-5 text-5xl! tracking-wider drop-shadow-[3px_3px_0_#0C327D]`}
         >
@@ -583,7 +633,7 @@ export default function Invite() {
           {/* Invitation — last snap stop; free scrolling from here down. */}
           <section id="invitation" className="relative flex min-h-svh snap-start snap-always items-center px-5 py-20">
             <RisingHearts />
-            <Floaty src={`${IMG}/ring.png`} className="right-2 top-[14%] z-10 h-24 w-24" />
+            <Floaty src={`${IMG}/ring.webp`} className="right-2 top-[14%] z-10 h-24 w-24" />
             <motion.div
               className="relative w-full"
               initial={{ opacity: 0, scale: 0.6, rotate: -6 }}
