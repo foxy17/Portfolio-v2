@@ -1,0 +1,25 @@
+import { Metadata } from 'next';
+import { VT323, Roboto_Condensed } from 'next/font/google';
+import Invite from './Invite';
+
+const pixel = VT323({ weight: '400', subsets: ['latin'], variable: '--font-pixel' });
+const condensed = Roboto_Condensed({
+  weight: ['400', '700'],
+  subsets: ['latin'],
+  variable: '--font-condensed',
+});
+
+export const metadata: Metadata = {
+  title: "Arnav & Aditi's Engagement",
+  description:
+    "You're invited to celebrate Arnav & Aditi's engagement · Friday, 11 December 2026 · Kandivali East, Mumbai.",
+  robots: { index: false, follow: false },
+};
+
+export default function EngagementInvitePage() {
+  return (
+    <div className={`${pixel.variable} ${condensed.variable}`}>
+      <Invite />
+    </div>
+  );
+}

@@ -22,6 +22,10 @@ const rewrites = async () => [
   },
 ];
 
+// Dev over plain http on the LAN (phone testing) breaks if the browser upgrades
+// asset requests to https, so only send upgrade-insecure-requests in prod.
+const isDev = process.env.NODE_ENV !== 'production';
+
 const cspHeader = `
     default-src 'self';
     script-src 'self' 'unsafe-eval' 'unsafe-inline';
@@ -32,7 +36,7 @@ const cspHeader = `
     base-uri 'self';
     form-action 'self';
     frame-ancestors 'none';
-    upgrade-insecure-requests;
+    ${isDev ? '' : 'upgrade-insecure-requests;'}
 `;
 
 const securityHeaders = [
@@ -77,6 +81,8 @@ const securityHeaders = [
 module.exports = {
   rewrites,
   reactStrictMode: true,
+  // Let phones on the local network load dev assets (e.g. http://192.168.x.x:3000).
+  allowedDevOrigins: ['192.168.*.*'],
   experimental: {},
   async headers() {
     return [
