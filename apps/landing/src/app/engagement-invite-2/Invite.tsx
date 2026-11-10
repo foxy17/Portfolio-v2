@@ -1,432 +1,189 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { MotionConfig, motion, useTransform, type MotionValue } from 'motion/react';
+import { MotionConfig, motion, useReducedMotion, useTransform, type MotionValue } from 'motion/react';
 import { SnapStop, focusRange, haptic, playTones, usePinnedStrip, useSnapZone } from '~/lib/invite';
 
-// Neon esports take on the invite: match-found hero, replay highlights, squad invite,
-// mission briefing. Inspired by MOBA / battle-royale / tactical-shooter UI conventions;
-// no official logos, characters or art from any game.
-
-const VENUE_QUERY =
-  'Evershine Millennium Paradise Club House, Thakur Village, Kandivali East, Mumbai 400101';
-const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(VENUE_QUERY)}`;
+const MAPS_URL = 'https://maps.app.goo.gl/KrPQgjJUShP2SFbv7';
 
 const PHOTOS = [
-  { src: '/images/engagement/photo-1.jpg', caption: 'GOLDEN HOUR' },
-  { src: '/images/engagement/photo-2.jpg', caption: 'THE RING' },
-  { src: '/images/engagement/photo-3.jpg', caption: 'BLUE HOUR' },
+  { src: '/images/engagement/us-1.jpg', caption: 'Sunny side', alt: 'Aditi and Arnav in a sunlit selfie' },
+  { src: '/images/engagement/us-2.jpg', caption: 'Side quest', alt: 'Aditi and Arnav between mossy stone gates on a forest trail' },
+  { src: '/images/engagement/us-3.jpg', caption: 'Night out', alt: 'Aditi and Arnav under a lit palm tree at night' },
+  { src: '/images/engagement/us-4.jpg', caption: 'Best seats', alt: 'Aditi and Arnav sitting together at a concert ground' },
+  { src: '/images/engagement/us-5.jpg', caption: 'Bombay nights', alt: 'Aditi and Arnav at a Bombay cafe' },
 ];
 
-const IMG = '/images/engagement-2';
-const HERO_SVH = 120;
-const PHOTO_SVH_EACH = 90;
-
 const display = 'font-[family-name:var(--font-display)]';
-const hud = 'font-[family-name:var(--font-hud)]';
-// globals.css styles h1/h2 unlayered (Paytone, black), so override with `!`.
-const heading = 'font-[family-name:var(--font-display)]! font-semibold! text-white! tracking-wide!';
+const hud = 'font-mono text-xs tabular-nums';
+// Unlayered global heading styles require important font and colour overrides.
+const heading = 'font-[family-name:var(--font-display)]! font-semibold! tracking-[-0.025em]!';
+const focus = 'focus-visible:outline-2 focus-visible:outline-offset-4';
 
-const CYAN = '#19F0FF';
-const MAGENTA = '#FF2BD6';
-const GOLD = '#FFB224';
-const NEON_TEXT = `0 0 6px ${CYAN}, 0 0 18px ${CYAN}99`;
-const NEON_TEXT_PINK = `0 0 6px ${MAGENTA}, 0 0 18px ${MAGENTA}99`;
-// Angled "cut corner" panel shape used everywhere.
-const CUT = '[clip-path:polygon(14px_0,100%_0,100%_calc(100%-14px),calc(100%-14px)_100%,0_100%,0_14px)]';
-
-// Glowing HUD panel with cut corners and a small header strip.
-function Panel({
-  label,
-  tag,
-  accent = CYAN,
-  children,
-  className = '',
-}: {
-  label: string;
-  tag?: string;
-  accent?: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={`relative ${className}`} style={{ filter: `drop-shadow(0 0 10px ${accent}55)` }}>
-      <div className={`${CUT} p-[1.5px]`} style={{ background: accent }}>
-        <div className={`${CUT} bg-[#0B0A1A]/95`}>
-          <div
-            className={`${hud} flex items-center justify-between px-4 py-1.5 text-xs font-bold uppercase tracking-[0.25em]`}
-            style={{ background: `${accent}22`, color: accent }}
-          >
-            <span>{label}</span>
-            {tag && <span className="text-white/70">{tag}</span>}
-          </div>
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-const reveal = {
-  initial: { opacity: 0, y: 40 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, amount: 0.5 },
-  transition: { type: 'spring', stiffness: 120, damping: 18 },
-} as const;
-
-// Hero scroll effects run as CSS scroll-driven animations (compositor thread, no JS per frame).
-// The grid floor scrolls on its own clock. Progress 0 = hero top at viewport top, 1 = bottom.
+// Orange and lilac echo the players’ jackets; sage marks readiness.
 const HERO_CSS = `
 @supports (animation-timeline: view()) {
-  .g-hero { view-timeline-name: --ghero; }
-  .g-hero .g-bg, .g-hero .g-p1, .g-hero .g-p2, .g-hero .g-title {
+  .invite-hero { view-timeline-name: --invite-hero; }
+  .invite-hero-players, .invite-hero-footer {
     animation-timing-function: linear;
     animation-fill-mode: both;
-    animation-timeline: --ghero;
+    animation-timeline: --invite-hero;
     animation-range: contain 0% exit 100%;
   }
-  .g-bg { animation-name: g-bg; }
-  .g-p1 { animation-name: g-p1; }
-  .g-p2 { animation-name: g-p2; }
-  .g-title { animation-name: g-title; }
+  .invite-hero-players { animation-name: invite-players; }
+  .invite-hero-footer { animation-name: invite-footer; }
 }
-@keyframes g-bg { to { translate: 0 -8%; scale: 1.08; } }
-@keyframes g-p1 { 40%, 100% { translate: -70% 0; opacity: 0; } }
-@keyframes g-p2 { 40%, 100% { translate: 70% 0; opacity: 0; } }
-@keyframes g-title { 35%, 100% { translate: 0 -120px; opacity: 0; } }
-.g-grid { animation: g-grid 1.6s linear infinite; }
-@keyframes g-grid { to { translate: 0 48px; } }
-@media (prefers-reduced-motion: reduce) { .g-hero * { animation: none !important; } }
+@keyframes invite-players { 65%, 100% { transform: translateY(-35px); opacity: 0; } }
+@keyframes invite-footer { 40%, 100% { transform: translateY(-20px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .invite-hero * { animation: none !important; }
+}
 `;
 
-function PlayerCard({
-  side,
-  name,
-  src,
-  accent,
-  ready,
-  onDone,
-}: {
-  side: 'left' | 'right';
-  name: string;
-  src: string;
-  accent: string;
-  ready: boolean;
-  onDone: () => void;
-}) {
-  const left = side === 'left';
-  return (
-    <div className={`${left ? 'g-p1' : 'g-p2'} w-[44%] will-change-transform`}>
-      <motion.div
-        initial={{ opacity: 0, x: left ? -120 : 120, skewX: left ? -8 : 8 }}
-        animate={ready ? { opacity: 1, x: 0, skewX: 0 } : undefined}
-        transition={{ type: 'spring', stiffness: 140, damping: 16, delay: left ? 0.6 : 0.75 }}
-      >
-        <div className={`${CUT} p-[2px]`} style={{ background: accent }}>
-          <div className={`${CUT} relative aspect-[3/4] overflow-hidden bg-[#0B0A1A]`}>
-            <Image
-              src={src}
-              alt={`${name}, player ${left ? 1 : 2}`}
-              fill
-              unoptimized
-              loading="eager"
-              fetchPriority="high"
-              onLoad={onDone}
-              onError={onDone}
-              className="object-cover"
-            />
-            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#07060F] to-transparent" />
-            <span
-              className={`${hud} absolute left-2 top-1.5 text-[10px] font-bold uppercase tracking-[0.25em]`}
-              style={{ color: accent }}
-            >
-              Player {left ? 1 : 2}
-            </span>
-          </div>
-        </div>
-        <p
-          className={`${display} mt-1 text-center text-5xl font-bold leading-none text-white`}
-          style={{ textShadow: left ? NEON_TEXT : NEON_TEXT_PINK }}
-        >
-          {name}
-        </p>
-        <p className={`${hud} text-center text-xs font-bold uppercase tracking-[0.2em] text-white/70`}>
-          LV 99 · <span style={{ color: GOLD }}>Ready</span>
-        </p>
-      </motion.div>
-    </div>
-  );
-}
-
 function Hero() {
-  const [bgLoaded, setBgLoaded] = useState(false);
-  const [portraits, setPortraits] = useState(0);
-  const portraitDone = () => setPortraits((n) => n + 1);
-  // Never leave the cards hidden if a load event goes missing.
-  useEffect(() => {
-    const t = setTimeout(() => setPortraits((n) => Math.max(n, 2)), 4000);
-    return () => clearTimeout(t);
-  }, []);
-  const ready = portraits >= 2;
-
   return (
-    <section className="g-hero relative" style={{ height: `${HERO_SVH}svh` }}>
+    <section className="invite-hero relative isolate h-[120svh] overflow-clip" aria-label="Aditi and Arnav's engagement">
       <style>{HERO_CSS}</style>
       <SnapStop top="0" />
-      {/* Dark gradient stands in for the arena until it loads. */}
-      <div className="sticky top-0 h-svh overflow-hidden bg-gradient-to-b from-[#120B2E] via-[#07060F] to-[#1A0830]">
-        <div className={`g-bg absolute inset-0 transition-opacity duration-700 will-change-transform ${bgLoaded ? 'opacity-70' : 'opacity-0'}`}>
-          {/* Load order: arena (preloaded) → portraits (high) → below the fold (lazy). */}
-          <Image
-            src={`${IMG}/arena.webp`}
-            alt=""
-            fill
-            preload
-            unoptimized
-            onLoad={() => setBgLoaded(true)}
-            onError={() => setBgLoaded(true)}
-            className="object-cover"
-          />
+      <div className="sticky top-0 flex h-svh min-h-[600px] flex-col bg-[#24252d] px-7 pb-8 pt-7">
+        <div className={`${hud} flex items-center justify-between border-b border-[#f3eddf]/25 pb-4`}>
+          <span>ENGAGEMENT / LOBBY</span>
+          <span className="text-[#a8c5ad]">02 / 02 READY</span>
         </div>
 
-        {/* Neon perspective grid floor. */}
-        <div aria-hidden className="absolute inset-x-0 bottom-0 h-[38%] overflow-hidden [perspective:300px]">
-          <div className="absolute inset-x-[-50%] -top-[48px] bottom-0 origin-top [transform:rotateX(62deg)]">
-            <div
-              className="g-grid absolute inset-0 -top-[48px] will-change-transform"
-              style={{
-                backgroundImage: `linear-gradient(${CYAN}AA 1.5px, transparent 1.5px), linear-gradient(90deg, ${MAGENTA}88 1.5px, transparent 1.5px)`,
-                backgroundSize: '48px 48px',
-              }}
-            />
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-[#07060F] via-transparent to-transparent" />
+        <div className="invite-hero-players mt-[5svh]">
+          <p className="mb-5 text-base text-[#d2cdbf]">Player two. For life.</p>
+          <h1 className={`${heading} text-[#f3eddf]!`}>
+            <span className="sr-only">Aditi &amp; Arnav</span>
+            <span aria-hidden className="relative grid grid-cols-2 gap-4">
+              {['Aditi', 'Arnav'].map((name, index) => (
+                <span key={name} className={`block min-w-0 ${name === 'Arnav' ? 'text-[#efa16f]' : 'text-[#c4adeb]'}`}>
+                  <span className="relative block aspect-[3/4] max-h-[32svh] overflow-hidden border border-current bg-[#282b24]">
+                    <Image
+                      src={`/images/engagement-2/player-${name.toLowerCase()}.webp`}
+                      alt=""
+                      fill
+                      preload={index === 0}
+                      loading={index === 0 ? undefined : 'eager'}
+                      sizes="(max-width: 448px) 40vw, 188px"
+                      className="object-cover object-center"
+                    />
+                    <span className={`${hud} absolute bottom-0 inset-x-0 flex items-center justify-between bg-[#1b1d19]/95 px-2 py-2 font-normal tracking-normal text-current`}>
+                      <span>P0{index + 1}</span><span>READY ✓</span>
+                    </span>
+                  </span>
+                  <span className={`${display} mt-2 block text-[clamp(3.5rem,16vw,4.5rem)] font-semibold leading-none tracking-[-0.025em]`}>
+                    {name.toUpperCase()}
+                  </span>
+                </span>
+              ))}
+              <span className="absolute left-1/2 top-[35%] flex h-8 w-8 -translate-x-1/2 items-center justify-center border-2 border-[#c4adeb] border-b-[#efa16f] border-r-[#efa16f] bg-[#24252d] text-xl font-normal text-[#f3eddf]">+</span>
+            </span>
+          </h1>
+          <p className="mt-4 text-base">are getting engaged.</p>
         </div>
 
-        {/* Top HUD strip. */}
-        <div
-          className={`${hud} absolute inset-x-0 top-0 flex items-center justify-between px-4 py-3 text-[11px] font-bold uppercase tracking-[0.2em] text-white/80`}
-        >
-          <span className="flex items-center gap-1.5">
-            <motion.span
-              className="h-2 w-2 rounded-full bg-[#FF3B3B]"
-              animate={{ opacity: [1, 0.2, 1] }}
-              transition={{ duration: 1.2, repeat: Infinity }}
-            />
-            Live
-          </span>
-          <span style={{ color: CYAN }}>Ranked · Engagement</span>
-          <span>11.12.26</span>
-        </div>
-
-        <div className="relative flex h-full flex-col items-center pt-[11svh]">
-          <div className="g-title text-center will-change-transform">
-            <motion.p
-              className={`${hud} text-sm font-bold uppercase tracking-[0.45em]`}
-              style={{ color: GOLD }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.1 }}
-            >
-              Duo queue
-            </motion.p>
-            {/* One-shot glitch-in, then a steady glow. */}
-            <motion.h1
-              aria-label="Match found"
-              className={`${heading} text-[clamp(3.5rem,19vw,5.5rem)]! leading-[0.85]`}
-              style={{ textShadow: NEON_TEXT }}
-              initial={{ opacity: 0, x: 0 }}
-              animate={{ opacity: [0, 1, 0.3, 1, 0.6, 1], x: [0, -6, 5, -3, 2, 0] }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              MATCH FOUND
-            </motion.h1>
+        <div className="invite-hero-footer mt-auto border-t border-[#f3eddf]/25 pt-4">
+          <time dateTime="2026-12-11" className={`${display} text-[2.25rem] font-medium leading-none`}>11 DECEMBER 2026</time>
+          <div className={`${hud} mt-4 grid grid-cols-2 border-t border-[#f3eddf]/15 pt-3 text-[#b9b9ab]`}>
+            <p>SESSION<br /><span className="mt-1 block text-[#f3eddf]">FRIDAY / MORNING</span></p>
+            <p className="border-l border-[#f3eddf]/15 pl-4">REGION<br /><span className="mt-1 block text-[#f3eddf]">MUMBAI</span></p>
           </div>
-
-          <div className="mt-[4svh] flex w-full items-start justify-center gap-3 px-4">
-            <PlayerCard side="left" name="ARNAV" src={`${IMG}/p1.webp`} accent={CYAN} ready={ready} onDone={portraitDone} />
-            <motion.div
-              className="mt-[18%] flex flex-col items-center"
-              initial={{ opacity: 0, scale: 0 }}
-              animate={ready ? { opacity: 1, scale: 1 } : undefined}
-              transition={{ type: 'spring', delay: 1.1 }}
-            >
-              <motion.span
-                className="text-4xl"
-                style={{ color: MAGENTA, textShadow: NEON_TEXT_PINK }}
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 1, repeat: Infinity }}
-              >
-                ♥
-              </motion.span>
-              <span className={`${hud} text-xs font-bold tracking-[0.3em] text-white`}>DUO</span>
-            </motion.div>
-            <PlayerCard side="right" name="ADITI" src={`${IMG}/p2.webp`} accent={MAGENTA} ready={ready} onDone={portraitDone} />
-          </div>
-
-          <motion.p
-            className={`${hud} mt-6 text-center text-sm font-bold uppercase tracking-[0.3em] text-white/80`}
-            initial={{ opacity: 0 }}
-            animate={ready ? { opacity: 1 } : undefined}
-            transition={{ delay: 1.4 }}
-          >
-            are getting <span style={{ color: GOLD }}>engaged</span>
-          </motion.p>
-
-          <motion.p
-            className={`${hud} absolute bottom-8 text-xs font-bold uppercase tracking-[0.35em]`}
-            style={{ color: CYAN }}
-            animate={{ opacity: [1, 0.3, 1], y: [0, 5, 0] }}
-            transition={{ duration: 1.4, repeat: Infinity }}
-          >
-            ▼ Swipe to continue ▼
-          </motion.p>
         </div>
       </div>
     </section>
   );
 }
 
-// Replay card: straight and full-size when centred, angled and smaller either side.
-function ReplayCard({
-  src,
-  caption,
-  index,
-  progress,
-}: {
-  src: string;
-  caption: string;
-  index: number;
-  progress: MotionValue<number>;
-}) {
-  const range = focusRange(index, PHOTOS.length);
-  const rotateY = useTransform(progress, range, [-28, 0, 28]);
-  const scale = useTransform(progress, range, [0.8, 1, 0.8]);
-  // Function form: Motion would otherwise hand opacity to a native scroll timeline, which
-  // rejects this range's negative start offset for the first card.
-  const opacity = useTransform(progress, (p) => 1 - Math.min(Math.abs(p - range[1]) / (range[2] - range[1]), 1) * 0.5);
-  const accent = index % 2 ? MAGENTA : CYAN;
+function HighlightPhoto({
+  src, caption, alt, index, progress,
+}: (typeof PHOTOS)[number] & { index: number; progress: MotionValue<number> }) {
+  const [, center, next] = focusRange(index, PHOTOS.length);
+  const reducedMotion = useReducedMotion();
+  // Function form avoids WAAPI's rejection of focusRange's negative first offset.
+  const opacity = useTransform(progress, (p) => reducedMotion ? 1 : 1 - Math.min(Math.abs(p - center) / (next - center), 1) * 0.25);
+  const scale = useTransform(progress, (p) => reducedMotion ? 1 : 1 - Math.min(Math.abs(p - center) / (next - center), 1) * 0.06);
 
   return (
-    <motion.div style={{ rotateY, scale, opacity }} className="w-[78vw] max-w-[340px] shrink-0 [perspective:800px]">
-      <Panel label={`▶ Replay 0${index + 1}`} tag="● REC" accent={accent}>
-        <div className="relative aspect-[4/5] w-full overflow-hidden">
-          <Image src={src} alt={caption} fill sizes="340px" className="object-cover" />
-          {/* Viewfinder brackets + scanlines. */}
-          <div aria-hidden className="pointer-events-none absolute inset-3">
-            {['left-0 top-0 border-l-2 border-t-2', 'right-0 top-0 border-r-2 border-t-2', 'bottom-0 left-0 border-b-2 border-l-2', 'bottom-0 right-0 border-b-2 border-r-2'].map(
-              (c) => (
-                <span key={c} className={`absolute h-6 w-6 ${c}`} style={{ borderColor: accent }} />
-              ),
-            )}
-          </div>
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-25"
-            style={{ backgroundImage: 'repeating-linear-gradient(0deg, #000 0 1px, transparent 1px 3px)' }}
-          />
-        </div>
-        {/* Kill-feed style caption. */}
-        <p className={`${hud} flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-widest text-white`}>
-          <span style={{ color: CYAN }}>Arnav</span>
-          <span style={{ color: MAGENTA }}>♥</span>
-          <span style={{ color: MAGENTA }}>Aditi</span>
-          <span className="ml-auto text-white/60">{caption}</span>
-        </p>
-      </Panel>
-    </motion.div>
+    <motion.figure style={{ opacity, scale }} className="w-[78vw] max-w-[350px] shrink-0 origin-bottom">
+      <div className={`${hud} flex items-center justify-between border-b border-[#f3eddf]/25 pb-3 text-[#b9b9ab]`}>
+        <span>MEMORY / 0{index + 1}</span><span>DUO ARCHIVE</span>
+      </div>
+      <div className="relative mt-3 aspect-[4/5] max-h-[50svh] overflow-hidden bg-[#282b24]">
+        <Image src={src} alt={alt} fill sizes="(max-width: 448px) 78vw, 350px" className="object-cover" />
+      </div>
+      <figcaption className="grid grid-cols-[2.5rem_1fr] border-b border-[#f3eddf]/25 py-4">
+        <span className={`${hud} pt-1 ${index % 2 === 0 ? 'text-[#c4adeb]' : 'text-[#efa16f]'}`}>0{index + 1}</span>
+        <span>
+          <span className={`${display} block text-[2rem] font-medium uppercase leading-none ${index % 2 === 0 ? 'text-[#c4adeb]' : 'text-[#efa16f]'}`}>{caption}</span>
+          <span className={`${hud} mt-2 block text-[#b9b9ab]`}>ADITI + ARNAV</span>
+        </span>
+      </figcaption>
+    </motion.figure>
   );
 }
 
 function Segment({ index, progress }: { index: number; progress: MotionValue<number> }) {
   const [, center, next] = focusRange(index, PHOTOS.length);
-  const opacity = useTransform(progress, (p) => 1 - Math.min(Math.abs(p - center) / (next - center), 1) * 0.75);
-  return <motion.span className="h-1.5 w-10" style={{ opacity, background: CYAN, boxShadow: `0 0 8px ${CYAN}` }} />;
+  const opacity = useTransform(progress, (p) => 1 - Math.min(Math.abs(p - center) / (next - center), 1) * 0.8);
+  return <motion.span className={`h-[3px] w-8 ${index % 2 === 0 ? 'bg-[#c4adeb]' : 'bg-[#efa16f]'}`} style={{ opacity }} />;
 }
 
 function Highlights() {
-  const { sectionRef, trackRef, progress, x, height, stops } = usePinnedStrip(PHOTOS.length, PHOTO_SVH_EACH);
+  const { sectionRef, trackRef, progress, x, height, stops } = usePinnedStrip(PHOTOS.length, 90);
   return (
-    <section ref={sectionRef} className="relative" style={{ height }}>
-      {stops.map((top) => (
-        <SnapStop key={top} top={top} />
-      ))}
-      <div className="sticky top-0 flex h-svh flex-col justify-center overflow-hidden">
-        <div className="mb-6 px-5">
-          <p className={`${hud} text-xs font-bold uppercase tracking-[0.4em]`} style={{ color: GOLD }}>
-            Play of the game
-          </p>
-          <h2 className={`${heading} text-6xl! leading-none`} style={{ textShadow: NEON_TEXT_PINK }}>
-            HIGHLIGHTS
-          </h2>
+    <section ref={sectionRef} className="relative isolate bg-[#232b29]" style={{ height }} aria-labelledby="highlights-title">
+      {stops.map((top) => <SnapStop key={top} top={top} />)}
+      <div className="sticky top-0 flex h-svh min-h-[640px] flex-col justify-center overflow-hidden">
+        <div className="mb-7 flex flex-wrap items-end justify-between gap-x-3 gap-y-1 px-7">
+          <div>
+            <p className={`${hud} mb-2 text-[#b9b9ab]`}>01 / MATCH HISTORY</p>
+            <h2 id="highlights-title" className={`${heading} text-[3.75rem]! leading-none! text-[#f3eddf]!`}>HIGHLIGHTS</h2>
+          </div>
+          <span className={`${hud} mb-1 text-[#b9b9ab]`}>{String(PHOTOS.length).padStart(2, '0')} MEMORIES</span>
         </div>
-        <motion.div ref={trackRef} style={{ x }} className="flex w-max gap-6 px-[11vw] min-[448px]:px-12">
-          {PHOTOS.map((p, i) => (
-            <ReplayCard key={p.src} {...p} index={i} progress={progress} />
-          ))}
+        <motion.div ref={trackRef} style={{ x }} className="flex w-max gap-6 px-[11vw] min-[448px]:px-[49px]">
+          {PHOTOS.map((photo, index) => <HighlightPhoto key={photo.src} {...photo} index={index} progress={progress} />)}
         </motion.div>
-        <div className="mt-8 flex justify-center gap-2" aria-hidden>
-          {PHOTOS.map((p, i) => (
-            <Segment key={p.src} index={i} progress={progress} />
-          ))}
+        <div className="mt-7 flex justify-center gap-2" aria-hidden>
+          {PHOTOS.map((photo, index) => <Segment key={photo.src} index={index} progress={progress} />)}
         </div>
       </div>
     </section>
   );
 }
 
-// "Ready check" sound: quick rising sweep, then a two-note confirm.
-const readySound = () =>
-  playTones(
-    [
-      { freq: 220, endFreq: 880, at: 0, dur: 0.18 },
-      { freq: 988, at: 0.2, dur: 0.12 },
-      { freq: 1319, at: 0.32, dur: 0.4 },
-    ],
-    { type: 'sawtooth', volume: 0.05 },
-  );
+const readySound = () => playTones(
+  [
+    { freq: 330, endFreq: 660, at: 0, dur: 0.18 },
+    { freq: 830, at: 0.2, dur: 0.12 },
+    { freq: 988, at: 0.32, dur: 0.4 },
+  ],
+  { type: 'sine', volume: 0.08 },
+);
 
-const BURST_COLORS = [CYAN, MAGENTA, GOLD, '#FFFFFF', '#8A5CFF'];
-
-// Neon shards + hearts bursting out from the centre of the screen; remounted (via key) per accept.
 function Burst() {
-  const [bits] = useState(() =>
-    Array.from({ length: 40 }, (_, i) => {
-      const angle = Math.random() * Math.PI * 2;
-      const dist = 140 + Math.random() * 260;
-      return {
-        x: Math.cos(angle) * dist,
-        y: Math.sin(angle) * dist,
-        spin: (Math.random() - 0.5) * 540,
-        heart: i % 3 === 0,
-        size: 8 + Math.random() * 14,
-        color: BURST_COLORS[i % BURST_COLORS.length],
-        delay: Math.random() * 0.15,
-      };
-    }),
-  );
+  const reducedMotion = useReducedMotion();
+  const [bits] = useState(() => Array.from({ length: 32 }, (_, i) => {
+    const angle = (i / 32) * Math.PI * 2;
+    const distance = 100 + Math.random() * 230;
+    return { x: Math.cos(angle) * distance, y: Math.sin(angle) * distance, spin: i * 37, color: i % 2 ? '#efa16f' : '#c4adeb' };
+  }));
+
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center">
-      {bits.map((b, i) => (
+      {reducedMotion ? (
+        <span className={`${display} border border-[#a8c5ad] bg-[#1b1d19] px-8 py-5 text-4xl text-[#f3eddf]`}>YOU’RE IN.</span>
+      ) : bits.map((bit, i) => (
         <motion.span
           key={i}
-          className="absolute"
-          style={{
-            width: b.heart ? undefined : b.size,
-            height: b.heart ? undefined : b.size / 3,
-            background: b.heart ? undefined : b.color,
-            color: b.color,
-            fontSize: b.heart ? b.size * 1.6 : undefined,
-            boxShadow: b.heart ? undefined : `0 0 10px ${b.color}`,
-            textShadow: b.heart ? `0 0 10px ${b.color}` : undefined,
-          }}
-          initial={{ x: 0, y: 0, opacity: 1, rotate: 0, scale: 0.4 }}
-          animate={{ x: b.x, y: b.y, opacity: 0, rotate: b.spin, scale: 1 }}
-          transition={{ duration: 1.1, delay: b.delay, ease: [0.1, 0.7, 0.3, 1] }}
-        >
-          {b.heart ? '♥' : null}
-        </motion.span>
+          className="absolute h-1.5 w-3"
+          style={{ backgroundColor: bit.color }}
+          initial={{ x: 0, y: 0, opacity: 1, rotate: 0 }}
+          animate={{ x: bit.x, y: bit.y, opacity: 0, rotate: bit.spin }}
+          transition={{ duration: 1, ease: [0.1, 0.7, 0.3, 1] }}
+        />
       ))}
     </div>
   );
@@ -434,208 +191,132 @@ function Burst() {
 
 function SquadInvite({ onAccept }: { onAccept: () => void }) {
   const [accepted, setAccepted] = useState(false);
-  const [declineTries, setDeclineTries] = useState(0);
-
-  const accept = () => {
-    setAccepted(true);
-    onAccept();
-  };
-
   return (
-    <section id="squad" className="relative flex min-h-svh snap-start snap-always items-center px-5 py-20">
-      <motion.div
-        className="relative w-full"
-        initial={{ opacity: 0, scale: 0.85 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true, amount: 0.4 }}
-        transition={{ type: 'spring', stiffness: 160, damping: 15 }}
+    <section id="squad" className="relative flex min-h-svh snap-start snap-always flex-col justify-center bg-[#362a32] px-7 py-16" aria-labelledby="squad-title">
+      <div className={`${hud} mb-10 flex items-center justify-between border-b border-[#f3eddf]/25 pb-4`}>
+        <span>02 / SQUAD INVITE</span>
+        <span className="text-[#a8c5ad]">READY CHECK</span>
+      </div>
+      <p className="mb-5 text-base text-[#d2cdbf]">Aditi &amp; Arnav invited you.</p>
+      <h2 id="squad-title" className={`${heading} text-[clamp(3.5rem,16vw,4.5rem)]! leading-[0.94]! text-[#f3eddf]!`}>
+        JOIN OUR<br />NEXT CHAPTER.
+      </h2>
+      <p className="mb-10 mt-6 max-w-[18rem] text-base leading-relaxed text-[#d2cdbf]">
+        Together with our families, we invite you to celebrate our engagement. We’d love to have you by our side.
+      </p>
+      <dl className={`${hud} mb-8 grid grid-cols-2 border-y border-[#f3eddf]/25 py-4`}>
+        <div><dt className="mb-2 text-[#b9b9ab]">MODE</dt><dd>ENGAGEMENT</dd></div>
+        <div className="border-l border-[#f3eddf]/15 pl-4"><dt className="mb-2 text-[#b9b9ab]">SESSION</dt><dd>11.12.26 / AM</dd></div>
+      </dl>
+      <div className={`${hud} mb-3 flex justify-between text-[#b9b9ab]`}>
+        <span>YOUR RESPONSE</span>
+        <span className={accepted ? 'text-[#a8c5ad]' : ''}>{accepted ? '01 / 01 READY' : '00 / 01 READY'}</span>
+      </div>
+      <button
+        type="button"
+        disabled={accepted}
+        onClick={() => { setAccepted(true); onAccept(); }}
+        className={`${display} ${focus} relative flex min-h-20 w-full cursor-pointer items-center justify-between border border-[#efa16f] bg-[#efa16f] px-5 text-4xl font-semibold text-[#1b1d19] transition-[background-color,transform] hover:bg-[#f6b88f] active:translate-y-0.5 focus-visible:outline-[#c4adeb] disabled:cursor-default disabled:border-[#c4adeb] disabled:bg-[#302936] disabled:text-[#c4adeb] motion-reduce:transition-none`}
       >
-        <Panel label={accepted ? 'Match accepted ✓' : 'Incoming squad invite'} tag="1 / 1" accent={accepted ? GOLD : CYAN}>
-          <div className={`${hud} space-y-5 p-5 text-center text-white`}>
-            <div className="relative mx-auto h-28 w-28">
-              <Image src={`${IMG}/ring.webp`} alt="" fill unoptimized className="object-contain" />
-            </div>
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-white/70">
-              Legendary item unlocked
-            </p>
-            <p className={`${display} text-5xl font-bold leading-none`}>
-              <span style={{ color: CYAN, textShadow: NEON_TEXT }}>ARNAV</span>{' '}
-              <span style={{ color: MAGENTA }}>&amp;</span>{' '}
-              <span style={{ color: MAGENTA, textShadow: NEON_TEXT_PINK }}>ADITI</span>
-            </p>
-            <p className="text-lg font-semibold leading-snug">
-              invited you to their squad to celebrate their <span style={{ color: GOLD }}>engagement</span>.
-            </p>
-            <dl className="grid grid-cols-2 gap-2 text-left text-xs font-bold uppercase tracking-widest">
-              {[
-                ['Mode', 'Engagement'],
-                ['Match', 'Fri 11.12.26'],
-                ['Queue', 'Morning'],
-                ['Region', 'Mumbai'],
-              ].map(([k, v]) => (
-                <div key={k} className="bg-white/5 px-3 py-2">
-                  <dt className="text-white/50">{k}</dt>
-                  <dd style={{ color: CYAN }}>{v}</dd>
-                </div>
-              ))}
-            </dl>
-
-            <div className="flex items-center justify-center gap-3 pt-1">
-              <motion.button
-                type="button"
-                onClick={accept}
-                whileTap={{ scale: 0.94 }}
-                className={`${display} ${CUT} relative px-7 pb-0.5 pt-1.5 text-3xl font-bold uppercase leading-none text-[#07060F]`}
-                style={{ background: GOLD, boxShadow: `0 0 24px ${GOLD}` }}
-              >
-                {accepted ? 'Accepted' : 'Accept'}
-                {/* Ready-check timer bar, loops until accepted. */}
-                {!accepted && (
-                  <motion.span
-                    aria-hidden
-                    className="absolute inset-x-0 bottom-0 h-1 origin-left bg-[#07060F]/60"
-                    animate={{ scaleX: [1, 0] }}
-                    transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
-                  />
-                )}
-              </motion.button>
-              <motion.button
-                type="button"
-                onClick={() => setDeclineTries((n) => n + 1)}
-                animate={declineTries ? { x: [0, -8, 8, -6, 6, 0] } : undefined}
-                key={declineTries}
-                transition={{ duration: 0.4 }}
-                className={`${display} ${CUT} border border-white/20 px-5 pb-0.5 pt-1.5 text-2xl font-semibold uppercase leading-none text-white/50`}
-              >
-                {declineTries ? 'Nice try' : 'Decline'}
-              </motion.button>
-            </div>
-          </div>
-        </Panel>
-      </motion.div>
+        <span>{accepted ? 'ACCEPTED' : 'ACCEPT'}</span>
+        <span aria-hidden className="flex h-9 w-9 items-center justify-center border border-[#1b1d19] bg-[#c4adeb] text-2xl text-[#1b1d19]">{accepted ? '✓' : '+'}</span>
+      </button>
+      <div aria-hidden className="mt-2 h-1 bg-[#f3eddf]/15">
+        {accepted && <motion.div className="h-full origin-left bg-[#c4adeb]" initial={{ scaleX: 1 }} animate={{ scaleX: 0 }} transition={{ duration: 1.1, ease: 'linear' }} />}
+      </div>
+      <p aria-live="polite" className="mt-4 min-h-5 text-center text-xs text-[#b9b9ab]">
+        {accepted ? 'You’re in. Opening the briefing in 1 second…' : 'We’d love to celebrate with you.'}
+      </p>
     </section>
   );
 }
 
-// Pulsing location ping on the map.
-function Ping() {
-  return (
-    <span aria-hidden className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-      {[0, 0.6].map((delay) => (
-        <motion.span
-          key={delay}
-          className="absolute -left-6 -top-6 h-12 w-12 rounded-full border-2"
-          style={{ borderColor: GOLD }}
-          animate={{ scale: [0.3, 1.6], opacity: [1, 0] }}
-          transition={{ duration: 1.4, repeat: Infinity, delay, ease: 'easeOut' }}
-        />
-      ))}
-      <span className="block h-3 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45" style={{ background: GOLD, boxShadow: `0 0 12px ${GOLD}` }} />
-    </span>
-  );
-}
-
-const BRIEFING: { label: string; value: string; note: string; accent: string }[] = [
-  { label: 'Objective', value: 'Celebrate the duo', note: 'Arnav & Aditi · engagement', accent: GOLD },
-  { label: 'Match day', value: '11.12.2026', note: 'Friday', accent: CYAN },
-  { label: 'Drop time', value: 'TBA', note: 'Morning', accent: MAGENTA }, // TODO: exact time
-];
-
 function Briefing() {
   return (
-    <section id="briefing" className="relative px-5 py-16">
-      <motion.div {...reveal} className="mb-6">
-        <p className={`${hud} text-xs font-bold uppercase tracking-[0.4em]`} style={{ color: CYAN }}>
-          Classified · eyes only
-        </p>
-        <h2 className={`${heading} text-6xl! leading-none`} style={{ textShadow: NEON_TEXT }}>
-          MISSION BRIEFING
-        </h2>
-      </motion.div>
-      <div className="space-y-5">
-        {BRIEFING.map((b, i) => (
-          <motion.div
-            key={b.label}
-            initial={{ opacity: 0, x: i % 2 ? 80 : -80 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.6 }}
-            transition={{ type: 'spring', stiffness: 130, damping: 16 }}
-          >
-            <Panel label={b.label} tag={`0${i + 1}`} accent={b.accent}>
-              <div className="px-4 py-3">
-                <p className={`${display} text-4xl font-bold leading-none text-white`}>{b.value}</p>
-                <p className={`${hud} text-sm font-bold uppercase tracking-widest text-white/60`}>{b.note}</p>
-              </div>
-            </Panel>
-          </motion.div>
-        ))}
-
-        <motion.div
-          initial={{ opacity: 0, y: 60 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ type: 'spring', stiffness: 120, damping: 16 }}
-        >
-          <Panel label="Drop zone" tag="04" accent={GOLD}>
-            <div className="relative aspect-[4/3] w-full overflow-hidden">
-              <Image src={`${IMG}/map.webp`} alt="Map of the venue area" fill unoptimized className="object-cover" />
-              <Ping />
-            </div>
-            <div className="space-y-1 px-4 py-3">
-              <p className={`${display} text-3xl font-bold leading-none text-white`}>
-                Evershine Millennium Paradise Club House
-              </p>
-              <p className={`${hud} text-sm font-bold uppercase tracking-widest text-white/60`}>
-                Thakur Village, Kandivali East, Mumbai 400101
-              </p>
-              <a
-                href={MAPS_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`${display} ${CUT} mt-3 inline-block px-5 pb-0.5 pt-1.5 text-2xl font-bold uppercase leading-none text-[#07060F]`}
-                style={{ background: GOLD, boxShadow: `0 0 16px ${GOLD}88` }}
-              >
-                Ping location ↗
-              </a>
-            </div>
-          </Panel>
-        </motion.div>
+    <section id="briefing" className="border-t border-[#f3eddf]/25 bg-[#232b29] px-7 pb-10 pt-10" aria-labelledby="briefing-title">
+      <div className={`${hud} mb-6 flex justify-between text-[#b9b9ab]`}>
+        <span>03 / BRIEFING</span><span>ENGAGEMENT</span>
+      </div>
+      <h2 id="briefing-title" className={`${heading} text-[clamp(3.5rem,15vw,3.75rem)]! leading-none! text-[#f3eddf]!`}>SAVE THE DATE.</h2>
+      <div className="my-8 border-y border-[#f3eddf]/25 py-6">
+        <time dateTime="2026-12-11" className="block">
+          <span className={`${hud} text-[#a8c5ad]`}>MATCH DAY / FRIDAY</span>
+          <span className={`${display} mt-1 flex items-center gap-5 font-medium leading-[0.85]`}>
+            <span className="text-[9.5rem] tracking-[-0.06em]">11</span>
+            <span className="text-[3.5rem]">DEC<br />2026</span>
+          </span>
+        </time>
+        <dl className={`${hud} mt-6 grid grid-cols-2 border-t border-[#f3eddf]/15 pt-4`}>
+          <div><dt className="mb-2 text-[#b9b9ab]">SESSION</dt><dd>MORNING</dd></div>
+          {/* TODO: Confirm the exact morning time. */}
+          <div className="border-l border-[#f3eddf]/15 pl-4"><dt className="mb-2 text-[#b9b9ab]">START TIME</dt><dd>TBA</dd></div>
+        </dl>
       </div>
 
-      <div className="mt-16 text-center">
-        <p className={`${display} text-5xl font-bold text-white`} style={{ textShadow: NEON_TEXT_PINK }}>
-          GG · WP
-        </p>
-        <p className={`${hud} text-xs font-bold uppercase tracking-[0.3em] text-white/50`}>made with ♥ by arnav</p>
+      <div className="mb-6 border border-[#f3eddf]/25">
+        <div className={`${hud} flex items-center justify-between border-b border-[#f3eddf]/25 px-3 py-3`}>
+          <span className="text-[#a8c5ad]">DROP ZONE / MUMBAI</span>
+          <span className="text-[#b9b9ab]">01</span>
+        </div>
+        <div className="relative aspect-[4/3] overflow-hidden bg-[#282b24]">
+          <Image src="/images/engagement-2/map.webp" alt="Stylised top-down venue schematic" fill sizes="(max-width: 448px) 85vw, 392px" className="object-cover" />
+          <div aria-hidden className="absolute inset-4 border border-[#f3eddf]/30" />
+          <div aria-hidden className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full border border-[#a8c5ad] bg-[#1b1d19]/80">
+              <span className="h-3 w-3 rotate-45 bg-[#a8c5ad]" />
+            </span>
+            <span className={`${hud} mt-2 whitespace-nowrap bg-[#a8c5ad] px-2 py-1 text-[#1b1d19]`}>CLUB HOUSE</span>
+          </div>
+        </div>
+        <p className={`${hud} border-t border-[#f3eddf]/25 px-3 py-3 text-[#b9b9ab]`}>VENUE SCHEMATIC / NOT TO SCALE</p>
       </div>
+      <h3 className={`${display} text-[2.25rem] font-medium leading-[1.05] text-[#f3eddf]!`}>
+        Evershine Millennium<br />Paradise Club House
+      </h3>
+      <p className="mt-4 max-w-[17rem] text-sm leading-relaxed text-[#b9b9ab]">
+        Thakur Village, Kandivali East,<br />Mumbai 400101
+      </p>
+      <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className={`${focus} mt-6 flex min-h-14 cursor-pointer items-center justify-between border border-[#a8c5ad] px-4 text-sm font-medium transition-colors hover:bg-[#282b24] active:bg-[#33372e] focus-visible:outline-[#a8c5ad] motion-reduce:transition-none`}>
+        <span>Open in Google Maps</span>
+        <span aria-hidden className="text-xl">↗</span>
+      </a>
+      <footer className="mt-14 border-t border-[#f3eddf]/25 pt-8 text-center">
+        <p className={`${display} text-4xl font-medium uppercase`}>See you there.</p>
+        <p className="mt-3 text-sm text-[#d2cdbf]">Made with love by Aditi &amp; Arnav</p>
+        <p className={`${hud} mt-8 text-[#b9b9ab]`}>A + A / 11.12.2026</p>
+      </footer>
     </section>
   );
 }
 
 export default function Invite() {
-  const [bursts, setBursts] = useState(0);
+  const [celebrating, setCelebrating] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reducedMotion = useReducedMotion();
   useSnapZone('squad');
+  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
 
   const onAccept = () => {
     haptic([20, 40, 20, 40, 120]);
     readySound();
-    setBursts((n) => n + 1);
-    setTimeout(() => {
-      document.getElementById('briefing')?.scrollIntoView({ behavior: 'smooth' });
+    setCelebrating(true);
+    timer.current = setTimeout(() => {
+      setCelebrating(false);
+      document.getElementById('briefing')?.scrollIntoView({ behavior: reducedMotion ? 'instant' : 'smooth' });
     }, 1100);
   };
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="min-h-svh bg-[#07060F] text-white">
-        <main className="relative mx-auto max-w-md overflow-x-clip bg-gradient-to-b from-[#07060F] via-[#120B2E] to-[#07060F] pb-10">
+      <div className="min-h-svh bg-[#151713] font-[family-name:var(--font-body)] text-[#f3eddf]">
+        <main className="relative mx-auto max-w-md overflow-x-clip bg-[#1b1d19]">
           <Hero />
           <Highlights />
           <SquadInvite onAccept={onAccept} />
           <Briefing />
         </main>
       </div>
-      {bursts > 0 && <Burst key={bursts} />}
+      {celebrating && <Burst />}
     </MotionConfig>
   );
 }

@@ -10,9 +10,9 @@ const condensed = Roboto_Condensed({
 });
 
 export const metadata: Metadata = {
-  title: "Arnav & Aditi's Engagement",
+  title: "Aditi & Arnav's Engagement",
   description:
-    "You're invited to celebrate Arnav & Aditi's engagement · Friday, 11 December 2026 · Kandivali East, Mumbai.",
+    "You're invited to celebrate Aditi & Arnav's engagement · Friday, 11 December 2026 · Kandivali East, Mumbai.",
   robots: { index: false, follow: false },
 };
 

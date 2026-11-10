@@ -10,9 +10,6 @@ import {
 } from 'motion/react';
 import { SnapStop, focusRange, haptic, playTones, usePinnedStrip, useSnapZone } from '~/lib/invite';
 
-const VENUE_QUERY =
-  'Evershine Millennium Paradise Club House, Thakur Village, Kandivali East, Mumbai 400101';
-
 const DETAILS: { label: string; value: string; note: string; href?: string }[] = [
   { label: 'DATE', value: '11 DEC 2026', note: 'Friday' },
   { label: 'TIME', value: 'TBA', note: 'Morning' }, // TODO: exact time
@@ -20,14 +17,16 @@ const DETAILS: { label: string; value: string; note: string; href?: string }[] =
     label: 'VENUE',
     value: 'Evershine Millennium Paradise Club House',
     note: 'Thakur Village, Kandivali East, Mumbai 400101',
-    href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(VENUE_QUERY)}`,
+    href: 'https://maps.app.goo.gl/KrPQgjJUShP2SFbv7',
   },
 ];
 
 const PHOTOS = [
-  { src: '/images/engagement/photo-1.jpg', caption: 'TRACK 01 · GOLDEN HOUR' },
-  { src: '/images/engagement/photo-2.jpg', caption: 'TRACK 02 · THE RING' },
-  { src: '/images/engagement/photo-3.jpg', caption: 'TRACK 03 · BLUE HOUR' },
+  { src: '/images/engagement/us-1.jpg', caption: 'TRACK 01 · SUNNY SIDE' },
+  { src: '/images/engagement/us-2.jpg', caption: 'TRACK 02 · SIDE QUEST' },
+  { src: '/images/engagement/us-3.jpg', caption: 'TRACK 03 · NIGHT OUT' },
+  { src: '/images/engagement/us-4.jpg', caption: 'TRACK 04 · BEST SEATS' },
+  { src: '/images/engagement/us-5.jpg', caption: 'TRACK 05 · BOMBAY NIGHTS' },
 ];
 
 const IMG = '/images/engagement';
@@ -356,11 +355,11 @@ function Hero() {
               className="absolute -inset-8 rounded-full bg-[radial-gradient(closest-side,rgba(255,255,255,0.7),transparent)]"
             />
             <h1
-              aria-label="Arnav & Aditi"
+              aria-label="Aditi & Arnav"
               className={`${heading} relative text-[clamp(5rem,27vw,7rem)]! leading-[0.85] tracking-normal!`}
               style={{ textShadow: NAME_SHADOW }}
             >
-              <Name word="ARNAV" start={0.4} />
+              <Name word="ADITI" start={0.4} />
               <motion.span
                 aria-hidden
                 className="block text-[#F7ED75]"
@@ -370,7 +369,7 @@ function Hero() {
               >
                 &amp;
               </motion.span>
-              <Name word="ADITI" start={1.1} />
+              <Name word="ARNAV" start={1.1} />
             </h1>
           </div>
           <motion.p
@@ -561,7 +560,7 @@ export default function Invite() {
                     Together with their families
                   </motion.p>
                   <motion.p variants={child} className={`${pixel} text-5xl leading-none`}>
-                    ARNAV <span className="text-[#FF7AC8]">&amp;</span> ADITI
+                    ADITI <span className="text-[#FF7AC8]">&amp;</span> ARNAV
                   </motion.p>
                   <motion.p variants={child} className="text-lg">
                     request the pleasure of your company as they celebrate their engagement.
@@ -623,7 +622,7 @@ export default function Invite() {
                 </motion.div>
               ))}
             </div>
-            <p className={`${pixel} relative mt-16 text-center text-lg text-white`}>made with ♥ by arnav</p>
+            <p className={`${pixel} relative mt-16 text-center text-lg text-white`}>made with ♥ by aditi &amp; arnav</p>
           </section>
         </main>
       </div>
