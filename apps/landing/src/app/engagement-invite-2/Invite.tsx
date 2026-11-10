@@ -89,7 +89,7 @@ function Hero() {
         <div className="invite-hero-footer relative mt-auto border-t border-[#f3eddf]/25 pt-4">
           <time dateTime="2026-12-11" className={`${display} block text-[clamp(3rem,14vw,4rem)] font-semibold leading-none`}>11 DECEMBER 2026</time>
           <div className={`${hud} mt-4 grid grid-cols-2 border-t border-[#f3eddf]/15 pt-3 text-[#b9b9ab]`}>
-            <p>SESSION<br /><span className="mt-1 block text-[#f3eddf]">FRIDAY / MORNING</span></p>
+            <p>SESSION<br /><span className="mt-1 block text-[#f3eddf]">FRIDAY / 10 AM</span></p>
             <p className="border-l border-[#f3eddf]/15 pl-4">REGION<br /><span className="mt-1 block text-[#f3eddf]">MUMBAI</span></p>
           </div>
         </div>
@@ -209,7 +209,7 @@ function SquadInvite({ onAccept }: { onAccept: () => void }) {
       </p>
       <dl className={`${hud} mb-8 grid grid-cols-2 border-y border-[#f3eddf]/25 py-4`}>
         <div><dt className="mb-2 text-[#b9b9ab]">MODE</dt><dd>ENGAGEMENT</dd></div>
-        <div className="border-l border-[#f3eddf]/15 pl-4"><dt className="mb-2 text-[#b9b9ab]">SESSION</dt><dd>11.12.26 / AM</dd></div>
+        <div className="border-l border-[#f3eddf]/15 pl-4"><dt className="mb-2 text-[#b9b9ab]">SESSION</dt><dd>11.12.26 / 10 AM</dd></div>
       </dl>
       <div className={`${hud} mb-3 flex justify-between text-[#b9b9ab]`}>
         <span>YOUR RESPONSE</span>
@@ -260,8 +260,7 @@ function Briefing() {
         </time>
         <dl className={`${hud} mt-6 grid grid-cols-2 border-t border-[#f3eddf]/15 pt-4`}>
           <div><dt className="mb-2 text-[#b9b9ab]">SESSION</dt><dd>MORNING</dd></div>
-          {/* TODO: Confirm the exact morning time. */}
-          <div className="border-l border-[#f3eddf]/15 pl-4"><dt className="mb-2 text-[#b9b9ab]">START TIME</dt><dd>TBA</dd></div>
+          <div className="border-l border-[#f3eddf]/15 pl-4"><dt className="mb-2 text-[#b9b9ab]">START TIME</dt><dd>10:00 AM</dd></div>
         </dl>
       </div>
 

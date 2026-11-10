@@ -12,7 +12,7 @@ import { SnapStop, focusRange, haptic, playTones, usePinnedStrip, useSnapZone } 
 
 const DETAILS: { label: string; value: string; note: string; href?: string }[] = [
   { label: 'DATE', value: '11 DEC 2026', note: 'Friday' },
-  { label: 'TIME', value: 'TBA', note: 'Morning' }, // TODO: exact time
+  { label: 'TIME', value: '10:00 AM', note: 'Morning' },
   {
     label: 'VENUE',
     value: 'Evershine Millennium Paradise Club House',
