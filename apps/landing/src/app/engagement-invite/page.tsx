@@ -14,6 +14,16 @@ export const metadata: Metadata = {
   description:
     "You're invited to celebrate Aditi & Arnav's engagement · Friday, 11 December 2026 · Kandivali East, Mumbai.",
   robots: { index: false, follow: false },
+  // carnav.in redirects to www; link-preview crawlers don't always follow redirects for images.
+  metadataBase: new URL('https://www.carnav.in'),
+  openGraph: {
+    title: "Aditi & Arnav's Engagement",
+    description: "You're invited to celebrate Aditi & Arnav's engagement · Friday, 11 December 2026 · Kandivali East, Mumbai.",
+    url: '/engagement-invite',
+    type: 'website',
+    images: [{ url: '/images/engagement/og.jpg', width: 1200, height: 630, alt: "Aditi & Arnav's Engagement · 11 Dec 2026 · Mumbai" }],
+  },
+  twitter: { card: 'summary_large_image' },
 };
 
 export default function EngagementInvitePage() {
