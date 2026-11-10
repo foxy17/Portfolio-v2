@@ -1,17 +1,14 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import {
   MotionConfig,
   motion,
-  useScroll,
   useTransform,
   type MotionValue,
 } from 'motion/react';
-
-const VENUE_QUERY =
-  'Evershine Millennium Paradise Club House, Thakur Village, Kandivali East, Mumbai 400101';
+import { SnapStop, focusRange, haptic, playTones, usePinnedStrip, useSnapZone } from '~/lib/invite';
 
 const DETAILS: { label: string; value: string; note: string; href?: string }[] = [
   { label: 'DATE', value: '11 DEC 2026', note: 'Friday' },
@@ -20,14 +17,16 @@ const DETAILS: { label: string; value: string; note: string; href?: string }[] =
     label: 'VENUE',
     value: 'Evershine Millennium Paradise Club House',
     note: 'Thakur Village, Kandivali East, Mumbai 400101',
-    href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(VENUE_QUERY)}`,
+    href: 'https://maps.app.goo.gl/KrPQgjJUShP2SFbv7',
   },
 ];
 
 const PHOTOS = [
-  { src: '/images/engagement/photo-1.jpg', caption: 'TRACK 01 · GOLDEN HOUR' },
-  { src: '/images/engagement/photo-2.jpg', caption: 'TRACK 02 · THE RING' },
-  { src: '/images/engagement/photo-3.jpg', caption: 'TRACK 03 · BLUE HOUR' },
+  { src: '/images/engagement/us-1.jpg', caption: 'TRACK 01 · SUNNY SIDE' },
+  { src: '/images/engagement/us-2.jpg', caption: 'TRACK 02 · SIDE QUEST' },
+  { src: '/images/engagement/us-3.jpg', caption: 'TRACK 03 · NIGHT OUT' },
+  { src: '/images/engagement/us-4.jpg', caption: 'TRACK 04 · BEST SEATS' },
+  { src: '/images/engagement/us-5.jpg', caption: 'TRACK 05 · BOMBAY NIGHTS' },
 ];
 
 const IMG = '/images/engagement';
@@ -86,11 +85,6 @@ function Win({
       {children}
     </div>
   );
-}
-
-// Invisible scroll-snap stop at a given offset inside a relative section (active on phones, see useSnapZone).
-function SnapStop({ top }: { top: string }) {
-  return <div aria-hidden className="pointer-events-none absolute left-0 h-px w-px snap-start snap-always" style={{ top }} />;
 }
 
 const reveal = {
@@ -361,11 +355,11 @@ function Hero() {
               className="absolute -inset-8 rounded-full bg-[radial-gradient(closest-side,rgba(255,255,255,0.7),transparent)]"
             />
             <h1
-              aria-label="Arnav & Aditi"
+              aria-label="Aditi & Arnav"
               className={`${heading} relative text-[clamp(5rem,27vw,7rem)]! leading-[0.85] tracking-normal!`}
               style={{ textShadow: NAME_SHADOW }}
             >
-              <Name word="ARNAV" start={0.4} />
+              <Name word="ADITI" start={0.4} />
               <motion.span
                 aria-hidden
                 className="block text-[#F7ED75]"
@@ -375,7 +369,7 @@ function Hero() {
               >
                 &amp;
               </motion.span>
-              <Name word="ADITI" start={1.1} />
+              <Name word="ARNAV" start={1.1} />
             </h1>
           </div>
           <motion.p
@@ -411,9 +405,7 @@ function PhotoCard({
   index: number;
   progress: MotionValue<number>;
 }) {
-  const center = index / (PHOTOS.length - 1);
-  const span = 1 / (PHOTOS.length - 1);
-  const range = [center - span, center, center + span];
+  const range = focusRange(index, PHOTOS.length);
   const rotate = useTransform(progress, range, [10, 0, -10]);
   const scale = useTransform(progress, range, [0.82, 1, 0.82]);
   const y = useTransform(progress, range, [30, 0, 30]);
@@ -435,29 +427,16 @@ function PhotoCard({
 
 // Vertical scroll drives the photo strip sideways while the section is pinned.
 function Photos() {
-  const ref = useRef<HTMLElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const distance = useRef(0);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
-  const x = useTransform(scrollYProgress, (p) => -p * distance.current);
-  const pinnedSvh = PHOTOS.length * PHOTO_SVH_EACH - 100;
-
-  useEffect(() => {
-    const measure = () => {
-      const track = trackRef.current;
-      if (!track?.parentElement) return;
-      distance.current = track.scrollWidth - track.parentElement.clientWidth;
-    };
-    measure();
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, []);
+  const { sectionRef, trackRef, progress: scrollYProgress, x, height, stops } = usePinnedStrip(
+    PHOTOS.length,
+    PHOTO_SVH_EACH,
+  );
 
   return (
-    <section ref={ref} className="relative" style={{ height: `${PHOTOS.length * PHOTO_SVH_EACH}svh` }}>
+    <section ref={sectionRef} className="relative" style={{ height }}>
       {/* One snap stop per photo, landing it dead centre. */}
-      {PHOTOS.map((p, i) => (
-        <SnapStop key={p.src} top={`${(i * pinnedSvh) / (PHOTOS.length - 1)}svh`} />
+      {stops.map((top) => (
+        <SnapStop key={top} top={top} />
       ))}
       <div className="sticky top-0 flex h-svh flex-col justify-center overflow-hidden">
         <Floaty src={`${IMG}/hearts.webp`} className="right-3 top-[4%] z-10 h-16 w-16" />
@@ -483,56 +462,16 @@ function Photos() {
 }
 
 function Dot({ index, progress }: { index: number; progress: MotionValue<number> }) {
-  const center = index / (PHOTOS.length - 1);
-  const span = 1 / (PHOTOS.length - 1);
-  const scaleX = useTransform(progress, [center - span, center, center + span], [1, 3, 1]);
+  const scaleX = useTransform(progress, focusRange(index, PHOTOS.length), [1, 3, 1]);
   return <motion.span className="h-2.5 w-2.5 bg-white shadow-[2px_2px_0_#0C327D]" style={{ scaleX }} />;
 }
 
-// Tap feedback for ACCEPT. Android: Vibration API. iOS Safari has no vibrate(), but
-// toggling a native <input switch> fires the system haptic (iOS 18+), so click a hidden one.
-function haptic() {
-  if (typeof navigator.vibrate === 'function') {
-    navigator.vibrate([30, 60, 30, 60, 80]);
-    return;
-  }
-  const label = document.createElement('label');
-  label.ariaHidden = 'true';
-  label.style.display = 'none';
-  const input = document.createElement('input');
-  input.type = 'checkbox';
-  input.setAttribute('switch', '');
-  label.appendChild(input);
-  document.body.appendChild(label);
-  label.click();
-  label.remove();
-}
-
-// Tiny chiptune arpeggio (C6 E6 G6 C7) synthesised with Web Audio; no audio file needed.
-let audioCtx: AudioContext | null = null;
-function chime() {
-  try {
-    audioCtx ??= new AudioContext();
-    void audioCtx.resume();
-    const t0 = audioCtx.currentTime;
-    [1047, 1319, 1568, 2093].forEach((freq, i) => {
-      const ctx = audioCtx!;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'square';
-      osc.frequency.value = freq;
-      const t = t0 + i * 0.09;
-      gain.gain.setValueAtTime(0.0001, t);
-      gain.gain.exponentialRampToValueAtTime(0.08, t + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + (i === 3 ? 0.45 : 0.12));
-      osc.connect(gain).connect(ctx.destination);
-      osc.start(t);
-      osc.stop(t + 0.5);
-    });
-  } catch {
-    // Audio unavailable (old browser / blocked): the hearts still fall.
-  }
-}
+// Tiny chiptune arpeggio (C6 E6 G6 C7).
+const chime = () =>
+  playTones(
+    [1047, 1319, 1568, 2093].map((freq, i) => ({ freq, at: i * 0.09, dur: i === 3 ? 0.45 : 0.12 })),
+    { type: 'square' },
+  );
 
 const RAIN_COLORS = ['#FF7AC8', '#FFFFFF', '#AF9CE6', '#F7ED75', '#FFBFE9'];
 
@@ -575,38 +514,6 @@ const child = {
   hidden: { opacity: 0, y: 16 },
   show: { opacity: 1, y: 0 },
 };
-
-// Phones only: mandatory snap from the hero through the photo strip to the invitation
-// (hero → 1 swipe → photos → 1 swipe each → invitation). From the invitation down it's
-// free scrolling. Hysteresis (on below end − ½vh, off at end) stops it fighting upward scrolls.
-function useSnapZone(endId: string) {
-  useEffect(() => {
-    const html = document.documentElement;
-    const mq = window.matchMedia('(max-width: 767px)');
-    let on = false;
-    const update = () => {
-      const endEl = document.getElementById(endId);
-      if (!endEl) return;
-      const end = endEl.getBoundingClientRect().top + window.scrollY;
-      const y = window.scrollY;
-      const next = mq.matches && (y < end - window.innerHeight / 2 || (on && y < end - 1));
-      if (next !== on) {
-        on = next;
-        html.style.scrollSnapType = on ? 'y mandatory' : '';
-      }
-    };
-    update();
-    window.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
-    mq.addEventListener('change', update);
-    return () => {
-      window.removeEventListener('scroll', update);
-      window.removeEventListener('resize', update);
-      mq.removeEventListener('change', update);
-      html.style.scrollSnapType = '';
-    };
-  }, [endId]);
-}
 
 export default function Invite() {
   const [rain, setRain] = useState(0);
@@ -653,7 +560,7 @@ export default function Invite() {
                     Together with their families
                   </motion.p>
                   <motion.p variants={child} className={`${pixel} text-5xl leading-none`}>
-                    ARNAV <span className="text-[#FF7AC8]">&amp;</span> ADITI
+                    ADITI <span className="text-[#FF7AC8]">&amp;</span> ARNAV
                   </motion.p>
                   <motion.p variants={child} className="text-lg">
                     request the pleasure of your company as they celebrate their engagement.
@@ -715,7 +622,7 @@ export default function Invite() {
                 </motion.div>
               ))}
             </div>
-            <p className={`${pixel} relative mt-16 text-center text-lg text-white`}>made with ♥ by arnav</p>
+            <p className={`${pixel} relative mt-16 text-center text-lg text-white`}>made with ♥ by aditi &amp; arnav</p>
           </section>
         </main>
       </div>
