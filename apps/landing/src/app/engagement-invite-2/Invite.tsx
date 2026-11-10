@@ -8,11 +8,8 @@ import { SnapStop, focusRange, haptic, playTones, usePinnedStrip, useSnapZone } 
 const MAPS_URL = 'https://maps.app.goo.gl/KrPQgjJUShP2SFbv7';
 
 const PHOTOS = [
-  { src: '/images/engagement/us-1.jpg', caption: 'Sunny side', alt: 'Aditi and Arnav in a sunlit selfie' },
-  { src: '/images/engagement/us-2.jpg', caption: 'Side quest', alt: 'Aditi and Arnav between mossy stone gates on a forest trail' },
-  { src: '/images/engagement/us-3.jpg', caption: 'Night out', alt: 'Aditi and Arnav under a lit palm tree at night' },
-  { src: '/images/engagement/us-4.jpg', caption: 'Best seats', alt: 'Aditi and Arnav sitting together at a concert ground' },
   { src: '/images/engagement/us-5.jpg', caption: 'Bombay nights', alt: 'Aditi and Arnav at a Bombay cafe' },
+  { src: '/images/engagement/us-2.jpg', caption: 'Side quest', alt: 'Aditi and Arnav between mossy stone gates on a forest trail' },
 ];
 
 const display = 'font-[family-name:var(--font-display)]';
