@@ -566,7 +566,7 @@ export default function Invite() {
                     We invite you to celebrate as we level up to our next adventure together!
                   </motion.p>
                   <motion.div variants={child} className={`${pixel} flex justify-center gap-3 pt-2 text-xl`}>
-                    {['ACCEPT ♥️', 'OBVIOUSLY!'].map((label) => (
+                    {['ACCEPT ♥️', 'ALSO ACCEPT'].map((label) => (
                       <motion.a
                         key={label}
                         href="#details"

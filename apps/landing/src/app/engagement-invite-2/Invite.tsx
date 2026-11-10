@@ -230,7 +230,7 @@ function SquadInvite({ onAccept }: { onAccept: () => void }) {
           onClick={() => { setAccepted(true); onAccept(); }}
           className={`${display} ${focus} mt-3 flex min-h-14 w-full cursor-pointer items-center justify-center border border-[#c4adeb] px-5 text-3xl font-semibold text-[#c4adeb] transition-[background-color,transform] hover:bg-[#302936] active:translate-y-0.5 focus-visible:outline-[#c4adeb] motion-reduce:transition-none`}
         >
-          OBVIOUSLY!
+          ALSO ACCEPT
         </button>
       )}
       <div aria-hidden className="mt-2 h-1 bg-[#f3eddf]/15">
