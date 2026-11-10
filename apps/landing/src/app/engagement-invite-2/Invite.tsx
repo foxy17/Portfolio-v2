@@ -73,7 +73,7 @@ function Hero() {
                       <span>P0{index + 1}</span><span>READY ✓</span>
                     </span>
                   </span>
-                  <span className={`${display} mt-2 block text-[clamp(3.5rem,16vw,4.5rem)] font-semibold leading-none tracking-[-0.025em]`}>
+                  <span className={`${hud} mt-2 block text-sm font-normal tracking-normal`}>
                     {name.toUpperCase()}
                   </span>
                 </span>
@@ -81,7 +81,10 @@ function Hero() {
               <span className="absolute left-1/2 top-[35%] flex h-8 w-8 -translate-x-1/2 items-center justify-center border-2 border-[#c4adeb] border-b-[#efa16f] border-r-[#efa16f] bg-[#24252d] text-xl font-normal text-[#f3eddf]">+</span>
             </span>
           </h1>
-          <p className="mt-4 text-base">are getting engaged.</p>
+          <p className={`${display} mt-5 text-[clamp(2.75rem,14vw,4rem)] font-semibold uppercase leading-[0.9] tracking-[-0.02em] text-[#f3eddf]`}>
+            <span className="text-[#c4adeb]">Aditi</span> &amp; <span className="text-[#efa16f]">Arnav&rsquo;s</span>
+            <br />Engagement
+          </p>
         </div>
 
         <div className="invite-hero-footer mt-auto border-t border-[#f3eddf]/25 pt-4">
@@ -282,7 +285,7 @@ function Briefing() {
       </a>
       <footer className="mt-14 border-t border-[#f3eddf]/25 pt-8 text-center">
         <p className={`${display} text-4xl font-medium uppercase`}>See you there.</p>
-        <p className="mt-3 text-sm text-[#d2cdbf]">Made with love by Aditi &amp; Arnav</p>
+        <p className="mt-3 text-sm text-[#d2cdbf]">Made with love by Arnav &amp; Aditi</p>
         <p className={`${hud} mt-8 text-[#b9b9ab]`}>A + A / 11.12.2026</p>
       </footer>
     </section>
