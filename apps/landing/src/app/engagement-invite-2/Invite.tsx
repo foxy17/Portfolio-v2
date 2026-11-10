@@ -263,9 +263,8 @@ function Briefing() {
           <span className="text-[#a8c5ad]">DROP ZONE / MUMBAI</span>
           <span className="text-[#b9b9ab]">01</span>
         </div>
-        <div className="relative aspect-[4/3] overflow-hidden bg-[#282b24]">
-          <Image src="/images/engagement-2/map.webp" alt="Stylised top-down venue schematic" fill sizes="(max-width: 448px) 85vw, 392px" className="object-cover" />
-          <div aria-hidden className="absolute inset-4 border border-[#f3eddf]/30" />
+        <div className="relative aspect-square overflow-hidden bg-[#282b24]">
+          <Image src="/images/engagement-2/minimap.webp" alt="Dota 2 style minimap with the venue marked in the centre" fill sizes="(max-width: 448px) 85vw, 392px" className="object-cover" />
           <div aria-hidden className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center">
             <span className="flex h-12 w-12 items-center justify-center rounded-full border border-[#a8c5ad] bg-[#1b1d19]/80">
               <span className="h-3 w-3 rotate-45 bg-[#a8c5ad]" />
@@ -273,7 +272,7 @@ function Briefing() {
             <span className={`${hud} mt-2 whitespace-nowrap bg-[#a8c5ad] px-2 py-1 text-[#1b1d19]`}>CLUB HOUSE</span>
           </div>
         </div>
-        <p className={`${hud} border-t border-[#f3eddf]/25 px-3 py-3 text-[#b9b9ab]`}>VENUE SCHEMATIC / NOT TO SCALE</p>
+        <p className={`${hud} border-t border-[#f3eddf]/25 px-3 py-3 text-[#b9b9ab]`}>MINIMAP / NOT TO SCALE</p>
       </div>
       <h3 className={`${display} text-[2.25rem] font-medium leading-[1.05] text-[#f3eddf]!`}>
         Evershine Millennium<br />Paradise Club House
