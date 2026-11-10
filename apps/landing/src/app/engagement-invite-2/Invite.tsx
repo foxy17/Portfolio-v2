@@ -47,12 +47,15 @@ function Hero() {
       <style>{HERO_CSS}</style>
       <SnapStop top="0" />
       <div className="sticky top-0 flex h-svh min-h-[600px] flex-col bg-[#24252d] px-7 pb-8 pt-7">
-        <div className={`${hud} flex items-center justify-between border-b border-[#f3eddf]/25 pb-4`}>
+        {/* Original fantasy heroes framing the lobby (not any real game's characters). */}
+        <Image src="/images/engagement-2/heroes.webp" alt="" fill preload sizes="(max-width: 448px) 100vw, 448px" className="object-cover brightness-150 saturate-125" />
+        <div aria-hidden className="absolute inset-0 bg-gradient-to-b from-[#24252d]/60 via-transparent to-[#24252d]/80" />
+        <div className={`${hud} relative flex items-center justify-between border-b border-[#f3eddf]/25 pb-4`}>
           <span>ENGAGEMENT / LOBBY</span>
           <span className="text-[#a8c5ad]">02 / 02 READY</span>
         </div>
 
-        <div className="invite-hero-players mt-[5svh]">
+        <div className="invite-hero-players relative mt-[5svh]">
           <p className="mb-5 text-base text-[#d2cdbf]">Player two. For life.</p>
           <h1 className={`${heading} text-[#f3eddf]!`}>
             <span className="sr-only">Aditi &amp; Arnav</span>
@@ -61,11 +64,10 @@ function Hero() {
                 <span key={name} className={`block min-w-0 ${name === 'Arnav' ? 'text-[#efa16f]' : 'text-[#c4adeb]'}`}>
                   <span className="relative block aspect-[3/4] max-h-[32svh] overflow-hidden border border-current bg-[#282b24]">
                     <Image
-                      src={`/images/engagement-2/player-${name.toLowerCase()}.webp`}
+                      src={`/images/engagement-2/p-${name.toLowerCase()}.webp`}
                       alt=""
                       fill
-                      preload={index === 0}
-                      loading={index === 0 ? undefined : 'eager'}
+                      loading="eager"
                       sizes="(max-width: 448px) 40vw, 188px"
                       className="object-cover object-center"
                     />
@@ -81,14 +83,14 @@ function Hero() {
               <span className="absolute left-1/2 top-[35%] flex h-8 w-8 -translate-x-1/2 items-center justify-center border-2 border-[#c4adeb] border-b-[#efa16f] border-r-[#efa16f] bg-[#24252d] text-xl font-normal text-[#f3eddf]">+</span>
             </span>
           </h1>
-          <p className={`${display} mt-5 text-[clamp(2.75rem,14vw,4rem)] font-semibold uppercase leading-[0.9] tracking-[-0.02em] text-[#f3eddf]`}>
+          <p className={`${display} mt-5 text-[clamp(3.5rem,17vw,5rem)] font-semibold uppercase leading-[0.9] tracking-[-0.02em] text-[#f3eddf]`}>
             <span className="text-[#c4adeb]">Aditi</span> &amp; <span className="text-[#efa16f]">Arnav&rsquo;s</span>
             <br />Engagement
           </p>
         </div>
 
-        <div className="invite-hero-footer mt-auto border-t border-[#f3eddf]/25 pt-4">
-          <time dateTime="2026-12-11" className={`${display} text-[2.25rem] font-medium leading-none`}>11 DECEMBER 2026</time>
+        <div className="invite-hero-footer relative mt-auto border-t border-[#f3eddf]/25 pt-4">
+          <time dateTime="2026-12-11" className={`${display} block text-[clamp(3rem,14vw,4rem)] font-semibold leading-none`}>11 DECEMBER 2026</time>
           <div className={`${hud} mt-4 grid grid-cols-2 border-t border-[#f3eddf]/15 pt-3 text-[#b9b9ab]`}>
             <p>SESSION<br /><span className="mt-1 block text-[#f3eddf]">FRIDAY / MORNING</span></p>
             <p className="border-l border-[#f3eddf]/15 pl-4">REGION<br /><span className="mt-1 block text-[#f3eddf]">MUMBAI</span></p>
