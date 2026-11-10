@@ -8,11 +8,8 @@ import { SnapStop, focusRange, haptic, playTones, usePinnedStrip, useSnapZone } 
 const MAPS_URL = 'https://maps.app.goo.gl/KrPQgjJUShP2SFbv7';
 
 const PHOTOS = [
-  { src: '/images/engagement/us-1.jpg', caption: 'Sunny side', alt: 'Aditi and Arnav in a sunlit selfie' },
-  { src: '/images/engagement/us-2.jpg', caption: 'Side quest', alt: 'Aditi and Arnav between mossy stone gates on a forest trail' },
-  { src: '/images/engagement/us-3.jpg', caption: 'Night out', alt: 'Aditi and Arnav under a lit palm tree at night' },
-  { src: '/images/engagement/us-4.jpg', caption: 'Best seats', alt: 'Aditi and Arnav sitting together at a concert ground' },
   { src: '/images/engagement/us-5.jpg', caption: 'Bombay nights', alt: 'Aditi and Arnav at a Bombay cafe' },
+  { src: '/images/engagement/us-2.jpg', caption: 'Side quest', alt: 'Aditi and Arnav between mossy stone gates on a forest trail' },
 ];
 
 const display = 'font-[family-name:var(--font-display)]';
@@ -202,12 +199,13 @@ function SquadInvite({ onAccept }: { onAccept: () => void }) {
         <span>02 / SQUAD INVITE</span>
         <span className="text-[#a8c5ad]">READY CHECK</span>
       </div>
-      <p className="mb-5 text-base text-[#d2cdbf]">Aditi &amp; Arnav invited you.</p>
+      <p className={`${hud} mb-5 uppercase leading-relaxed text-[#d2cdbf]`}>With the love and blessings of their families</p>
       <h2 id="squad-title" className={`${heading} text-[clamp(3.5rem,16vw,4.5rem)]! leading-[0.94]! text-[#f3eddf]!`}>
-        JOIN OUR<br />NEXT CHAPTER.
+        <span className="text-[#c4adeb]">ADITI</span> &amp; <span className="text-[#efa16f]">ARNAV</span>
       </h2>
-      <p className="mb-10 mt-6 max-w-[18rem] text-base leading-relaxed text-[#d2cdbf]">
-        Together with our families, we invite you to celebrate our engagement. We’d love to have you by our side.
+      <p className={`${display} mt-3 text-[2rem] font-medium uppercase leading-none text-[#a8c5ad]`}>are unlocking a new chapter!</p>
+      <p className="mb-10 mt-6 max-w-[20rem] text-base leading-relaxed text-[#d2cdbf]">
+        We invite you to celebrate as we level up to our next adventure together!
       </p>
       <dl className={`${hud} mb-8 grid grid-cols-2 border-y border-[#f3eddf]/25 py-4`}>
         <div><dt className="mb-2 text-[#b9b9ab]">MODE</dt><dd>ENGAGEMENT</dd></div>
@@ -224,8 +222,17 @@ function SquadInvite({ onAccept }: { onAccept: () => void }) {
         className={`${display} ${focus} relative flex min-h-20 w-full cursor-pointer items-center justify-between border border-[#efa16f] bg-[#efa16f] px-5 text-4xl font-semibold text-[#1b1d19] transition-[background-color,transform] hover:bg-[#f6b88f] active:translate-y-0.5 focus-visible:outline-[#c4adeb] disabled:cursor-default disabled:border-[#c4adeb] disabled:bg-[#302936] disabled:text-[#c4adeb] motion-reduce:transition-none`}
       >
         <span>{accepted ? 'ACCEPTED' : 'ACCEPT'}</span>
-        <span aria-hidden className="flex h-9 w-9 items-center justify-center border border-[#1b1d19] bg-[#c4adeb] text-2xl text-[#1b1d19]">{accepted ? '✓' : '+'}</span>
+        <span aria-hidden className="flex h-9 w-9 items-center justify-center border border-[#1b1d19] bg-[#c4adeb] text-xl text-[#1b1d19]">{accepted ? '✓' : '♥️'}</span>
       </button>
+      {!accepted && (
+        <button
+          type="button"
+          onClick={() => { setAccepted(true); onAccept(); }}
+          className={`${display} ${focus} mt-3 flex min-h-14 w-full cursor-pointer items-center justify-center border border-[#c4adeb] px-5 text-3xl font-semibold text-[#c4adeb] transition-[background-color,transform] hover:bg-[#302936] active:translate-y-0.5 focus-visible:outline-[#c4adeb] motion-reduce:transition-none`}
+        >
+          OBVIOUSLY!
+        </button>
+      )}
       <div aria-hidden className="mt-2 h-1 bg-[#f3eddf]/15">
         {accepted && <motion.div className="h-full origin-left bg-[#c4adeb]" initial={{ scaleX: 1 }} animate={{ scaleX: 0 }} transition={{ duration: 1.1, ease: 'linear' }} />}
       </div>

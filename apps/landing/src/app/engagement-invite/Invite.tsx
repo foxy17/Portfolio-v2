@@ -22,11 +22,8 @@ const DETAILS: { label: string; value: string; note: string; href?: string }[] =
 ];
 
 const PHOTOS = [
-  { src: '/images/engagement/us-1.jpg', caption: 'TRACK 01 · SUNNY SIDE' },
+  { src: '/images/engagement/us-5.jpg', caption: 'TRACK 01 · BOMBAY NIGHTS' },
   { src: '/images/engagement/us-2.jpg', caption: 'TRACK 02 · SIDE QUEST' },
-  { src: '/images/engagement/us-3.jpg', caption: 'TRACK 03 · NIGHT OUT' },
-  { src: '/images/engagement/us-4.jpg', caption: 'TRACK 04 · BEST SEATS' },
-  { src: '/images/engagement/us-5.jpg', caption: 'TRACK 05 · BOMBAY NIGHTS' },
 ];
 
 const IMG = '/images/engagement';
@@ -557,16 +554,19 @@ export default function Invite() {
                   viewport={{ once: true }}
                 >
                   <motion.p variants={child} className="text-sm uppercase tracking-[0.25em]">
-                    Together with their families
+                    With the love and blessings of their families
                   </motion.p>
                   <motion.p variants={child} className={`${pixel} text-5xl leading-none`}>
                     ADITI <span className="text-[#FF7AC8]">&amp;</span> ARNAV
                   </motion.p>
+                  <motion.p variants={child} className={`${pixel} text-2xl leading-tight text-[#FF7AC8]`}>
+                    are unlocking a new chapter!
+                  </motion.p>
                   <motion.p variants={child} className="text-lg">
-                    request the pleasure of your company as they celebrate their engagement.
+                    We invite you to celebrate as we level up to our next adventure together!
                   </motion.p>
                   <motion.div variants={child} className={`${pixel} flex justify-center gap-3 pt-2 text-xl`}>
-                    {['ACCEPT ♥', 'ALSO ACCEPT'].map((label) => (
+                    {['ACCEPT ♥️', 'OBVIOUSLY!'].map((label) => (
                       <motion.a
                         key={label}
                         href="#details"
