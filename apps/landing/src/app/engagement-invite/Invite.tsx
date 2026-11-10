@@ -12,7 +12,7 @@ import { SnapStop, focusRange, haptic, playTones, usePinnedStrip, useSnapZone } 
 
 const DETAILS: { label: string; value: string; note: string; href?: string }[] = [
   { label: 'DATE', value: '11 DEC 2026', note: 'Friday' },
-  { label: 'TIME', value: 'TBA', note: 'Morning' }, // TODO: exact time
+  { label: 'TIME', value: '10:00 AM', note: 'Morning' },
   {
     label: 'VENUE',
     value: 'Evershine Millennium Paradise Club House',
@@ -566,7 +566,7 @@ export default function Invite() {
                     We invite you to celebrate as we level up to our next adventure together!
                   </motion.p>
                   <motion.div variants={child} className={`${pixel} flex justify-center gap-3 pt-2 text-xl`}>
-                    {['ACCEPT ♥️', 'OBVIOUSLY!'].map((label) => (
+                    {['ACCEPT ♥️', 'ALSO ACCEPT'].map((label) => (
                       <motion.a
                         key={label}
                         href="#details"
