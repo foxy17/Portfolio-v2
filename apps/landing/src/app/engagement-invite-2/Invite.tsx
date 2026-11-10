@@ -47,9 +47,9 @@ function Hero() {
       <style>{HERO_CSS}</style>
       <SnapStop top="0" />
       <div className="sticky top-0 flex h-svh min-h-[600px] flex-col bg-[#24252d] px-7 pb-8 pt-7">
-        {/* Original fantasy heroes framing the lobby (not any real game's characters). */}
-        <Image src="/images/engagement-2/heroes.webp" alt="" fill preload sizes="(max-width: 448px) 100vw, 448px" className="object-cover brightness-150 saturate-125" />
-        <div aria-hidden className="absolute inset-0 bg-gradient-to-b from-[#24252d]/60 via-transparent to-[#24252d]/80" />
+        {/* Dota 2 hero-select grid as the crowd of guests (fan art, non-commercial). */}
+        <Image src="/images/engagement-2/hero-icons.webp" alt="" fill preload sizes="(max-width: 448px) 100vw, 448px" className="object-cover opacity-45" />
+        <div aria-hidden className="absolute inset-0 bg-gradient-to-b from-[#24252d]/50 via-[#24252d]/60 to-[#24252d]/95" />
         <div className={`${hud} relative flex items-center justify-between border-b border-[#f3eddf]/25 pb-4`}>
           <span>ENGAGEMENT / LOBBY</span>
           <span className="text-[#a8c5ad]">02 / 02 READY</span>
