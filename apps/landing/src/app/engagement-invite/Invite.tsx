@@ -355,7 +355,7 @@ function Hero() {
               className="absolute -inset-8 rounded-full bg-[radial-gradient(closest-side,rgba(255,255,255,0.7),transparent)]"
             />
             <h1
-              aria-label="Aditi & Arnav"
+              aria-label="Aditi & Arnav's"
               className={`${heading} relative text-[clamp(5rem,27vw,7rem)]! leading-[0.85] tracking-normal!`}
               style={{ textShadow: NAME_SHADOW }}
             >
@@ -369,11 +369,11 @@ function Hero() {
               >
                 &amp;
               </motion.span>
-              <Name word="ARNAV" start={1.1} />
+              <Name word="ARNAV'S" start={1.1} />
             </h1>
           </div>
           <motion.p
-            className={`${pixel} mt-5 border-2 border-white bg-[#FF7AC8] px-3 text-2xl tracking-widest shadow-[4px_4px_0_#0C327D]`}
+            className={`${pixel} mt-6 border-[3px] border-white bg-[#FF7AC8] px-4 py-1 text-[clamp(2rem,10vw,2.75rem)] leading-none tracking-wider shadow-[6px_6px_0_#0C327D]`}
             initial={{ opacity: 0, scale: 0.6 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ type: 'spring', delay: 1.7 }}
@@ -622,7 +622,7 @@ export default function Invite() {
                 </motion.div>
               ))}
             </div>
-            <p className={`${pixel} relative mt-16 text-center text-lg text-white`}>made with ♥ by aditi &amp; arnav</p>
+            <p className={`${pixel} relative mt-16 text-center text-lg text-white`}>made with ♥ by arnav &amp; aditi</p>
           </section>
         </main>
       </div>
