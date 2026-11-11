@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { MotionConfig, motion, useReducedMotion, useTransform, type MotionValue } from 'motion/react';
 import { SnapStop, focusRange, haptic, playTones, usePinnedStrip, useSnapZone } from '~/lib/invite';
 
-const MAPS_URL = 'https://maps.app.goo.gl/KrPQgjJUShP2SFbv7';
+const MAPS_URL = 'https://maps.app.goo.gl/DARdzgwTAzPLt2yo7';
 
 const PHOTOS = [
   { src: '/images/engagement/us-5.jpg', caption: 'Bombay nights', alt: 'Aditi and Arnav at a Bombay cafe' },

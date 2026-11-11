@@ -17,7 +17,7 @@ const DETAILS: { label: string; value: string; note: string; href?: string }[] =
     label: 'VENUE',
     value: 'Evershine Millennium Paradise Club House',
     note: 'Thakur Village, Kandivali East, Mumbai 400101',
-    href: 'https://maps.app.goo.gl/KrPQgjJUShP2SFbv7',
+    href: 'https://maps.app.goo.gl/DARdzgwTAzPLt2yo7',
   },
 ];
 
