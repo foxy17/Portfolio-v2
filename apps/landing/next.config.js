@@ -31,6 +31,7 @@ const cspHeader = `
     script-src 'self' 'unsafe-eval' 'unsafe-inline';
     style-src 'self' 'unsafe-inline';
     img-src 'self' blob: data:;
+    connect-src 'self' blob:;
     font-src 'self';
     object-src 'none';
     base-uri 'self';
@@ -90,6 +91,12 @@ module.exports = {
         source: '/(.*)',
         headers: securityHeaders,
       },
+      // Invite media (3D model, sound clips, images) is large and rarely changes; let
+      // browsers and the CDN reuse it for a week. Rename the file to bust the cache.
+      ...['/models/:path*', '/sfx/:path*', '/images/engagement/:path*', '/images/engagement-2/:path*'].map((source) => ({
+        source,
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=604800, stale-while-revalidate=86400' }],
+      })),
     ];
   },
 };

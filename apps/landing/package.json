@@ -22,6 +22,7 @@
     "react-icons": "^5.0.1",
     "rough-notation": "^0.5.1",
     "swr": "^2.2.5",
+    "three": "0.170.0",
     "ui": "*"
   },
   "devDependencies": {
@@ -31,15 +32,16 @@
     "@types/lodash": "^4.14.202",
     "@types/node": "20.11.20",
     "@types/react": "19.1.0",
+    "@types/three": "0.170.0",
+    "autoprefixer": "^10.4.18",
     "content-security-policy-builder": "^2.3.0",
+    "cssnano": "^6.0.5",
     "eslint-config-next": "16.2.4",
+    "eslint-plugin-prettier": "^5.2.6",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "postcss": "^8.4.35",
-    "typescript": "5.3.3",
-    "eslint-plugin-prettier": "^5.2.6",
-    "autoprefixer": "^10.4.18",
-    "cssnano": "^6.0.5"
+    "typescript": "5.3.3"
   },
   "husky": {
     "hooks": {
