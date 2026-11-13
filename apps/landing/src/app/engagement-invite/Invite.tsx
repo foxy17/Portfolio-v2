@@ -8,7 +8,7 @@ import {
   useTransform,
   type MotionValue,
 } from 'motion/react';
-import { RsvpDialog, hasRsvp } from '~/lib/rsvp';
+import { RsvpDialog } from '~/lib/rsvp';
 import { SnapStop, focusRange, haptic, playTones, usePinnedStrip, useSnapZone } from '~/lib/invite';
 
 const DETAILS: { label: string; value: string; note: string; href?: string }[] = [
@@ -516,9 +516,6 @@ const child = {
 export default function Invite() {
   const [rain, setRain] = useState(0);
   const [rsvpOpen, setRsvpOpen] = useState(false);
-  // Details stay hidden (and the page ends at the invitation) until the guest RSVPs.
-  const [unlocked, setUnlocked] = useState(false);
-  useEffect(() => setUnlocked(hasRsvp()), []);
   const closeRsvp = useCallback(() => setRsvpOpen(false), []);
   useSnapZone('invitation');
 
@@ -529,7 +526,6 @@ export default function Invite() {
 
   const accept = () => {
     setRsvpOpen(false);
-    setUnlocked(true);
     haptic();
     chime();
     setRain((n) => n + 1);
@@ -597,47 +593,45 @@ export default function Invite() {
 
 
           {/* Details */}
-          {unlocked && (
-            <section id="details" className="relative px-5 py-16">
-              <RisingHearts />
-              <motion.h2
-                {...reveal}
-                className={`${heading} relative mb-6 text-5xl! tracking-wider drop-shadow-[3px_3px_0_#0C327D]`}
-              >
-                THE DETAILS
-              </motion.h2>
-              <div className="relative space-y-5">
-                {DETAILS.map((d, i) => (
-                  <motion.div
-                    key={d.label}
-                    initial={{ opacity: 0, x: i % 2 ? 90 : -90, rotate: i % 2 ? 6 : -6 }}
-                    whileInView={{ opacity: 1, x: 0, rotate: 0 }}
-                    viewport={{ once: true, amount: 0.6 }}
-                    transition={{ type: 'spring', stiffness: 120, damping: 15 }}
-                  >
-                    <Win title={`${d.label.toLowerCase()}.txt`}>
-                      <div className="bg-white/70 p-4">
-                        <span className={`${pixel} text-xl tracking-widest text-[#FF7AC8]`}>{d.label}</span>
-                        <span className={`${pixel} block text-4xl leading-none`}>{d.value}</span>
-                        <span className={`${condensed} mt-1 block text-sm uppercase tracking-widest`}>{d.note}</span>
-                        {d.href && (
-                          <a
-                            href={d.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`${pixel} mt-3 inline-block border-2 border-[#0C327D] bg-white px-3 py-0.5 text-xl shadow-[3px_3px_0_#0C327D] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none`}
-                          >
-                            OPEN IN MAPS ↗
-                          </a>
-                        )}
-                      </div>
-                    </Win>
-                  </motion.div>
-                ))}
-              </div>
-              <p className={`${pixel} relative mt-16 text-center text-lg text-white`}>made with ♥ by arnav &amp; aditi</p>
-            </section>
-          )}
+          <section id="details" className="relative px-5 py-16">
+            <RisingHearts />
+            <motion.h2
+              {...reveal}
+              className={`${heading} relative mb-6 text-5xl! tracking-wider drop-shadow-[3px_3px_0_#0C327D]`}
+            >
+              THE DETAILS
+            </motion.h2>
+            <div className="relative space-y-5">
+              {DETAILS.map((d, i) => (
+                <motion.div
+                  key={d.label}
+                  initial={{ opacity: 0, x: i % 2 ? 90 : -90, rotate: i % 2 ? 6 : -6 }}
+                  whileInView={{ opacity: 1, x: 0, rotate: 0 }}
+                  viewport={{ once: true, amount: 0.6 }}
+                  transition={{ type: 'spring', stiffness: 120, damping: 15 }}
+                >
+                  <Win title={`${d.label.toLowerCase()}.txt`}>
+                    <div className="bg-white/70 p-4">
+                      <span className={`${pixel} text-xl tracking-widest text-[#FF7AC8]`}>{d.label}</span>
+                      <span className={`${pixel} block text-4xl leading-none`}>{d.value}</span>
+                      <span className={`${condensed} mt-1 block text-sm uppercase tracking-widest`}>{d.note}</span>
+                      {d.href && (
+                        <a
+                          href={d.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`${pixel} mt-3 inline-block border-2 border-[#0C327D] bg-white px-3 py-0.5 text-xl shadow-[3px_3px_0_#0C327D] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none`}
+                        >
+                          OPEN IN MAPS ↗
+                        </a>
+                      )}
+                    </div>
+                  </Win>
+                </motion.div>
+              ))}
+            </div>
+            <p className={`${pixel} relative mt-16 text-center text-lg text-white`}>made with ♥ by arnav &amp; aditi</p>
+          </section>
         </main>
       </div>
       {rain > 0 && <HeartRain key={rain} />}

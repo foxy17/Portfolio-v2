@@ -47,9 +47,6 @@ function storage<T>(key: string, value?: T): T | null {
   }
 }
 
-// A guest who already RSVP'd on this device skips straight to the details next visit.
-export const hasRsvp = () => storage<Saved>('rsvp') !== null;
-
 function deviceId() {
   const existing = storage<string>('rsvp-device');
   if (existing) return existing;
