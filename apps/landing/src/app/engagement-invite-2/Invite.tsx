@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { MotionConfig, motion, useInView, useReducedMotion, useTransform, type MotionValue } from 'motion/react';
-import { RsvpDialog } from '~/lib/rsvp';
+import { RsvpDialog, hasRsvp } from '~/lib/rsvp';
 import { SnapStop, focusRange, haptic, playTones, usePinnedStrip, useSnapZone } from '~/lib/invite';
 
 const MAPS_URL = 'https://maps.app.goo.gl/DARdzgwTAzPLt2yo7';
@@ -788,6 +788,9 @@ function Briefing() {
 
 export default function Invite() {
   const [celebrating, setCelebrating] = useState(false);
+  // Briefing stays hidden (and the page ends at the squad invite) until the guest RSVPs.
+  const [unlocked, setUnlocked] = useState(false);
+  useEffect(() => setUnlocked(hasRsvp()), []);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reducedMotion = useReducedMotion();
   useSnapZone('squad');
@@ -800,6 +803,7 @@ export default function Invite() {
   const onAccept = () => {
     haptic([20, 40, 20, 40, 120]);
     readySound();
+    setUnlocked(true);
     setCelebrating(true);
     timer.current = setTimeout(() => {
       setCelebrating(false);
@@ -814,7 +818,7 @@ export default function Invite() {
           <Hero />
           <Highlights />
           <SquadInvite onAccept={onAccept} />
-          <Briefing />
+          {unlocked && <Briefing />}
         </main>
       </div>
       {celebrating && <Burst />}
