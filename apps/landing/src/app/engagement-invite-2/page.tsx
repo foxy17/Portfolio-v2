@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 
 export default function EngagementInvite2Page() {
   return (
-    <div className={`${display.variable} ${body.variable}`}>
+    <div id="invite-root" className={`${display.variable} ${body.variable}`}>
       <Invite />
     </div>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
 import {
   MotionConfig,
@@ -8,6 +8,7 @@ import {
   useTransform,
   type MotionValue,
 } from 'motion/react';
+import { RsvpDialog } from '~/lib/rsvp';
 import { SnapStop, focusRange, haptic, playTones, usePinnedStrip, useSnapZone } from '~/lib/invite';
 
 const DETAILS: { label: string; value: string; note: string; href?: string }[] = [
@@ -514,10 +515,17 @@ const child = {
 
 export default function Invite() {
   const [rain, setRain] = useState(0);
+  const [rsvpOpen, setRsvpOpen] = useState(false);
+  const closeRsvp = useCallback(() => setRsvpOpen(false), []);
   useSnapZone('invitation');
 
-  const accept = (e: React.MouseEvent) => {
+  const openRsvp = (e: React.MouseEvent) => {
     e.preventDefault();
+    setRsvpOpen(true);
+  };
+
+  const accept = () => {
+    setRsvpOpen(false);
     haptic();
     chime();
     setRain((n) => n + 1);
@@ -570,7 +578,7 @@ export default function Invite() {
                       <motion.a
                         key={label}
                         href="#details"
-                        onClick={accept}
+                        onClick={openRsvp}
                         whileTap={{ scale: 0.92 }}
                         className="border-2 border-[#0C327D] bg-white px-3 py-0.5 shadow-[3px_3px_0_#0C327D] transition active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
                       >
@@ -627,6 +635,7 @@ export default function Invite() {
         </main>
       </div>
       {rain > 0 && <HeartRain key={rain} />}
+      <RsvpDialog open={rsvpOpen} invite="invite-1" theme="pixel" title="See you there!" onClose={closeRsvp} onSaved={accept} />
     </MotionConfig>
   );
 }
