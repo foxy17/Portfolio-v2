@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { MotionConfig, motion, useInView, useReducedMotion, useTransform, type MotionValue } from 'motion/react';
+import { RsvpDialog } from '~/lib/rsvp';
 import { SnapStop, focusRange, haptic, playTones, usePinnedStrip, useSnapZone } from '~/lib/invite';
 
 const MAPS_URL = 'https://maps.app.goo.gl/DARdzgwTAzPLt2yo7';
@@ -489,6 +490,8 @@ function GlassBreak() {
 
 function SquadInvite({ onAccept }: { onAccept: () => void }) {
   const [accepted, setAccepted] = useState(false);
+  const [rsvpOpen, setRsvpOpen] = useState(false);
+  const closeRsvp = useCallback(() => setRsvpOpen(false), []);
   const sectionRef = useRef<HTMLElement>(null);
   const inView = useInView(sectionRef, { amount: 0.5, once: true });
   const near = useInView(sectionRef, { margin: '800px 0px', once: true });
@@ -673,7 +676,7 @@ function SquadInvite({ onAccept }: { onAccept: () => void }) {
         <button
           type="button"
           disabled={accepted}
-          onClick={() => { setAccepted(true); onAccept(); }}
+          onClick={() => setRsvpOpen(true)}
           className={`${display} ${focus} relative flex min-h-20 w-full cursor-pointer items-center justify-between border border-[#a8c5ad] bg-[#a8c5ad] px-5 text-4xl font-semibold text-[#1b1d19] transition-[background-color,transform] hover:bg-[#bfd8c3] active:translate-y-0.5 focus-visible:outline-[#c4adeb] disabled:cursor-default disabled:border-[#c4adeb] disabled:bg-[#302936] disabled:text-[#c4adeb] motion-reduce:transition-none`}
         >
           <span>{accepted ? 'ACCEPTED' : 'ACCEPT'}</span>
@@ -682,12 +685,20 @@ function SquadInvite({ onAccept }: { onAccept: () => void }) {
         {!accepted && (
           <button
             type="button"
-            onClick={() => { setAccepted(true); onAccept(); }}
+            onClick={() => setRsvpOpen(true)}
             className={`${display} ${focus} mt-3 flex min-h-14 w-full cursor-pointer items-center justify-center border border-[#c4adeb] px-5 text-3xl font-semibold text-[#c4adeb] transition-[background-color,transform] hover:bg-[#302936] active:translate-y-0.5 focus-visible:outline-[#c4adeb] motion-reduce:transition-none`}
           >
             ALSO ACCEPT
           </button>
         )}
+        <RsvpDialog
+          open={rsvpOpen}
+          invite="invite-2"
+          theme="hud"
+          title="Join the squad"
+          onClose={closeRsvp}
+          onSaved={() => { setRsvpOpen(false); setAccepted(true); onAccept(); }}
+        />
         <div aria-hidden className="mt-2 h-1 bg-[#f3eddf]/15">
           {accepted && <motion.div className="h-full origin-left bg-[#c4adeb]" initial={{ scaleX: 1 }} animate={{ scaleX: 0 }} transition={{ duration: 1.1, ease: 'linear' }} />}
         </div>
