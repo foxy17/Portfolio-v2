@@ -1,9 +1,8 @@
 ---
-title: How Terminal Multiplexers Work
+title: "How Terminal Multiplexers Work"
 description: >-
   How tmux, screen and Zellij work under the hood: PTYs, the line discipline,
-  the client/server split, escape codes and why your programs survive an SSH
-  drop.
+  the client/server split, escape codes and why your programs survive an SSH drop.
 pubDate: 2026-11-14
 heroImage: ../../assets/blog/how-terminal-multiplexers-work/heroImage.png
 ogImage: /og/how-terminal-multiplexers-work/ogImage.png
@@ -26,13 +25,12 @@ The difference is where the agent's terminal lives. In a plain terminal it belon
 Hold on to one sentence: **a multiplexer is a program that pretends to be a terminal for your shells, while pretending to be an ordinary program to your real terminal.**
 
 > **Key Takeaways**
-> 
+>
 > - A terminal session runs through a pseudo-terminal (PTY): a fake cable with a "master" end for the terminal window and a "slave" end for the shell.
-
-- tmux gives every pane its own PTY, reads each pane's output, keeps a copy of each pane's screen in memory, and redraws one combined picture into your real terminal.
-- tmux is two programs. A small client connects your terminal to a background server that owns every pane. Your programs survive an SSH drop because the server never loses its connection to them.
-- Colour, clipboard and scrolling problems usually come from tmux translating between two terminals: the one it pretends to be and the one you actually use.
-- tmux only sees bytes and timing, so it can't know whether a program is waiting for input. Agent-aware tools add that knowledge on top.
+> - tmux gives every pane its own PTY, reads each pane's output, keeps a copy of each pane's screen in memory, and redraws one combined picture into your real terminal.
+> - tmux is two programs. A small client connects your terminal to a background server that owns every pane. Your programs survive an SSH drop because the server never loses its connection to them.
+> - Colour, clipboard and scrolling problems usually come from tmux translating between two terminals: the one it pretends to be and the one you actually use.
+> - tmux only sees bytes and timing, so it can't know whether a program is waiting for input. Agent-aware tools add that knowledge on top.
 
 ## What is a terminal, really?
 
@@ -70,8 +68,8 @@ So with three panes open, tmux holds three PTY masters. Your shell, vim and what
 For each pane, tmux does three things:
 
 1. **Read.** It reads the bytes the program writes.
-1. **Understand.** It runs them through its own built-in terminal emulator. The parser in `input.c` is modelled on Paul Williams' DEC parser state machine ([vt100.net](https://vt100.net/emu/dec_ansi_parser)). The result is an in-memory grid of characters and colours for that pane.
-1. **Redraw.** It combines all the pane grids, plus the status bar, into one picture and draws it into your real terminal (`tty.c`).
+2. **Understand.** It runs them through its own built-in terminal emulator. The parser in `input.c` is modelled on Paul Williams' DEC parser state machine ([vt100.net](https://vt100.net/emu/dec_ansi_parser)). The result is an in-memory grid of characters and colours for that pane.
+3. **Redraw.** It combines all the pane grids, plus the status bar, into one picture and draws it into your real terminal (`tty.c`).
 
 Your real terminal window only ever talks to one program: tmux. It has no idea three programs are running behind it.
 
@@ -115,11 +113,11 @@ When you log back in and run `tmux attach`, a fresh client connects to the same 
 One keypress makes a round trip through six stops, and it still feels instant. One detail first: the tmux client doesn't relay your keys. When it attached, it passed your terminal's connection to the server, so the server talks to your terminal directly ([client.c](https://github.com/tmux/tmux/blob/master/client.c), [tty.c](https://github.com/tmux/tmux/blob/master/tty.c)).
 
 1. You press `l`. Your terminal window writes `l` into its PTY.
-1. The tmux server reads it straight from your terminal's connection.
-1. The server checks whether `l` is part of a tmux command. The default prefix key is `Ctrl-b`, set in `options-table.c` ([options-table.c](https://github.com/tmux/tmux/blob/master/options-table.c)). After the prefix, tmux reads the next key as a command instead of passing it on. Without the prefix, `l` goes straight through.
-1. The server writes `l` into the active pane's PTY master.
-1. bash receives it. Because interactive shells switch off the kernel's echo, bash's line editor echoes `l` itself, and that echo travels back out through the master.
-1. The server parses the echo, updates the pane's grid, works out which cells changed, and writes just those to your terminal.
+2. The tmux server reads it straight from your terminal's connection.
+3. The server checks whether `l` is part of a tmux command. The default prefix key is `Ctrl-b`, set in `options-table.c` ([options-table.c](https://github.com/tmux/tmux/blob/master/options-table.c)). After the prefix, tmux reads the next key as a command instead of passing it on. Without the prefix, `l` goes straight through.
+4. The server writes `l` into the active pane's PTY master.
+5. bash receives it. Because interactive shells switch off the kernel's echo, bash's line editor echoes `l` itself, and that echo travels back out through the master.
+6. The server parses the echo, updates the pane's grid, works out which cells changed, and writes just those to your terminal.
 
 ![Round-trip diagram of one keypress in tmux: key pressed, tmux server reads it, checks for the prefix, writes to PTY B, bash echoes the character, then grid update and redraw on screen](../../assets/blog/how-terminal-multiplexers-work/mux-keypress-roundtrip.png)
 
@@ -129,22 +127,12 @@ Because every byte passes through the server, tmux can also inject and read text
 
 Programs don't draw pixels. They print text mixed with **escape sequences**: short codes starting with the Escape character that move the cursor, change colours, or switch modes. xterm's reference lists hundreds ([xterm control sequences](https://mirrors.mit.edu/NetBSD/NetBSD-release-11/xsrc/external/mit/xterm/dist/ctlseqs.txt)). A few you meet every day:
 
-{% table %}
-- Escape sequence
-- What it does
----
-- `ESC [ 5 ; 10 H`
-- Move the cursor to row 5, column 10
----
-- `ESC [ ? 1049 h`
-- Switch to the "alternate screen" (why vim's display vanishes when you quit)
----
-- `ESC [ 38 ; 2 ; 255 ; 0 ; 0 m`
-- Set the text colour to pure red using 24-bit colour
----
-- `ESC ] 52 ; ...`
-- OSC 52: ask the terminal to put text on the clipboard
-{% /table %}
+| Escape sequence | What it does |
+|---|---|
+| `ESC [ 5 ; 10 H` | Move the cursor to row 5, column 10 |
+| `ESC [ ? 1049 h` | Switch to the "alternate screen" (why vim's display vanishes when you quit) |
+| `ESC [ 38 ; 2 ; 255 ; 0 ; 0 m` | Set the text colour to pure red using 24-bit colour |
+| `ESC ] 52 ; ...` | OSC 52: ask the terminal to put text on the clipboard |
 
 tmux's double life gets tricky here. It reads these codes from each pane as a terminal would, then writes new codes to your real terminal as a program would. In the middle it has to decide what your real terminal can handle.
 
@@ -155,9 +143,9 @@ That's why `TERM` matters. Inside tmux, `TERM` must be `screen` or `tmux` (usual
 Resizing is a relay of signals and size updates down the stack:
 
 1. You drag your terminal window bigger. The window tells the kernel the new size, and the kernel sends SIGWINCH ("window changed") to the tmux client.
-1. The client tells the server over the socket that the size changed. The server reads the new size from your terminal, which it already holds, and recalculates the layout of every pane.
-1. For each pane, the server sets the new size on that pane's PTY with the `TIOCSWINSZ` ioctl, in `window_pane_send_resize()` ([TIOCSWINSZ man page](https://man7.org/linux/man-pages/man2/TIOCSWINSZ.2const.html)).
-1. The kernel stores the size and sends SIGWINCH to the program in that pane. vim catches it and redraws itself to fit.
+2. The client tells the server over the socket that the size changed. The server reads the new size from your terminal, which it already holds, and recalculates the layout of every pane.
+3. For each pane, the server sets the new size on that pane's PTY with the `TIOCSWINSZ` ioctl, in `window_pane_send_resize()` ([TIOCSWINSZ man page](https://man7.org/linux/man-pages/man2/TIOCSWINSZ.2const.html)).
+4. The kernel stores the size and sends SIGWINCH to the program in that pane. vim catches it and redraws itself to fit.
 
 When two clients of different sizes attach to one session, tmux has to pick a size. By default, the window follows the client that was used most recently (the `window-size` option defaults to `latest`, per [tmux(1)](https://man.openbsd.org/tmux.1)).
 
@@ -165,32 +153,12 @@ When two clients of different sizes attach to one session, tmux has to pick a si
 
 All three use the same client/server idea. They differ in age, defaults and what you can extend.
 
-{% table %}
-- 
-- GNU screen
-- tmux
-- Zellij
----
-- Started
-- 1987, by Oliver Laumann ([Wikipedia](https://en.wikipedia.org/wiki/GNU_Screen))
-- 2007, by Nicholas Marriott ([Wikipedia](https://en.wikipedia.org/wiki/Tmux))
-- Newer, written in Rust ([GitHub](https://github.com/zellij-org/zellij))
----
-- Default prefix
-- `Ctrl-a`
-- `Ctrl-b`
-- Mode-based keys, shown on screen
----
-- Model
-- Client/server
-- Client/server over a Unix socket
-- Client/server, with separate threads for screen, PTYs and plugins
----
-- Stand-out feature
-- Runs nearly everywhere
-- Control mode (`-CC`), which iTerm2 uses to show tmux windows as native windows ([iTerm2 docs](https://iterm2.com/documentation-tmux-integration.html))
-- WebAssembly plugins (its own UI is built from them) and [session resurrection](https://zellij.dev/documentation/session-resurrection.html)
-{% /table %}
+| | GNU screen | tmux | Zellij |
+|---|---|---|---|
+| Started | 1987, by Oliver Laumann ([Wikipedia](https://en.wikipedia.org/wiki/GNU_Screen)) | 2007, by Nicholas Marriott ([Wikipedia](https://en.wikipedia.org/wiki/Tmux)) | Newer, written in Rust ([GitHub](https://github.com/zellij-org/zellij)) |
+| Default prefix | `Ctrl-a` | `Ctrl-b` | Mode-based keys, shown on screen |
+| Model | Client/server | Client/server over a Unix socket | Client/server, with separate threads for screen, PTYs and plugins |
+| Stand-out feature | Runs nearly everywhere | Control mode (`-CC`), which iTerm2 uses to show tmux windows as native windows ([iTerm2 docs](https://iterm2.com/documentation-tmux-integration.html)) | WebAssembly plugins (its own UI is built from them) and [session resurrection](https://zellij.dev/documentation/session-resurrection.html) |
 
 tmux was imported into OpenBSD's base system in 2009, which is why it ships with OpenBSD by default ([Wikipedia](https://en.wikipedia.org/wiki/Tmux)). Zellij saves your sessions as layouts every 60 seconds by default, and when it restores one it waits for you to press Enter before rerunning commands, which is a sensible guard ([Zellij docs](https://zellij.dev/documentation/session-resurrection.html)).
 
