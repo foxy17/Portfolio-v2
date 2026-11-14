@@ -54,7 +54,7 @@ Between the two ends of the PTY sits the **line discipline**, a filter inside th
 It does three jobs you rely on every day without noticing:
 
 - **Echo.** It shows the characters you type before the program even reads them.
-- **Signals.** It turns Ctrl-C into a SIGINT signal that stops the running program ([POSIX, General Terminal Interface](https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap11.html)).
+- **Signals.** It turns Ctrl-C into a SIGINT signal that stops the running program, unless that program has switched signal handling off (raw-mode programs often do, and get Ctrl-C as an ordinary key) ([POSIX, General Terminal Interface](https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap11.html)).
 - **Line editing.** In "canonical" mode it holds your input until you press Enter, so Backspace works before the program receives the line.
 
 Full-screen programs like vim switch the line discipline to "raw" mode, so they get every key the moment you press it. Interactive shells like bash and zsh do much the same, so they can offer arrow-key editing and history and do their own echo. Plain canonical mode is what simpler programs like `cat` get.
