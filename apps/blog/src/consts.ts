@@ -3,6 +3,6 @@
 
 export const SITE_TITLE = 'Arnav Chauhan';
 export const SITE_DESCRIPTION =
-	'Notes on web engineering, frontend performance, and developer tooling by Arnav Chauhan.';
+	'Notes on AI agents, terminals and developer tooling by Arnav Chauhan, with older posts on Astro, Bun and Node.js.';
 export const SITE_AUTHOR = 'Arnav Chauhan';
 export const SITE_URL = 'https://blog.carnav.in';

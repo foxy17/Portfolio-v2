@@ -13,7 +13,7 @@ export const GET: APIRoute = async () => {
 	lines.push(`> ${SITE_DESCRIPTION}`);
 	lines.push('');
 	lines.push(
-		'Personal blog by Arnav Chauhan, software engineer. Long-form notes on web platforms, frontend performance, and developer tooling.',
+		'Personal blog by Arnav Chauhan, software engineer. Long-form notes on AI agents and agent memory, terminals and tmux, and developer tooling. Older posts cover Astro, Bun, Node.js and GraphQL.',
 	);
 	lines.push('');
 	lines.push('## Posts');

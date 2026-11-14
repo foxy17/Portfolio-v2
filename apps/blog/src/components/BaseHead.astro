@@ -15,6 +15,7 @@ interface Props {
 	tags?: string[];
 	wordCount?: number;
 	category?: string;
+	noindex?: boolean;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -30,6 +31,7 @@ const {
 	tags = [],
 	wordCount,
 	category,
+	noindex = false,
 } = Astro.props;
 
 const imageURL = new URL(image, Astro.site ?? Astro.url).toString();
@@ -75,10 +77,12 @@ const umamiWebsiteId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
 
 <ClientRouter />
 
-<!-- Robots: index everything, allow large image previews for AI Overviews -->
+<!-- Robots: index by default, allow large image previews for AI Overviews -->
 <meta
 	name="robots"
-	content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"
+	content={noindex
+		? 'noindex, follow'
+		: 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'}
 />
 
 <!-- Theme script: shared cookie-based theme across blog + landing -->

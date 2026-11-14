@@ -1,4 +1,6 @@
 // @ts-check
+import { readdirSync, readFileSync } from 'node:fs';
+import yaml from 'js-yaml';
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import markdoc from '@astrojs/markdoc';
@@ -30,6 +32,31 @@ function remarkReadingTime() {
   };
 }
 
+// Sitemap inputs, read straight from post frontmatter (astro:content is not
+// available in this file). Gives each post a lastmod and counts published
+// posts per tag so thin tag pages (< 2 posts) stay out of the sitemap; the
+// same threshold drives the noindex meta in src/pages/tags/[tag].astro.
+// ponytail: assumes slug === filename, true for the glob loader as long as
+// filenames are already lowercase slugs and no post sets a custom `slug`.
+const postsDir = new URL('./src/content/blog/', import.meta.url);
+const postLastmod = new Map();
+const tagCounts = new Map();
+for (const file of readdirSync(postsDir)) {
+  const ext = file.match(/\.(md|mdx|mdoc)$/);
+  if (!ext) continue;
+  const raw = readFileSync(new URL(file, postsDir), 'utf8');
+  const fm = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  const data = /** @type {any} */ ((fm && yaml.load(fm[1])) || {});
+  if (data.draft) continue;
+  const date = new Date(data.updatedDate ?? data.pubDate);
+  if (!Number.isNaN(date.valueOf())) {
+    postLastmod.set(file.slice(0, -ext[0].length), date.toISOString());
+  }
+  for (const tag of data.tags ?? []) {
+    tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+  }
+}
+
 let adapter =  vercel({
   webAnalytics: {
     enabled: true,
@@ -51,7 +78,11 @@ export default defineConfig({
     mdx(),
     markdoc({ allowHTML: true, typographer: true }),
     sitemap({
-      filter: (page) => !page.includes('/keystatic') && !page.includes('/api/'),
+      filter: (page) => {
+        if (page.includes('/keystatic') || page.includes('/api/')) return false;
+        const tag = new URL(page).pathname.match(/^\/tags\/([^/]+)\/$/);
+        return !tag || (tagCounts.get(decodeURIComponent(tag[1])) ?? 0) >= 2;
+      },
       serialize(item) {
         const url = new URL(item.url);
         const path = url.pathname;
@@ -62,6 +93,8 @@ export default defineConfig({
           // Top-level slug: blog post
           item.priority = 0.8;
           item.changefreq = 'monthly';
+          const lastmod = postLastmod.get(path.slice(1, -1));
+          if (lastmod) item.lastmod = lastmod;
         } else {
           item.priority = 0.5;
         }

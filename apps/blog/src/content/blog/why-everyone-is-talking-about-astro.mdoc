@@ -81,8 +81,8 @@ Three things make Astro a much easier sell today than it was when the original p
 
 Astro is the right tool when the page is **content-first**: a blog, marketing site, docs, landing page, portfolio, newsletter archive. Anywhere the user spends most of their time *reading*, not *interacting*.
 
-It is *not* the right tool for app shells — dashboards, multi-step product flows, anything where the page is mostly stateful UI. For those, a real client-side framework still makes sense. Astro doesn't pretend otherwise; that's what its `client:` escape hatches and "use any framework you want for islands" model exist for.
+It is *not* the right tool for app shells — dashboards, multi-step product flows, anything where the page is mostly stateful UI. For those, a real client-side framework still makes sense, usually in front of an API with its own auth, like the [Node.js GraphQL server with JWT authentication](https://blog.carnav.in/nodejs-graphql-authentication-with-jwt-apollo-server-mysql-and-sequelize-orm-3af8/) from an earlier post. Astro doesn't pretend otherwise; that's what its `client:` escape hatches and "use any framework you want for islands" model exist for.
 
 The mental model that finally clicked for me: **most websites don't need to be applications**. Astro lets you build websites that are websites again, and only reaches for application machinery in the few specific places it's actually needed.
 
-That's it. The rest is the usual stuff — pick your preferred component framework, write Markdown for content, deploy to Vercel or wherever. The opinionated part — *how much JS to ship* — is decided for you, in your favor, by default.
+That's it. The rest is the usual stuff — pick your preferred component framework, write Markdown for content, deploy to Vercel or wherever. If install and startup speed are next on your list, see [whether Bun 1.0 lives up to the hype](https://blog.carnav.in/bun-10-is-the-hype-justified-af8/). The opinionated part — *how much JS to ship* — is decided for you, in your favor, by default.
