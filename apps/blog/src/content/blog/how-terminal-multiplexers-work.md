@@ -1,5 +1,5 @@
 ---
-title: "How Terminal Multiplexers Work: tmux, Explained Simply"
+title: "How Terminal Multiplexers Work"
 description: >-
   How tmux, screen and Zellij work under the hood: PTYs, the line discipline,
   the client/server split, escape codes and why your programs survive an SSH drop.
