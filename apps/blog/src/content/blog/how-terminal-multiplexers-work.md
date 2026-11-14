@@ -18,9 +18,9 @@ tags:
 category: engineering
 draft: false
 ---
-You start a coding agent on your dev box over SSH, hand it a long task, and close your laptop. If the agent runs inside tmux, it keeps working while you're gone. When you open the laptop and reattach, it's right where you left it, with everything it did while you were away on screen. Start the same agent in a plain SSH terminal and close the laptop, and the agent dies with the connection. You come back to a fresh prompt and a half-finished task.
+You start a coding agent in your laptop's terminal, hand it a long task, and then close the terminal window, maybe by accident, maybe to tidy up. In a plain terminal, closing the window kills the agent mid-task. Do the same with the agent running inside tmux and it keeps working. Open a new terminal, run `tmux attach`, and it's right where you left it, with everything it did while the window was closed on screen.
 
-The difference is where the agent's terminal lives. In a plain terminal it belongs to your SSH session. In tmux it belongs to a tmux server that keeps running after you leave. This post follows that connection through PTYs and tmux's client/server design, in plain English with a diagram at each step. You'll see how a keypress reaches your program and how its output finds its way back to your screen.
+The difference is where the agent's terminal lives. In a plain terminal it belongs to the window you just closed. In tmux it belongs to a tmux server that keeps running in the background. This post follows that connection through PTYs and tmux's client/server design, in plain English with a diagram at each step. You'll see how a keypress reaches your program and how its output finds its way back to your screen.
 
 Hold on to one sentence: **a multiplexer is a program that pretends to be a terminal for your shells, while pretending to be an ordinary program to your real terminal.**
 
