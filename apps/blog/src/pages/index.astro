@@ -51,7 +51,10 @@ const safeBlogJson = JSON.stringify(blogJsonLd).replace(
 <!doctype html>
 <html lang="en">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<BaseHead
+			title={`${SITE_TITLE}: AI agents, terminals and developer tooling`}
+			description={SITE_DESCRIPTION}
+		/>
 		<script type="application/ld+json" is:inline set:html={safeBlogJson} />
 	</head>
 	<body>

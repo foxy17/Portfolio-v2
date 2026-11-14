@@ -21,7 +21,7 @@ draft: false
 
 You give a coding agent such as Claude Code or Codex a long task in your laptop's terminal window, then accidentally close it. The agent may exit before it finishes.
 
-Start a named tmux **session**, a workspace you can leave and return to, with `tmux new -s agent`. Launch the agent inside it. If you close the window, open another terminal on the same machine and run `tmux attach -t agent`. You return to the running session, its current screen and recent output kept as **scrollback**.
+The fix is tmux, a terminal multiplexer. Start a named tmux **session**, a workspace you can leave and return to, with `tmux new -s agent`. Launch the agent inside it. If you close the window, open another terminal on the same machine and run `tmux attach -t agent`. You return to the running session, its current screen and recent output kept as **scrollback**.
 
 A background process, the **tmux server**, keeps the agent's terminal open while you are disconnected. It runs on the same machine as the agent. That machine must stay running: tmux does not preserve processes through a reboot ([tmux manual](https://man.openbsd.org/tmux.1)).
 
@@ -88,7 +88,7 @@ These examples use spaces for readability. `ESC` means the Escape character, not
 | `ESC [ 31 m` | Use the terminal's red text colour |
 | `ESC [ ? 1049 h` | Switch to an alternate screen buffer, keeping the previous screen contents to restore when the program leaves it |
 
-This is why quitting vim usually brings your earlier shell screen back.
+The alternate screen buffer is why quitting vim usually brings your earlier shell screen back.
 
 Try this at a shell prompt, inside or outside tmux:
 
@@ -194,6 +194,8 @@ The tool can show idle, working, blocked or done alongside the source of that st
 For example, Herdr uses process detection and rules that read an agent's screen, with explicit reports taking precedence when available ([Herdr docs](https://herdr.dev/tui/docs/preview/agents/)). Zellij includes both terminal multiplexing and attention tracking: its inbox combines reported status, shell markers and output-based inference to flag panes that may need you ([Zellij docs](https://zellij.dev/documentation/inbox.html)).
 
 You can close a window without abandoning a running agent because tmux keeps its terminal open and remembers its screen. To tell whether it needs approval, look for a permission prompt or an explicit status report.
+
+tmux keeps the agent's process running. What the agent knows from earlier sessions comes from its own memory system, which [How AI Agents Remember](https://blog.carnav.in/how-ai-agents-remember/) explains.
 
 The next post covers **agentic development environments**: agent-aware tools that help you manage the work running in those terminals.
 

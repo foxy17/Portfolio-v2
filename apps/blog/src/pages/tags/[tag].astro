@@ -35,7 +35,7 @@ interface Props {
 const { tag, posts } = Astro.props;
 const description = `${posts.length} ${
 	posts.length === 1 ? 'article' : 'articles'
-} tagged "${tag}" — notes on web engineering, frontend performance, and developer tooling by ${SITE_AUTHOR}.`;
+} tagged "${tag}" — notes on AI agents, terminals and developer tooling by ${SITE_AUTHOR}.`;
 
 // CollectionPage + ItemList lets search/AI engines treat each tag as a
 // browsable topic with an explicit, ordered list of relevant articles.
@@ -73,6 +73,7 @@ const safeCollectionJson = JSON.stringify(collectionJsonLd).replace(
 		<BaseHead
 			title={`#${tag} · ${SITE_TITLE}`}
 			description={description}
+			noindex={posts.length < 2}
 		/>
 		<script
 			type="application/ld+json"
