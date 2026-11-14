@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
+import markdoc from '@astrojs/markdoc';
 import sitemap from '@astrojs/sitemap';
 import react from '@astrojs/react';
 import node from "@astrojs/node";
@@ -44,27 +45,11 @@ if (process.argv[3] === "--node" || process.argv[4] === "--node") {
 export default defineConfig({
   site: 'https://blog.carnav.in',
   integrations: [
-    expressiveCode({
-      themes: ['github-light', 'github-dark'],
-      useDarkModeMediaQuery: false,
-      themeCssSelector: (theme) =>
-        theme.type === 'dark' ? '.dark' : ':root:not(.dark)',
-      defaultProps: {
-        wrap: true,
-      },
-      frames: {
-        showCopyToClipboardButton: true,
-      },
-      styleOverrides: {
-        borderRadius: '0.5rem',
-        borderWidth: '1px',
-        codeFontFamily:
-          'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-        codeFontSize: '0.9rem',
-        codeLineHeight: '1.65',
-      },
-    }),
+    // Options live in ec.config.mjs so the <Code> component (used for
+    // Markdoc fences) shares them.
+    expressiveCode(),
     mdx(),
+    markdoc({ allowHTML: true, typographer: true }),
     sitemap({
       filter: (page) => !page.includes('/keystatic') && !page.includes('/api/'),
       serialize(item) {
