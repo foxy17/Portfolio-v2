@@ -1,4 +1,5 @@
 import { config, fields, collection, singleton } from '@keystatic/core';
+import { wrapper } from '@keystatic/core/content-components';
 
 // Storage resolution (must match on server + client, so read it from
 // import.meta.env which Astro exposes to both):
@@ -96,7 +97,12 @@ export default config({
 				}),
 				content: fields.markdoc({
 					label: 'Content',
-					extension: 'md',
+					extension: 'mdoc',
+					// Keystatic's serializer splits lists inside `>` blockquotes on save,
+					// so the summary box is a tag instead (rendered as a blockquote).
+					components: {
+						takeaways: wrapper({ label: 'Key takeaways', schema: {} }),
+					},
 					options: {
 						// Body images share the hero store: src/assets/blog with a
 						// post-relative publicPath, so existing `![](../../assets/blog/..)`

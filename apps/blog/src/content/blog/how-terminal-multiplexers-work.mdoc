@@ -24,13 +24,13 @@ The difference is where the agent's terminal lives. In a plain terminal it belon
 
 Hold on to one sentence: **a multiplexer is a program that pretends to be a terminal for your shells, while pretending to be an ordinary program to your real terminal.**
 
-> **Key Takeaways**
->
-> - A terminal session runs through a pseudo-terminal (PTY): a fake cable with a "master" end for the terminal window and a "slave" end for the shell.
-> - tmux gives every pane its own PTY, reads each pane's output, keeps a copy of each pane's screen in memory, and redraws one combined picture into your real terminal.
-> - tmux is two programs. A small client connects your terminal to a background server that owns every pane. Your programs survive an SSH drop because the server never loses its connection to them.
-> - Colour, clipboard and scrolling problems usually come from tmux translating between two terminals: the one it pretends to be and the one you actually use.
-> - tmux only sees bytes and timing, so it can't know whether a program is waiting for input. Agent-aware tools add that knowledge on top.
+{% takeaways %}
+- A terminal session runs through a pseudo-terminal (PTY): a fake cable with a "master" end for the terminal window and a "slave" end for the shell.
+- tmux gives every pane its own PTY, reads each pane's output, keeps a copy of each pane's screen in memory, and redraws one combined picture into your real terminal.
+- tmux is two programs. A small client connects your terminal to a background server that owns every pane. Your programs survive an SSH drop because the server never loses its connection to them.
+- Colour, clipboard and scrolling problems usually come from tmux translating between two terminals: the one it pretends to be and the one you actually use.
+- tmux only sees bytes and timing, so it can't know whether a program is waiting for input. Agent-aware tools add that knowledge on top.
+{% /takeaways %}
 
 ## What is a terminal, really?
 

@@ -44,7 +44,7 @@ Theme is shared across `landing` and `blog` via a `theme` cookie scoped to `.car
 - `ui` is a bare-specifier import (workspace package).
 
 ### Blog content
-Posts live in `apps/blog/src/content/blog/*.md{,x}` and load via Astro's content collections (`apps/blog/src/content.config.ts`). Frontmatter is zod-validated: required `title`, `description`, `pubDate`; optional `updatedDate`, `heroImage`. To add a post, drop a new `.md` or `.mdx` file with valid frontmatter — no registration needed.
+Posts live in `apps/blog/src/content/blog/*.mdoc` (Markdoc, via `@astrojs/markdoc`) and load via Astro's content collections (`apps/blog/src/content.config.ts`). They're `.mdoc` so Keystatic's markdoc field round-trips them; plain `.md` broke on Keystatic saves (tables became `{% table %}` text). Code fences render through expressive-code's `<Code>` (`markdoc.config.mjs` → `src/components/CodeFence.astro`, options in `ec.config.mjs`). Reading time/word count for `.mdoc` is computed from the body in `pages/[...slug].astro`. Frontmatter is zod-validated: required `title`, `description`, `pubDate`; optional `updatedDate`, `heroImage`. To add a post, use Keystatic (`/keystatic`) or drop a new `.mdoc` file with valid frontmatter — no registration needed.
 
 ### Deployment
 Root `vercel.json` builds and deploys **landing only** (`buildCommand: turbo run build`, `outputDirectory: ./apps/landing/.next`). Blog is a separate Vercel project pointing at `apps/blog/vercel.json`. Don't add the blog to the root `vercel.json` — they're intentionally separate projects.

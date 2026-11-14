@@ -1,0 +1,12 @@
+---
+import { Code } from 'astro-expressive-code/components';
+
+interface Props {
+	content: string;
+	language?: string;
+}
+
+const { content, language } = Astro.props;
+---
+
+<Code code={content.replace(/\n$/, '')} lang={language} />

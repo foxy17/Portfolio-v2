@@ -46,14 +46,30 @@ interface Props {
 
 const { post, prev, next, related } = Astro.props;
 const { Content, headings, remarkPluginFrontmatter } = await render(post);
+
+// Markdoc (.mdoc) skips remark plugins, so fall back to counting words in the
+// raw body (code, link URLs and markup stripped) for reading time + JSON-LD.
+const wordCount: number =
+	remarkPluginFrontmatter?.wordCount ??
+	(post.body ?? '')
+		.replace(/```[\s\S]*?```/g, ' ')
+		.replace(/`[^`\n]*`/g, ' ')
+		.replace(/<[^>]+>/g, ' ')
+		.replace(/\]\([^)]*\)/g, ' ')
+		.replace(/[#>*_`|[\]-]/g, ' ')
+		.split(/\s+/)
+		.filter(Boolean).length;
+const minutesRead: string =
+	remarkPluginFrontmatter?.minutesRead ??
+	`${Math.max(1, Math.round(wordCount / 200))} min read`;
 ---
 
 <BlogPost
 	{...post.data}
 	slug={post.id}
 	headings={headings}
-	minutesRead={remarkPluginFrontmatter.minutesRead}
-	wordCount={remarkPluginFrontmatter.wordCount}
+	minutesRead={minutesRead}
+	wordCount={wordCount}
 	prev={prev}
 	next={next}
 	related={related}
