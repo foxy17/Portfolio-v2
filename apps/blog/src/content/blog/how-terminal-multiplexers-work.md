@@ -18,9 +18,9 @@ tags:
 category: engineering
 draft: false
 ---
-You start a long job over SSH, your Wi-Fi drops, and when you log back in the job is gone. Run the same job inside tmux and it keeps going. You reattach and find it exactly where you left it, cursor and all.
+You start a coding agent on your dev box over SSH, hand it a long task, and close your laptop. If the agent runs inside tmux, it keeps working while you're gone. When you open the laptop and reattach, it's right where you left it, with everything it did while you were away on screen. Start the same agent in a plain SSH terminal and close the laptop, and the agent dies with the connection. You come back to a fresh prompt and a half-finished task.
 
-That trick looks like magic until you see the layers underneath. This post walks through them from the bottom up, in plain English, with a diagram at each step. You don't need any C or kernel knowledge. By the end you'll know what a terminal really is, where tmux sits, why detaching works, and why tmux can't tell whether the program in a pane is thinking or waiting for you.
+The difference is where the agent's terminal lives. In a plain terminal it belongs to your SSH session. In tmux it belongs to a tmux server that keeps running after you leave. This post follows that connection through PTYs and tmux's client/server design, in plain English with a diagram at each step. You'll see how a keypress reaches your program and how its output finds its way back to your screen.
 
 Hold on to one sentence: **a multiplexer is a program that pretends to be a terminal for your shells, while pretending to be an ordinary program to your real terminal.**
 
