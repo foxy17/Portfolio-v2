@@ -18,28 +18,28 @@ category: engineering
 draft: false
 ---
 
-In April 2026, Cisco's AI security team published a proof of concept against Claude Code. A malicious npm package ran a `postinstall` script that rewrote every `MEMORY.md` file under `~/.claude/projects/`, added a hook to `~/.claude/settings.json` that ran on every prompt, and put a shell alias in place that turned auto memory back on if you disabled it. Closing the terminal did nothing. The next session loaded the poisoned memory again, and the one after that. Claude Code v2.1.50 stopped putting user memories in the system prompt, which blunts that particular attack ([Cisco](https://blogs.cisco.com/ai/identifying-and-remediating-a-persistent-memory-compromise-in-claude-code)).
+In April 2026, Cisco's AI security team published a proof of concept against Claude Code. A malicious npm package ran a `postinstall` script that rewrote every `MEMORY.md` file under `~/.claude/projects/`, added a hook to `~/.claude/settings.json` that ran on every prompt, and put a shell alias in place that turned auto memory back on if you disabled it. Restarting Claude Code left the poisoned memory in place for subsequent sessions to load. Claude Code v2.1.50 stopped putting user memories in the system prompt, which blunts that particular attack ([Cisco](https://blogs.cisco.com/ai/identifying-and-remediating-a-persistent-memory-compromise-in-claude-code)).
 
-The lasting risk is the writable file. An agent can reload poisoned instructions when their scope and loading settings apply. Poisoned settings take a different path: the agent or editor can use them to run commands or skip approval. Neither path requires the attacker to return.
+An attacker who can write these files can affect later sessions without returning. Agents reload poisoned instructions according to scope and loading settings. Agents or editors can apply poisoned settings to run commands or skip approval.
 
-I tested three Claude Code hooks against writes to instruction files. Two missed simple bypasses. The third restored several writes, but a commit defeated it.
+I tested three Claude Code hooks against writes to instruction files. I bypassed two with shell commands. The third restored several writes until I committed the change.
 
 {% takeaways %}
 - A poisoned instruction or memory file can bring an injection back when the agent loads it in a later session.
-- CLAUDE.md, AGENTS.md, rules files and auto memory are context. A "do not" rule in them enforces nothing.
+- Agents read CLAUDE.md, AGENTS.md, rules files and auto memory as context; they can disregard a "do not" rule.
 - In my tests, a hook on the Edit and Write tools missed `echo >> CLAUDE.md` through Bash, and matching file names in Bash commands missed a renamed variable.
 - Hooks can check agent tool calls. Code running outside those calls needs an OS or container boundary; review helps detect poisoned files before use.
 {% /takeaways %}
 
 ## Why poisoned memory outlives the session
 
-A prompt injection hides instructions in something the agent reads, such as a web page, an issue comment or a README. The payload works while that text sits in the context window. Its effects can outlast the session, if the agent ran a command or pushed code, but in a new session the payload has to be read again before it can steer anything.
+An attacker can hide instructions in a web page, issue comment or README that the agent reads. The agent can act on that text while it sits in the context window. Commands it runs or code it pushes can have effects beyond the session; in a new session, the agent must reread the payload to act on it.
 
-Memory poisoning makes that reread part of normal operation. The payload enters a persistent store that the agent loads or retrieves from later, giving attacker-written text the appearance of remembered guidance. OWASP lists this as ASI06, "Memory & Context Poisoning", in its Top 10 for Agentic Applications ([OWASP](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/), December 2025).
+An attacker can plant a payload in persistent memory for the agent to load or retrieve during normal operation and treat as remembered guidance. OWASP lists this as ASI06, "Memory & Context Poisoning", in its Top 10 for Agentic Applications ([OWASP](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/), December 2025).
 
-Researchers have planted malicious memories through conversation ([MINJA](https://arxiv.org/abs/2503.03704)) and poisoned stored memories to influence later retrieval ([AgentPoison](https://arxiv.org/abs/2407.12784)). A June 2026 study found greater risk in agents that write and retrieve memory more aggressively, within the systems tested ([arXiv 2606.04329](https://arxiv.org/abs/2606.04329)).
+Researchers have planted malicious memories through conversation ([MINJA](https://arxiv.org/abs/2503.03704)) and poisoned stored memories to influence later retrieval ([AgentPoison](https://arxiv.org/abs/2407.12784)). In a June 2026 study, researchers found greater risk among the tested agents with more aggressive memory writing and retrieval ([arXiv 2606.04329](https://arxiv.org/abs/2606.04329)).
 
-Coding agents add one twist. "Bad Memory" tested Claude Code and Codex and found it hard to trick them into rewriting their own memory. A payload already sitting in a memory file was another story: it could steer current and future sessions, with success and persistence varying across systems and models ([arXiv 2607.14611](https://arxiv.org/abs/2607.14611)). That shifts the question from "will the model resist?" to "who else can write these files?"
+In "Bad Memory", researchers struggled to trick Claude Code and Codex into rewriting their own memory. By planting a payload in a memory file, they could steer current and future sessions. Success and persistence varied across systems and models ([arXiv 2607.14611](https://arxiv.org/abs/2607.14611)). You need to check who else can write these files, even if the model resists requests to rewrite them.
 
 ## Files that can carry poison forward
 
@@ -53,25 +53,25 @@ Review these locations according to your agent, file scope and enabled features.
 | `~/.claude/projects/<project>/memory/` or a configured memory directory | `MEMORY.md` at startup when enabled; topic files on demand ([docs](https://code.claude.com/docs/en/memory#how-it-works)) | outside repo review by default |
 | `.claude/settings.json`, `.vscode/settings.json` | when the agent or editor applies that settings scope | repo copies can appear in review |
 
-**Instruction files supply context.** Claude Code loads applicable ancestor instructions at launch; nested instructions and path-scoped rules can load later as it accesses matching files. Auto memory normally lives under `~/.claude/projects/<project>/memory/`. When enabled, its startup load stops at 200 lines or 25KB of `MEMORY.md`, whichever comes first. Claude reads topic files on demand through its file tools ([Claude Code docs](https://code.claude.com/docs/en/memory)). This is the startup-loaded memory described in [how agents store and retrieve memories](https://blog.carnav.in/how-ai-agents-remember/).
+**Agents read instruction files as context.** Claude Code loads applicable ancestor instructions at launch; it can load nested instructions and path-scoped rules as it accesses matching files. By default, Claude Code stores auto memory under `~/.claude/projects/<project>/memory/`. With auto memory enabled, it loads up to 200 lines or 25KB of `MEMORY.md` at startup, whichever comes first. Claude reads topic files on demand through its file tools ([Claude Code docs](https://code.claude.com/docs/en/memory)). I described this startup loading in [how agents store and retrieve memories](https://blog.carnav.in/how-ai-agents-remember/).
 
-**Settings control execution.** Claude Code settings can register command hooks for events such as session start or prompt submission ([hooks docs](https://code.claude.com/docs/en/hooks)). In the Copilot exploit below, an approval setting let subsequent tool calls run without confirmation ([Embrace The Red](https://embracethered.com/blog/posts/2025/github-copilot-remote-code-execution-via-prompt-injection/)). Changing that setting did not itself execute a command.
+**You configure execution through settings.** In Claude Code settings, you can register command hooks for events such as session start or prompt submission ([hooks docs](https://code.claude.com/docs/en/hooks)). In the Copilot exploit below, the attacker changed an approval setting so Copilot could run subsequent tool calls without confirmation ([Embrace The Red](https://embracethered.com/blog/posts/2025/github-copilot-remote-code-execution-via-prompt-injection/)). Copilot executed commands through tool calls after the setting change.
 
 ## Four ways poison gets in
 
-Each case gives an attacker a way to write files that the agent or editor may load later.
+An attacker can use each route to write files the agent or editor may load later.
 
 ### 1. A repo you cloned
 
-In March 2025 Pillar Security showed rules files for Cursor and GitHub Copilot carrying instructions hidden with zero-width and bidirectional Unicode characters. The text looked harmless in an editor and in review. In their demo, the model read the hidden part and added a script tag pointing at an attacker's site to a generated HTML page, without mentioning it in its reply. GitHub added a warning for hidden Unicode on github.com on 1 May 2025 ([Pillar Security](https://pillar.security/blog/new-vulnerability-in-github-copilot-and-cursor-how-hackers-can-weaponize-code-agents)).
+In March 2025 Pillar Security hid instructions in Cursor and GitHub Copilot rules files using zero-width and bidirectional Unicode characters. A reviewer would see harmless text in the editor and diff. In their demo, the model read the hidden part and added a script tag pointing at an attacker's site to a generated HTML page, without mentioning it in its reply. GitHub added a warning for hidden Unicode on github.com on 1 May 2025 ([Pillar Security](https://pillar.security/blog/new-vulnerability-in-github-copilot-and-cursor-how-hackers-can-weaponize-code-agents)).
 
 ### 2. A dependency or another local process
 
-An install script can write memory and settings directly with your account's permissions, as the [Cisco case in the opening](https://blogs.cisco.com/ai/identifying-and-remediating-a-persistent-memory-compromise-in-claude-code) shows.
+An install script can write memory and settings with your account's permissions, as the [Cisco case in the opening](https://blogs.cisco.com/ai/identifying-and-remediating-a-persistent-memory-compromise-in-claude-code) shows.
 
 ### 3. The agent edits its own config
 
-In August 2025 Johann Rehberger showed a prompt injection that got GitHub Copilot to add `"chat.tools.autoApprove": true` to `.vscode/settings.json`. From then on Copilot ran tools without asking, which turned the injection into remote code execution (CVE-2025-53773, [Embrace The Red](https://embracethered.com/blog/posts/2025/github-copilot-remote-code-execution-via-prompt-injection/)). Later that month his AgentHopper proof of concept targeted several agents and spread through repositories using the developer's access. The affected vendors have patched the issues it used ([Embrace The Red](https://embracethered.com/blog/posts/2025/agenthopper-a-poc-ai-virus)).
+In August 2025 Johann Rehberger showed a prompt injection that got GitHub Copilot to add `"chat.tools.autoApprove": true` to `.vscode/settings.json`. Copilot then ran tools without asking, allowing the attacker to execute code remotely (CVE-2025-53773, [Embrace The Red](https://embracethered.com/blog/posts/2025/github-copilot-remote-code-execution-via-prompt-injection/)). Later that month his AgentHopper proof of concept targeted several agents and spread through repositories using the developer's access. The affected vendors have patched the issues it used ([Embrace The Red](https://embracethered.com/blog/posts/2025/agenthopper-a-poc-ai-virus)).
 
 ### 4. Out of the sandbox through a config file
 
@@ -81,22 +81,22 @@ Before v2.1.2, Claude Code's sandbox did not protect `.claude/settings.json` whe
 
 ## Why a written rule cannot enforce itself
 
-It is tempting to answer all this by adding rules to CLAUDE.md: "never edit settings files", "never run curl". Claude Code's own docs describe these files as context and point you to hooks and permissions for enforcement ([Claude Code docs](https://code.claude.com/docs/en/memory)).
+You can add "never edit settings files" or "never run curl" to CLAUDE.md, but the model decides whether to comply. Claude Code's docs describe these files as context and direct you to hooks and permissions for enforcement ([Claude Code docs](https://code.claude.com/docs/en/memory)).
 
-An August 2026 study examined security rules in 481 public CLAUDE.md files. Manual review estimated that extraction captured 66.3% of eligible security rules. Of the extracted rules, 4.4% matched a documented built-in control under the strictest matching criterion ([arXiv 2608.23550](https://arxiv.org/abs/2608.23550)). This does not mean agents violated 95.6% of the rules; the study measured correspondence to controls, not attack outcomes. The researchers did not verify deployment. Written rules leave compliance to the model.
+In an August 2026 study, researchers examined security rules in 481 public CLAUDE.md files. Through manual review, they estimated that their extraction captured 66.3% of eligible security rules. They matched 4.4% of the extracted rules to a documented built-in control under the strictest matching criterion ([arXiv 2608.23550](https://arxiv.org/abs/2608.23550)). The researchers measured correspondence to controls without testing attacks or verifying deployment, so you cannot infer that agents violated 95.6% of the rules.
 
 ## Two threats need two kinds of defense
 
-Ask who performs the write and which boundary can stop it. A prompt injection can lead to arbitrary code execution, so the threats can occur in sequence.
+Ask who performs the write and which boundary can stop it. An attacker can use prompt injection to gain arbitrary code execution and carry out both threats in sequence.
 
 - **A fooled model** requests tool calls. The harness, the software running the model and its tools, can check those requests. Permissions and pre-tool hooks can block covered calls; a restore hook can undo selected file edits afterward.
-- **Code running with your permissions** can write files directly. An agent may launch it, or you may run it during an install. Hooks cannot mediate its individual filesystem operations. Code with access to the hook files can rewrite the checks too. Case 4 shows why the sandbox must protect configuration the host will later execute.
+- **Code running with your permissions** can write files. An agent may launch it, or you may run it during an install. You cannot use hooks to mediate its individual filesystem operations, and code with access to the hook files can rewrite the checks. To prevent the escape in Case 4, you must protect configuration that the host will execute.
 
 ## Against a fooled model: what I tested
 
 The command hooks below use three events: `PreToolUse` runs before a tool executes, `PostToolUse` after it succeeds, and `Stop` when the agent finishes responding. Exit code 2 blocks a `PreToolUse` call, gives feedback after `PostToolUse`, and prevents stopping at `Stop` ([hooks docs](https://code.claude.com/docs/en/hooks)).
 
-I tried three in a scratch git repo with Claude Code 2.1.x and Haiku, in bypass-permissions mode, asking the agent outright to append a line to CLAUDE.md. A real injection would be sneakier. These tests establish coverage for the listed writes. They do not establish resistance to a determined attacker.
+I tried three hooks in a scratch git repo with Claude Code 2.1.x and Haiku, in bypass-permissions mode. I asked the agent to append a line to CLAUDE.md without hiding the request in an injection. These tests cover the listed writes; I cannot claim resistance to a determined attacker.
 
 ### Attempt 1: block the Edit and Write tools
 
@@ -129,25 +129,25 @@ Merge into `.claude/settings.json`, appending to any existing hook event arrays 
 }
 ```
 
-The hook blocked the Edit tool. Then I asked for `echo "BASH-REDIRECT" >> CLAUDE.md` through the Bash tool, and the line landed. The hook only sees the tools its matcher names, and Bash can write files allowed by its OS permissions and sandbox. Path matching on strings also misses symlinks pointing at a protected file.
+The hook blocked the Edit tool. I then asked for `echo "BASH-REDIRECT" >> CLAUDE.md` through the Bash tool, and the agent appended the line. The harness invokes the hook for the tools named in its matcher; Bash can write files within its OS permissions and sandbox. With string-based path matching, you also miss symlinks pointing at a protected file.
 
 ### Attempt 2: match file names in Bash commands
 
-So I added a second `PreToolUse` hook on `Bash` that refuses any command containing `CLAUDE.md`, `AGENTS.md`, `.claude/` or `memory/`. The new hook blocked the plain redirect. This one got through:
+I added a second `PreToolUse` hook on `Bash` to reject commands containing `CLAUDE.md`, `AGENTS.md`, `.claude/` or `memory/`. The new hook blocked the plain redirect but allowed this command:
 
 ```sh
 f=CLAUDE; echo "OBFUSCATED" >> "$f.md"
 ```
 
-You can't win by string-matching shell. The variable bypass already defeats this matcher. Treat it as a speed bump.
+An attacker can bypass this matcher by putting the file name in a variable, as I did here.
 
 ### Attempt 3: put the files back after each step
 
-This hook checks the resulting diff against `HEAD`, the currently checked-out commit, and restores matching paths. Staging or removing a tracked file from the index does not hide its difference from `HEAD`. The baseline moves whenever `HEAD` moves.
+Use this hook to restore matching paths from `HEAD`, the checked-out commit, after checking the diff. You cannot hide a tracked file’s difference from `HEAD` by staging it or removing it from the index. A new `HEAD` gives you a new baseline.
 
 **This hook discards your own uncommitted edits** to these files when the restore hook runs after a successful tool call or at `Stop`. Commit instruction changes before you start the agent.
 
-If git fails, the script reports the error. Its exit code cannot guarantee that the agent halts.
+If git fails, the script reports the error, but you cannot rely on its exit code to halt the agent.
 
 ```sh
 #!/bin/sh
@@ -166,7 +166,7 @@ exit 2
 
 Save the script as `.claude/revert.sh` in the repo root, creating `.claude/` if needed. Run `chmod +x .claude/revert.sh`. Merge the entries below as in Attempt 1 ([hooks docs](https://code.claude.com/docs/en/hooks)).
 
-A command that wrote the file and then exited non-zero skipped `PostToolUse` in my test; `Stop` caught the change at the end of the turn. Until then the changed file remained on disk. The docs also list `PostToolUseFailure` for failed tool executions. I have not tested it with this script ([hooks docs](https://code.claude.com/docs/en/hooks)).
+In my test, I wrote the file through a command that exited non-zero. The harness skipped `PostToolUse` and ran the restore hook at `Stop`, leaving the changed file on disk until the end of the turn. You can also use `PostToolUseFailure` for failed tool executions, according to the docs; I have not tested it with this script ([hooks docs](https://code.claude.com/docs/en/hooks)).
 
 ```json
 {
@@ -182,8 +182,6 @@ A command that wrote the file and then exited non-zero skipped `PostToolUse` in 
 }
 ```
 
-The results:
-
 | Write | Result |
 |---|---|
 | obfuscated append through Bash | reverted |
@@ -196,26 +194,26 @@ The results:
 
 The hook skips untracked files, `CLAUDE.local.md`, settings, hook scripts and paths outside the repo, including auto memory. It also mishandles file names containing tabs or newlines, which git prints in quoted form. Restoring a file cannot undo a command that already ran or remove text the agent already loaded into context.
 
-My first version also had a bug worth sharing. It ran `git checkout -- CLAUDE.md AGENTS.md 2>/dev/null`. The repo had no AGENTS.md, so git rejected the whole command, the error went to `/dev/null`, and the hook still reported success. The model said the change was reverted. The file still had the line. Test your hooks against the attack, and make them fail loudly.
+In my first version, I ran `git checkout -- CLAUDE.md AGENTS.md 2>/dev/null`. The repo had no AGENTS.md, so git rejected the whole command. I had sent the error to `/dev/null`, and the hook reported success. The model claimed it had reverted the change, though I could still see the line in the file. Test your hooks against the attack and make sure you can see their errors.
 
 ## Against code already running as you
 
-Use isolation to limit direct writes. Use remote review to keep poisoned changes out of shared branches. These controls protect different stages of the attack.
+Use isolation to limit direct writes, then remote review to keep poisoned changes out of shared branches.
 
-- **Run unattended agents in a container or as a separate OS user,** with read-only mounts or file permissions controlled by another account for the repo's instructions and settings. Keep your real home directory unmounted; expose only the files and credentials the task needs. If you use file permissions, protect parent directories too so the agent cannot replace protected files through a writable parent.
-- **Install dependencies inside that boundary too.** Running an install in your main shell gives its scripts your main account's access, as the [Cisco case](https://blogs.cisco.com/ai/identifying-and-remediating-a-persistent-memory-compromise-in-claude-code) demonstrates.
-- **Enforce review on the remote.** CODEOWNERS on its own only requests reviewers. Turn on branch protection or a ruleset with "require review from code owners" for CLAUDE.md, AGENTS.md, `.cursor/rules/` and `.claude/`, and protect CODEOWNERS itself ([GitHub docs](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)). Require those checks for the actors pushing changes. Review gates merges into the protected branch; your local working tree remains a separate exposure.
-- **Update.** The historical fixes were [v2.1.50 for Cisco's system-prompt path](https://blogs.cisco.com/ai/identifying-and-remediating-a-persistent-memory-compromise-in-claude-code) and [v2.1.2 for CVE-2026-25725](https://osv.dev/vulnerability/CVE-2026-25725). Those fixes do not make writable memory safe.
+- **Run unattended agents in a container or as a separate OS user,** with read-only mounts or file permissions controlled by another account for the repo's instructions and settings. Keep your real home directory unmounted; expose only the files and credentials the task needs. If you use file permissions, protect parent directories to prevent the agent from replacing protected files through a writable parent.
+- **Install dependencies inside that boundary.** Running an install in your main shell gives its scripts your main account's access, as the [Cisco case](https://blogs.cisco.com/ai/identifying-and-remediating-a-persistent-memory-compromise-in-claude-code) demonstrates.
+- **Enforce review on the remote.** With CODEOWNERS alone, you request reviewers without requiring their approval. Turn on branch protection or a ruleset with "require review from code owners" for CLAUDE.md, AGENTS.md, `.cursor/rules/` and `.claude/`, and protect CODEOWNERS itself ([GitHub docs](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)). Require those checks for the actors pushing changes. Reviewers can block merges into the protected branch, but cannot protect your local working tree through that gate.
+- **Update your agent.** The historical fixes were [v2.1.50 for Cisco's system-prompt path](https://blogs.cisco.com/ai/identifying-and-remediating-a-persistent-memory-compromise-in-claude-code) and [v2.1.2 for CVE-2026-25725](https://osv.dev/vulnerability/CVE-2026-25725). An attacker can poison writable memory even with those fixes installed.
 
 ## Make memory reviewable
 
-These checks help detect poisoned text from either threat. They do not prevent direct writes.
+Check for poisoned text from either threat; use other controls to prevent direct writes.
 
-- **Put auto memory under git.** Run `git init` in `~/.claude/projects/<project>/memory/` and commit after sessions you trust. `git diff HEAD` shows changes to tracked files; check `git status --short` for new files too. Review the diff before accepting a new baseline. This history is an audit aid; code with the same access can change it too.
-- **Turn auto memory off where you don't need it.** This removes that loading route; instruction files and hooks remain separate. Set `autoMemoryEnabled: false` in settings or `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1` in the environment ([Claude Code docs](https://code.claude.com/docs/en/memory)). That is the [default-off stance from the memory post](https://blog.carnav.in/how-ai-agents-remember/), applied to your own tools.
+- **Put auto memory under git.** Run `git init` in `~/.claude/projects/<project>/memory/` and commit after sessions you trust. `git diff HEAD` shows changes to tracked files; check `git status --short` for new files too. Review the diff before accepting a new baseline. Use this history for audits, though code with the same access can change it.
+- **Turn auto memory off where you don't need it.** You remove that loading route while keeping instruction files and hooks. Set `autoMemoryEnabled: false` in settings or `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1` in the environment ([Claude Code docs](https://code.claude.com/docs/en/memory)). Apply the [default-off stance from the memory post](https://blog.carnav.in/how-ai-agents-remember/) to your own tools.
 - **Scan instruction files for hidden Unicode** before loading an unfamiliar repo, and in a pre-commit hook for later changes ([Pillar Security](https://pillar.security/blog/new-vulnerability-in-github-copilot-and-cursor-how-hackers-can-weaponize-code-agents)).
 
-This scan rejects zero-width characters, bidirectional overrides and isolates, and Unicode tag characters, the ones used to smuggle invisible ASCII. It exits 2 if an argument isn't a regular file it can open. It uses Perl because macOS `grep` has no `-P`. It doesn't catch look-alike letters or text that only an editor hides, so a pass only means it found none of the listed code points in the files supplied.
+Use this scan to reject zero-width characters, bidirectional overrides and isolates, and Unicode tag characters that attackers use to smuggle invisible ASCII. The script exits 2 if an argument isn't a regular file it can open. Use Perl here because macOS `grep` has no `-P`. A pass means the supplied files contain none of the listed code points; you still need to check for look-alike letters and text hidden by an editor.
 
 ```sh
 #!/bin/sh
@@ -233,9 +231,9 @@ perl -CSD -e '
   exit $bad' "$@"
 ```
 
-**For people building their own memory handler:** validate paths against traversal ([Anthropic memory tool docs](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool)).
+**If you build your own memory handler,** validate paths against traversal ([Anthropic memory tool docs](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool)).
 
-These hooks target Claude Code. Check your agent's controls before adapting them.
+Check your agent's controls before adapting these Claude Code hooks.
 
 ## Check your own setup
 
@@ -244,7 +242,7 @@ These hooks target Claude Code. Check your agent's controls before adapting them
 3. Inspect `.vscode/settings.json` for approval changes, including the historical `chat.tools.autoApprove` setting above.
 4. Check which instruction, memory and settings files an unattended agent can write, including agents left in [a tmux pane](https://blog.carnav.in/how-terminal-multiplexers-work/).
 
-Read the files your agent will load before giving it access you care about. Repeat that review when those files or their baseline change.
+Read the files your agent will load before granting it access to your files or credentials. Repeat that review when those files or their baseline change.
 
 ## Sources and further reading
 
