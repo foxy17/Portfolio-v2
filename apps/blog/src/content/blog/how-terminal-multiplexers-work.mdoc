@@ -19,191 +19,173 @@ category: engineering
 draft: false
 ---
 
-You give a coding agent such as Claude Code or Codex a long task in your laptop's terminal window, then accidentally close it. The agent may exit before it finishes.
+## Can I close this window and answer from another one?
 
-With tmux, a terminal multiplexer, you can leave a workspace running and return to it. Start a named **session** with `tmux new -s agent`. Launch the agent inside it. If you close the window, open another terminal on the same machine and run `tmux attach -t agent`. You return to the running session and its current screen, with recent output stored as **scrollback**.
+Your coding agent has a question about which tests to run. You want to close the terminal window on your workstation and answer from your laptop after lunch. A **terminal multiplexer** such as tmux gives the agent a terminal you can reach from either place. You can fit several of these terminals into one desktop window, each in a rectangle called a **pane**. You might use the left pane for a shell and the right one for the agent. A background process on the workstation, the tmux **server**, holds a terminal open for each pane. You can close your view of the split and come back to the same programs. GNU Screen and Zellij share this design.
 
-A background process, the **tmux server**, keeps the agent's terminal open while you are disconnected. It runs on the same machine as the agent. That machine must stay running: tmux does not preserve processes through a reboot ([tmux manual](https://man.openbsd.org/tmux.1)).
+Start on the machine where you want the agent and its tests to run. You'll need tmux and your usual coding agent there. One machine is enough to try closing a desktop window and picking up in another. For the laptop handoff, choose a workstation you can reach over **SSH**, which lets you open a shell on a remote machine. On the workstation, open a desktop terminal outside tmux. Change to your project directory and run `tty`.
 
-{% takeaways %}
-- tmux keeps your programs connected to terminals that stay open after you close the visible window.
-- It stores each pane's screen contents so it can redraw your workspace when you return.
-- A quiet coding agent may be working or waiting for you. You cannot determine which from output alone.
-{% /takeaways %}
+Write down the device name it prints, beside the word “desktop.” The diagrams use Linux names, starting with `/dev/pts/3` for the desktop terminal. Your numbers can differ, and on macOS you might see `/dev/ttys003`. The shell is using a **pseudo-terminal** (PTY), a software terminal with two connected ends. The name you wrote down identifies the shell's end. Your terminal app, such as Ghostty or iTerm2, holds the **master** end. Your shell uses the **program-facing** end, labeled “slave” in the diagrams. To send the letters of `tty` to your shell, the app wrote to the master. To display the result, it read the output coming back through that same end. [Linux PTY manual](https://man7.org/linux/man-pages/man7/pty.7.html)
 
-## The window, the shell and the program
+<figure>
 
-Your **terminal window** is the visible interface of a terminal app, such as Ghostty or iTerm2. The app displays text and sends your keystrokes. Your **shell**, such as bash or zsh, is a separate program that reads your commands and starts other programs. At a bash prompt, you type into bash. After you start vim, vim receives your typing instead.
+![Without tmux the terminal app holds the PTY master. The shell, or Vim while the shell waits, uses the other end.](../../assets/blog/how-terminal-multiplexers-work/mux-stack-without-tmux.png)
 
-Unix connects these programs to the terminal app through a **pseudo-terminal**, or **PTY**. Think of it as a two-way cable made in software. A PTY also gives programs a terminal interface: they can query its size and control how input is buffered, echoed or turned into signals ([`pty(7)`](https://man7.org/linux/man-pages/man7/pty.7.html)).
+<figcaption>Follow the black arrows down from the terminal window and the green arrows back up to the window. In the middle, the operating system's “line discipline” handles terminal settings, such as whether to send a copy of the characters you type back to the screen. At the bottom, the foreground program is the one you're typing into. If you launch Vim, your shell waits while you edit. Vim uses the same terminal the shell used for its prompt.</figcaption>
+</figure>
 
-A PTY has two ends:
+An agent you start at this prompt inherits the shell's terminal, as Vim does in the drawing. Closing the desktop window makes the app let go of the master. Losing that connection, a **hang-up**, can end an interactive job. Even if the agent survives, typing in a fresh window gives your answer to the shell in that window. To get back to the agent, you need to keep both its program and its terminal available. Start tmux before launching the agent so the server can hold the master for it.
 
-- The **master** end connects to the terminal window. The window writes keystrokes here and reads output from it.
-- The **slave** end connects to the programs running inside the terminal. On Linux, it has a path such as `/dev/pts/3`.
+## The server holds the pane terminals
 
-The **foreground program** is the one currently using the terminal for input. In the usual shell-and-editor example, that is bash at the prompt or vim while you edit. The shell launches vim and waits; vim reads and writes the same terminal itself. A foreground job can also contain several processes, such as a pipeline ([Bash job control](https://www.gnu.org/software/bash/manual/html_node/Job-Control-Basics.html)).
-
-Between the PTY ends sits the **line discipline**, a set of terminal rules in the **kernel**, the core of the operating system. Its settings control what happens to the bytes passing through ([Linux TTY documentation](https://docs.kernel.org/driver-api/tty/index.html)).
-
-![Keys travel down through one PTY's master, kernel line discipline and slave to the foreground program, while output travels up; a dashed side arrow shows the shell launching vim and waiting.](../../assets/blog/how-terminal-multiplexers-work/mux-stack-without-tmux.png)
-
-## How tmux divides a workspace
-
-A **terminal multiplexer** lets you use several terminals through one visible terminal window. In tmux, you organise your workspace into sessions, windows and panes:
-
-| Object | What it holds |
-|---|---|
-| Session | A named workspace containing one or more windows |
-| Window | One or more panes arranged together, like a tab containing splits |
-| Pane | A rectangular terminal area with its own PTY and running program |
-
-A pane usually starts with a shell, from which you can launch an editor, an agent or a pipeline as you would outside tmux. Splitting a window creates another pane and another PTY. Several people or terminal windows can attach to the same session ([tmux Getting Started](https://github.com/tmux/tmux/wiki/Getting-Started)).
-
-Try running `tty`, which prints your terminal's device path, before starting tmux, then again inside it. The paths differ. With the default bindings, press `Ctrl-b`, release both keys, then press `%` to split the window. Run `tty` in the new pane: its different path identifies a separate terminal for the programs in that pane.
-
-### Client and server
-
-Running `tmux` starts a **client**, the program that attaches your terminal to a session. If necessary, it also starts the server. The **server** runs in the background and owns the sessions and their pane PTYs. Both processes run on the same machine.
-
-They communicate through a **Unix domain socket**, a local communication endpoint that programs use to exchange messages. The socket has a filesystem path without storing messages like an ordinary file. The client and server use it for control messages such as attach requests and resize notifications.
-
-During attachment, the client passes the server access to your terminal's connection. The server then reads keys and writes screen updates through that connection. The client remains running to handle events such as terminal resizing. It does not relay each keystroke through the socket.
-
-The original PTY still exists between your terminal window and tmux. Call this the **outer PTY**. The window holds its master end; the server uses its slave end. On the other side, the server holds a separate PTY master for each pane.
-
-![The terminal window connects through an outer PTY to the tmux server, which holds three in-memory screen grids and three pane PTYs; a separate control socket connects the client to the server.](../../assets/blog/how-terminal-multiplexers-work/mux-stack-with-tmux.png)
-
-In the diagram, the side socket carries control messages. When you attach, the client passes terminal access to the server; keys and screen updates then use the direct PTY connection. The diagram omits terminal settings.
-
-## From program output to a screen
-
-Terminal programs send text mixed with **escape sequences**: instructions that start with the Escape control character. They can move the cursor or change the colour of the text that follows. The terminal interprets these instructions instead of printing them as words.
-
-These examples use spaces for readability. `ESC` means the Escape character, not the three letters `E`, `S`, `C`; the spaces shown are not part of the sequences ([xterm control sequences](https://mirrors.mit.edu/NetBSD/NetBSD-release-11/xsrc/external/mit/xterm/dist/ctlseqs.txt)).
-
-| Sequence | Meaning |
-|---|---|
-| `ESC [ 2 ; 5 H` | Move the cursor to row 2, column 5 |
-| `ESC [ 31 m` | Use the terminal's red text colour |
-| `ESC [ ? 1049 h` | Switch to an alternate screen buffer, keeping the previous screen contents to restore when the program leaves it |
-
-The alternate screen buffer is why quitting vim usually brings your earlier shell screen back.
-
-Try this at a shell prompt, inside or outside tmux:
+**1. Create a session.** In the desktop terminal where you ran `tty`, create a named tmux workspace, or **session**. Use the name `agent` below, or choose a fresh name if you have a session called `agent`. Use the same name each time you connect to the session. The key combinations in this walkthrough assume the default tmux shortcuts.
 
 ```sh
-printf '\033[31mred\033[0m\n'
+tmux new -s agent
 ```
 
-`\033` supplies the Escape character. The first sequence selects red text; the second resets the styling. The terminal displays the word `red` in red and consumes the formatting instructions.
+The `tmux` command you started is the **client**. It starts the server if needed and requests a session named `agent`. To **attach** to that session, the client gives the server access to your desktop terminal over a **control socket**, a connection between processes on the workstation. The server can then read your keys from the terminal and draw the panes there. Your original shell waits for the client to finish. The prompt you see belongs to a new shell that the server started inside the session.
 
-For each pane, tmux interprets this output and maintains a **screen grid** in memory. The grid stores text and its appearance at screen positions; some characters occupy more than one cell. tmux also tracks the cursor position. It uses those grids to draw the visible panes and status bar into your terminal window.
+A session holds one or more **tmux windows**. Think of them as tabs within the session. Each tmux window has its own arrangement of panes, and you see the panes of whichever window you've selected. Look at the status line along the bottom of your desktop terminal. With the default settings you'll see `[agent]` and a `*` beside the name of the current tmux window. Its first pane takes up the space above that line. If you put a second tmux window in this session, you could switch to it and use that whole space, then switch back to the arrangement you left in the first one. [tmux Getting Started](https://github.com/tmux/tmux/wiki/Getting-Started#terminology)
 
-This work is **terminal emulation**: interpreting a program's output as instructions for a terminal screen. tmux contains a terminal emulator for its panes; your window's terminal emulator, such as Ghostty or iTerm2, displays the combined result. A program in one pane can clear its own screen without erasing the neighbouring panes.
+**2. Identify the first pane.** At the new prompt, run `tty` and label the result “shell pane.” Suppose you got `/dev/pts/3` before starting tmux and `/dev/pts/4` inside it. Your desktop app still holds the master of the first PTY, the **outer terminal**. The tmux server opened the second PTY for the pane and holds its master. The pane shell writes its prompt on the program-facing end. You see that prompt on your desktop because the server reads the output at the pane master and writes a screen update to the outer terminal.
 
-### Updating one cell
+Your client gave the server access to the outer terminal by passing a **terminal handle** over the control socket. A handle gives the server access to an open device, in this case the program-facing end of `/dev/pts/3`. A client in a different desktop window can supply a handle for its own outer terminal. The server will have somewhere else to draw the prompt, and the shell can keep using `/dev/pts/4` through the switch. [tmux client source](https://github.com/tmux/tmux/blob/master/client.c)
 
-Suppose a pane's screen is blank. Its program sends the instruction to move to row 2, column 5, followed by the letter `X`. tmux updates that cell in the pane's grid.
+**3. Give the agent a pane.** The default tmux **prefix** is `Ctrl-b`. It tells tmux to treat the next key as a shortcut. With the pane shell on screen, press `Ctrl-b`, release both keys, then press `%` to split the current tmux window into two panes side by side. The shell you measured stays on the left. The server opens another PTY and starts a shell on the right. The right pane is now the **active pane**, the one that gets your ordinary keystrokes. Both panes belong to the window marked with the star in the status line.
 
-Row 2, column 5 is relative to the pane. tmux translates that position into coordinates in your terminal window. It can move the terminal cursor there and print `X` without redrawing the other cells. For example, if six columns and a one-column divider sit to its left, the pane's column 5 becomes terminal column 12.
+At the right-hand prompt, run `tty` before launching anything. Label the result “agent pane,” `/dev/pts/5` in the drawing. You now have two prompts and two different device names inside the split. Starting a program at either prompt gives it the terminal for that pane, so choose the right-hand prompt for the agent and keep the left one free for shell commands.
 
-![tmux places X at pane row 2, column 5. In the terminal, the left pane occupies columns 1 through 6 and the divider occupies column 7, so the right pane spans columns 8 through 13 and X appears at row 2, column 12. Only the changed cell is redrawn.](../../assets/blog/how-terminal-multiplexers-work/pane-screen-grid-update.png)
+**4. Leave a question on screen.** At the right-hand prompt, start your coding agent in the project as you would from a plain shell. Ask it, “Ask me which test command to run, then wait for my answer.” Leave its question open. The shell on the right waits for the agent, which uses the terminal you measured there. Find the two programs at the bottom of the drawing and trace their connections up to the server.
 
-tmux stores the current screen in the grid and a limited amount of older output in scrollback, without recording every intermediate screen the program drew. tmux can update part of the display as output arrives, or redraw the visible layout when you attach again.
+<figure>
 
-## How input reaches the right program
+![The terminal window connects through outer PTY /dev/pts/3 to the tmux server. The server keeps two screens and holds the pane PTY masters for Bash on /dev/pts/4 at left and the coding agent on /dev/pts/5 at right. A dashed control socket connects the client to the server at the side.](../../assets/blog/how-terminal-multiplexers-work/mux-stack-with-tmux.png)
 
-The line discipline's settings determine what the program receives. With **echo** enabled, the kernel sends typed characters back towards the window so you can see them. In **canonical mode**, it collects a line before delivering it: Backspace edits that waiting line, and Enter submits it. A simple program such as `cat` can use this without implementing its own input editor.
+<figcaption>The three names from <code>tty</code> go beside the boxes marked “slave.” From the top, <code>/dev/pts/3</code> serves the desktop window. Below the server, <code>/dev/pts/4</code> serves the shell on the left (Bash in the drawing), and <code>/dev/pts/5</code> serves the agent on the right. The dashed line shows where the client passes its terminal handle at attach. Follow the solid arrows for keys and output. The server keeps a screen in memory for each pane, shown as two small grids above the pane terminals.</figcaption>
+</figure>
 
-A **signal** is an operating-system notification to a process. With terminal signal generation enabled, Ctrl-C sends **SIGINT**, an interruption request, to the foreground job. A program may handle or ignore it, or change the terminal settings so Ctrl-C arrives as input instead ([`termios(3)`](https://man7.org/linux/man-pages/man3/termios.3.html)).
+You can read the agent's question. To tmux, a program waiting for an answer and a program running a quiet test can leave the same text on screen. You can use the shell while the question sits in the other pane.
 
-Full-screen editors use raw or similar input settings to receive keys without waiting for Enter. Interactive bash and zsh also read keys individually and draw their own command-line edits, with kernel echo disabled. Line buffering, echo and signal generation have separate controls.
+**5. Close the desktop window while a command runs.** In the split, press `Ctrl-b`, then Left Arrow to select the shell pane. At the left-hand prompt, type `sleep 30 && date`. Press Enter and close this desktop terminal window during the thirty-second pause. Wait for the full thirty seconds to pass before opening a replacement. On your return, look for a timestamp from the interval when the window was closed.
 
-tmux disables all three on the outer PTY, so it receives input directly. Each pane has its own terminal settings. As tmux forwards Ctrl-C into a pane, that pane's settings determine whether the kernel turns it into SIGINT or delivers it as input. This also prevents the outer PTY from echoing characters twice or holding them until Enter.
+Closing the window disconnects its client. With no client showing it, the session is **detached**. On the workstation, the server still holds the masters for both panes. The left shell can start `date` at the end of the pause, and the agent on the right can wait for your answer through its own terminal. The shell has somewhere to print the timestamp. You'll see what the server kept from both panes when you connect to the session again.
 
-### Follow a single keypress
+## How tmux redraws the split
 
-At an interactive bash prompt inside tmux, press `x`:
+Open a fresh desktop terminal of about the same size on the workstation, under the same account. At its prompt outside tmux, run `tmux ls` to list the sessions on your server. Look for the entry for `agent`. It reports one window even though you left two panes. You can recognize the session by name from any project directory in this new shell. At the same prompt, **reattach** by connecting a new client to the existing session.
 
-1. Your terminal window writes `x` to the outer PTY's master end.
-2. The tmux server reads it through the outer PTY's slave end.
-3. The server checks its key bindings. By default, `Ctrl-b` is the **prefix**, a key combination that makes the following key a tmux command. A plain `x` passes through.
-4. The server writes `x` to the active pane's PTY master.
-5. Bash reads it from the slave end. Bash's line editor echoes `x` itself, sending output back through that pane's PTY.
-6. The server interprets the output, updates the pane's grid and sends the corresponding screen update through the outer PTY.
+```sh
+tmux attach -t agent
+```
 
-![Typing x at a bash prompt follows six steps through the outer PTY, tmux's binding check, the active pane's PTY, bash's echo and the screen-grid update.](../../assets/blog/how-terminal-multiplexers-work/mux-keypress-roundtrip.png)
+Look above the prompt on the left for the timestamp and across the divider for the agent's question. The timestamp tells you when `date` ran. At the left-hand prompt, run `tty`. Compare the result with the shell-pane name you wrote down. In the example it's still `/dev/pts/4`. The server held that pane's master open throughout the pause, so the shell could keep writing to its terminal after you closed the desktop window.
 
-You can also control panes from a script. `tmux send-keys` sends input to a pane, while `tmux capture-pane -p` prints its current screen as text. Your script could use these operations to send a command and inspect its output, but would need a way to detect completion ([OpenBSD tmux manual](https://man.openbsd.org/tmux.1)).
+To answer from your laptop now, go to [What survives an SSH disconnect?](#what-survives-an-ssh-disconnect) with the left pane still selected. To answer here on the workstation, press `Ctrl-b`, then Right Arrow to select the agent. Give it the test command at the same prompt where it asked the question.
 
-## Keeping panes open after you close the window
+The new desktop window opened after `date` had finished. It can show you the timestamp because tmux does the work of a **terminal emulator** for each pane. A terminal emulator interprets a program's output and keeps track of what the screen should contain. While you were away, the server read the timestamp and the shell prompt from the left pane's master. It could update its picture of that pane without a desktop window in which to draw it. [tmux manual](https://man.openbsd.org/tmux.1#DESCRIPTION)
 
-Without tmux, closing the window closes its end of the PTY. The operating system's terminal hang-up handling can send **SIGHUP**, the hang-up signal, to processes associated with that terminal. Shells can pass it on to their jobs. A program's signal handling and shell settings determine whether it exits ([POSIX `close()`](https://pubs.opengroup.org/onlinepubs/9799919799/functions/close.html), [Bash signals](https://www.gnu.org/s/bash/manual/html_node/Signals.html)).
+The server keeps a **screen grid** for each pane, rows and columns of character positions called **cells**. In the left grid, the timestamp occupies part of one row and the prompt starts on the next. In the right grid, the agent can start a line in column one of its own terminal. The server keeps styling with the characters. If the agent used green for a question, tmux has the information to draw those letters in green on a terminal that supports the color.
 
-With tmux, the outer terminal connection can close while the server keeps the pane PTYs open. The server runs independently of the terminal that started it. After an attached client exits, the agent remains connected to its pane's terminal.
+Along with text, programs send terminal instructions as **escape sequences**, groups of bytes that can start with the Escape character. A program can use one sequence to set a color and another to move its **cursor**, the position where the next character will appear. tmux applies those instructions inside the pane that produced them. The agent can move its cursor to the top left to redraw a menu while the shell keeps its cursor at the end of the prompt across the divider.
 
-Over **SSH**, you log into another machine and start tmux and the agent there. The remote SSH service holds the master end of your login PTY. Once it detects a lost connection and closes that PTY, the login shell and attached tmux client can exit. The tmux server still holds the separate pane PTYs on that machine.
+To **redraw** a window for a client that has attached, the server takes the current cells from both grids, places each pane in the layout and adds the divider. It writes cursor movements, styling instructions and characters to the new outer terminal. Your desktop app interprets those instructions and draws the split. Suppose the agent opened a menu and cleared it while you were away. The server applied both changes to the right grid as they arrived. On reattach, you see the question the agent left on screen. The agent can accept your answer without printing the question again.
 
-![The old SSH login and tmux client end together, while the server, pane PTYs and programs survive on the remote machine; a new SSH connection and tmux attach -t agent reconnect through a new client.](../../assets/blog/how-terminal-multiplexers-work/mux-ssh-drop.png)
+Once you have the split on screen, the server can send a smaller update. Suppose the program on the right puts an X at row 2, column 5 of its pane. If tmux sent that cursor movement straight through to the desktop, the X would land on the left. The diagram gives the left pane six columns and the divider one, so the right pane starts at outer column 8. The program can use coordinates measured from its own top left. The server knows where to put that cell on the desktop.
 
-SSH back into that machine and run `tmux attach -t agent` to return to the session named `agent`. A fresh client connects to the existing server, which redraws the current screen. You can also detach on purpose: with the default keys, press `Ctrl-b`, release both keys, then press `d`.
+<figure>
 
-The machine and server must keep running. Rebooting the machine or killing the tmux server ends this protection. If your laptop sleeps, local programs pause until it wakes; work running on a separate remote machine can continue.
+![A program puts X at row 2, column 5 of a six-column pane. With six columns on the left and one divider, X appears at row 2, column 12 on the desktop terminal.](../../assets/blog/how-terminal-multiplexers-work/pane-screen-grid-update.png)
 
-[GNU screen](https://www.gnu.org/software/screen/manual/screen.html) and Zellij also support detaching from running terminal work. Zellij offers [session resurrection](https://zellij.dev/documentation/session-resurrection.html): it can recreate a saved layout and offer to rerun commands after the session ends. Those commands start new processes; they do not recover the old processes' memory.
+<figcaption>Count five cells starting at column 8 and the X falls at outer column 12. tmux can write the Escape byte followed by <code>[2;12H</code> to move the outer cursor to row 2, column 12, then write X. Your terminal app draws the letter there. The cells on the other side of the divider keep their contents.</figcaption>
+</figure>
 
-## Resizing follows the same connections
+<details>
+<summary>Optional diagram about reading status from a quiet pane</summary>
 
-A terminal's size is a number of rows and columns. Enlarging your window triggers these updates:
+<figure>
 
-1. The terminal window updates the outer PTY's size. The kernel sends **SIGWINCH**, the window-size-change signal, to the foreground job, which includes the tmux client.
-2. The client notifies the server over the socket. The server reads the new size and recalculates the pane layout.
-3. The server asks the kernel to update each affected pane's terminal size. The kernel notifies that pane's foreground job, allowing vim or another full-screen program to redraw.
+![A monitoring tool can infer status from terminal activity or use a report from the agent. Silence alone cannot distinguish waiting for input from running a quiet command.](../../assets/blog/how-terminal-multiplexers-work/mux-what-tmux-sees.png)
 
-Two clients can attach with different terminal sizes. tmux's `window-size` option controls which size a shared window uses; the default, `latest`, follows the most recently used client ([tmux manual](https://man.openbsd.org/tmux.1)).
+<figcaption>The lines on the left show two ways a separate tool could get a status such as “blocked.” It could infer one from activity in the pane, or the agent could report that it needs an answer. A shell that marks where commands begin and end can supply the boundary markers in the top box. You used the text of the question itself to decide what to type.</figcaption>
+</figure>
+</details>
 
-## Colours, copying and scrolling
+## Routing a keystroke
 
-Programs inside tmux see the terminal tmux provides, which may support different features from your terminal app.
+In the workstation split, if the agent pane is active, press `Ctrl-b`, then Left Arrow to select the shell. At the left-hand prompt, type a lowercase `x` without pressing Enter. The arrow you used to select the shell and the letter you typed beside its prompt reached tmux through the same outer terminal. A **key binding** associates a key with an action in tmux. The server handled the arrow after the prefix as a request to select the pane to the left. With the default bindings, a plain `x` has no tmux action, so the server forwards it to the active pane.
 
-The `TERM` environment variable identifies the terminal type. Programs use it to look up supported features in a database called **terminfo**. Outside tmux, it describes your terminal app. Inside, tmux sets a type it supports, such as `tmux-256color` or `screen-256color`. You need the matching terminfo entry installed where the program runs ([tmux manual](https://man7.org/linux/man-pages/man1/tmux.1.html)).
+At attach, tmux sets the outer terminal to deliver keys as you type and turns off its **echo**, the operating system's option to send a copy of your input back to the screen. Follow the lowercase `x` through the split. Your desktop app writes the character to the outer master. The server reads it at the other end and writes it to the left pane's master. At this point the shell has a letter to work with and the desktop still needs an instruction to draw it. [tmux terminal setup](https://github.com/tmux/tmux/blob/master/tty.c)
 
-- **Colours look dull.** tmux may not know that your outer terminal supports 24-bit colour. If that terminal supports it, tmux's `terminal-features` option can declare the `RGB` capability. Changing `TERM` to an unrelated terminal type can cause other problems ([tmux FAQ](https://github.com/tmux/tmux/wiki/FAQ)).
-- **Copied text stays inside tmux.** tmux's copy buffer and your desktop clipboard are separate. **OSC 52** is an escape sequence that lets tmux ask your terminal to update the desktop clipboard, even over SSH, if the terminal permits it. The [Clipboard guide](https://github.com/tmux/tmux/wiki/Clipboard) explains the settings on both sides.
-- **The mouse wheel misses the history you want.** tmux stores history per pane; your outer terminal sees the combined display. Enter tmux's **copy mode**, which lets you browse and select pane history, with `Ctrl-b` then `[`. Press Escape to leave with emacs-style copy-mode bindings, or `q` with vi-style bindings ([copy-mode keys](https://man.openbsd.org/tmux.1#WINDOWS_AND_PANES)). The `history-limit` option controls retained lines; older output beyond that limit is unavailable ([Getting Started](https://github.com/tmux/tmux/wiki/Getting-Started)).
-- **Mouse selection behaves differently.** With `mouse on`, tmux handles mouse events. Your terminal may provide a modifier key to bypass that handling, such as Shift in many Linux terminals or Option in iTerm2 ([tmux FAQ](https://github.com/tmux/tmux/wiki/FAQ)).
-- **Escape feels slow in vim.** An Escape key can also begin a longer key sequence. tmux waits to distinguish them; `escape-time` controls that delay ([tmux manual](https://man.openbsd.org/tmux.1)).
+At a Bash prompt, **Readline** is the part of Bash that lets you edit a command before you run it. It reads individual keys with the pane terminal's echo turned off. Readline adds the `x` to the command you're editing and writes the letter to the pane terminal. Other shells, including zsh, have their own line editors. tmux reads the output from the pane master and puts the letter in the shell's grid. You see it when the server draws that cell. The agent gets no part of the exchange. It can send output to its own grid while you're partway through a command on the left. [GNU Readline terminal management](https://tiswww.case.edu/php/chet/readline/readline.html#Terminal-Management)
 
-## Distinguishing agent work from waiting
+<figure>
 
-If your agent stops printing, it might be working on a response or waiting for permission to run a command.
+![Steps 1 to 4 take x from the keyboard to Bash through the active pane's PTY. In step 5 Readline writes x to the pane. In step 6 tmux updates the grid and redraws the letter.](../../assets/blog/how-terminal-multiplexers-work/mux-keypress-roundtrip.png)
 
-tmux can monitor output activity and silence, and report the current command name when available. With a tmux version that supports **OSC 133** command tracking and a shell configured to emit those escape sequences, it can also track command boundaries and exit status.
+<figcaption>Read the top row from left to right, then the bottom row from right to left. In step 5, “bash echoes x” means that Readline writes x to the pane. The character has crossed the pane PTY twice by step 6, once toward Bash as input and once back toward tmux as output. The one letter beside the prompt came back from the program you typed it into.</figcaption>
+</figure>
 
-For a long-running agent, you can use those shell markers to track the process's run. You cannot use them to distinguish thinking from waiting for approval or finishing one task while still open ([tmux status fields](https://man7.org/linux/man-pages/man1/tmux.1.html)).
+## Scrollback belongs to the pane
 
-The `pane_dead` flag identifies a pane whose initial process has exited and which tmux has kept open with `remain-on-exit`. Normally, tmux removes the pane when that process exits. If the pane starts bash and you launch an agent from its prompt, the agent can exit while bash and the pane remain alive. You cannot use the flag to determine whether that agent has finished ([tmux manual](https://man.openbsd.org/tmux.1#remain-on-exit)).
+At the left-hand prompt, press Backspace to erase the `x`. The line editor removes the letter and tmux updates that cell. Now press Enter at the empty prompt until the timestamp scrolls off the top. Each press makes the shell print a fresh prompt on another line. You can fill the left pane with prompts without scrolling a line of the agent's output on the right. Each pane has its own **scrollback**, a history of lines that have scrolled off its **main screen**, the screen where you enter shell commands and read their results.
 
-An **agent-aware tool** adds information about the work inside a pane. It might mark the agent as blocked after recognising a permission question on the screen or receiving an explicit approval request from the agent. A change to the interface can break screen-text recognition. With an explicit report, you depend on the agent's accuracy.
+Keep the left pane selected and press `Ctrl-b`, then `[` to enter **copy mode**. tmux now takes your navigation keys so you can browse the lines it has kept for this pane and select text to copy. Press Up until the timestamp comes into view, or use Page Up to move a page at a time (Fn and Up Arrow on a Mac keyboard without a Page Up key). You're reading a line that scrolled off the shell's screen, in a desktop window that didn't exist when the shell printed it. You can follow the line to the edge of the pane without picking up part of the agent's output in the neighboring column.
 
-The tool can show idle, working, blocked or done alongside the source of that status: reported by the agent, or inferred from observations. The tool should mark inferred states as guesses.
+You can recover the timestamp because `date` wrote one line and left it there. Imagine a clock in its place that prints `10:42`, moves the cursor back to the last digit a minute later and writes a `3` over the `2`. That operation changes one cell, like the X in the diagram. If the line scrolls off the top after the change, you'll find `10:43` in copy mode. To find both readings in the history, you'd need the clock to have written them on separate lines.
 
-![An agent-aware tool combines observations and reports: it infers from terminal observations and uses reported status from agents. It shows idle, working, blocked or done with the source labelled reported or inferred, and marks inferred states as guesses.](../../assets/blog/how-terminal-multiplexers-work/mux-what-tmux-sees.png)
+`history-limit` sets how many scrolled-off lines tmux keeps per pane. Once the server discards a line to make room, you can no longer page back to it. If a test prints enough output on the right to reach that limit, you can lose the beginning of its report there and still find your timestamp in the history on the left.
 
-For example, Herdr uses process detection and rules that read an agent's screen, with explicit reports taking precedence when available ([Herdr docs](https://herdr.dev/tui/docs/preview/agents/)). Zellij includes both terminal multiplexing and attention tracking: its inbox combines reported status, shell markers and output-based inference to flag panes that may need you ([Zellij docs](https://zellij.dev/documentation/inbox.html)).
+In the left pane, press `Ctrl-c` to leave copy mode. You should see the live prompt where you left it. [tmux default bindings](https://github.com/tmux/tmux/blob/master/key-bindings.c)
 
-You can close a window without abandoning a running agent, because tmux keeps its terminal open and stores its screen. To check whether your agent needs approval, look for a permission prompt or an explicit status report.
+A full-screen program such as Vim can request an **alternate screen**, a temporary screen for its interface. If you were editing a file in Vim, you could page through it without pushing each page into the shell's scrollback. To find an earlier line of the file, you scroll in the editor. If you detach mid-edit, tmux can redraw the editor at your current place when you return. After you quit Vim, you see the shell screen that was there before you opened the file. In either screen the program arranges its text to fit the dimensions tmux gives the pane.
 
-tmux keeps the agent's process running. For what it knows from earlier sessions, your agent relies on its own memory system, which [How AI Agents Remember](https://blog.carnav.in/how-ai-agents-remember/) explains.
+## One pane width for two clients
 
-The next post covers **agentic development environments**: agent-aware tools that help you manage the work running in those terminals.
+Two people looking at the same pane can have different-sized desktop windows. The shell has one terminal from which to read its width, so tmux has to choose how much space to give it. You can measure that width as a second viewer joins the session and again after they leave. Widen your current desktop window. At the left-hand prompt in that window, set the rule for fitting the split to its clients, then measure the space the shell has now.
 
-## Sources and further reading
+```sh
+tmux set-option -w window-size smallest
+stty size
+```
 
-- **Terminal behaviour:** [`pty(7)`](https://man7.org/linux/man-pages/man7/pty.7.html), [`pts(4)`](https://man7.org/linux/man-pages/man4/pts.4.html) and the [POSIX terminal interface](https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap11.html) describe PTY endpoints, foreground jobs and terminal settings.
-- **tmux's implementation:** [client.c](https://github.com/tmux/tmux/blob/master/client.c) passes terminal access to the server; [tty.c](https://github.com/tmux/tmux/blob/master/tty.c) disables outer-terminal line buffering, echo and terminal-generated signals; [window.c](https://github.com/tmux/tmux/blob/master/window.c) manages panes and their virtual screens. [proc.c](https://github.com/tmux/tmux/blob/master/proc.c) contains the background-process setup.
-- **Resizing:** [`TIOCSWINSZ`](https://man7.org/linux/man-pages/man2/TIOCSWINSZ.2const.html) lets programs set a terminal's size and notify its foreground job.
-- **Using tmux:** the [Getting Started guide](https://github.com/tmux/tmux/wiki/Getting-Started) covers everyday commands; the [manual](https://man7.org/linux/man-pages/man1/tmux.1.html) documents options, sockets and status fields.
+The `-w` sets the option for this tmux window. With `smallest`, tmux gives it a width and height that fit both clients once the second one attaches. The two numbers from `stty size` give the shell pane's rows and columns, in that order. Write down the second number. It measures the space available to the shell between the left edge and the divider. The agent has its own share of the window on the other side.
 
-*The hero image and diagrams were made with AI image generation.*
+Leave the wide client attached. On the same machine and account, open a second desktop terminal about the same height but narrower. Place it where you can see both. At its prompt outside tmux, run `tmux attach -t agent`. At the left-hand prompt in the narrow client, run `stty size` again. Watch the command appear in both windows as you type, followed by the same result with a smaller column count. Both clients display the output from the same shell.
+
+Look at the space past the right edge of the split in the wide terminal while the narrow client is attached. For a 120-column client and an 80-column client, the whole tmux window fits into 80 columns under the `smallest` rule. The shell pane gets part of those 80 after tmux allows room for the agent and the divider. Both viewers see a long command wrap at the same place. The extra columns on the wide desktop fall outside the shared layout, so the shell has no use for them when it draws the prompt. [tmux window sizing](https://man.openbsd.org/tmux.1#window-size)
+
+On attachment the server reads the new terminal's dimensions. If you resize an attached desktop window, its client reports the change over the control socket. The server applies the sizing rule, adjusts the split and sets the new dimensions on the affected pane PTYs. The operating system tells the foreground program in each resized terminal that its size has changed. The shell can read its new width and redraw the line you're editing. The agent can fit its interface to the space on the other side.
+
+Under the default settings the clients share the active pane as well. In the narrow client, press `Ctrl-b`, then Right Arrow. Keep your keyboard focus in the narrow desktop terminal and watch the wide one. Its active-pane indicator moves to the agent too. In the narrow client, press `Ctrl-b`, then Left Arrow to select the shell again. If someone were typing in the wide client, your choice of pane would change where their next letter went. [tmux windows and panes](https://man.openbsd.org/tmux.1#WINDOWS_AND_PANES)
+
+In the narrow client, press `Ctrl-b`, then `d` to **detach**. This disconnects that client from the session and returns you to the shell where you ran the attach command. The wide client stays attached. At its left-hand prompt, run `stty size` once more. With the narrow client gone, the pane has room to grow back to the width you wrote down. You ran all three measurements in the same shell. Typing `exit` at its prompt would end that shell and, with the default settings, close its pane.
+
+## What survives an SSH disconnect?
+
+If you're staying on one machine, you can keep working in the desktop client. For the laptop handoff, detach your remaining workstation client. With that desktop terminal in focus, press `Ctrl-b`, then `d`. You'll return to the shell outside tmux. The server still holds both pane terminals on the workstation, ready for a new connection from another login under the same account.
+
+Open a terminal on your laptop. At the laptop prompt, run `ssh user@workstation`, using the workstation's hostname and the same account you used to create the session. SSH gives you a shell on the workstation. At that remote prompt, outside tmux, run the attach command.
+
+```sh
+tmux attach -t agent
+```
+
+You start the client at the workstation prompt because that's where the session lives. The name `agent` identifies a session on a tmux server under your workstation account. The client you started over SSH can reach that server over the same local control socket your desktop client used. An attach command at the laptop's own prompt would look for a server on the laptop. After the remote attach, you have the workstation split in front of you. [OpenSSH manual](https://man.openbsd.org/ssh.1#INTERACTIVE_SESSIONS)
+
+<p id="answer-the-agent">If you came here to answer the agent, press <code>Ctrl-b</code>, then Right Arrow to select its pane and give it the test command. Your answer reaches the agent through the terminal where it asked the question, <code>/dev/pts/5</code> in the drawing. If the agent starts the tests, they run in the project on the workstation. You can read the results at your laptop.</p>
+
+Your laptop terminal app holds the master of its local PTY, as the workstation's desktop app did in the first drawing. The `ssh` program runs on the other end and carries your input to a separate **login PTY** on the workstation. The workstation's SSH service holds the master of that login PTY. Your remote shell uses its program-facing end. At attach, the remote tmux client passes a handle for that end to the tmux server. For this client, the login PTY serves as the outer terminal.
+
+Follow a line of test output back to the laptop. The tmux server reads the line at the pane master and updates the grid for the agent. It writes the corresponding screen changes to the login PTY. The workstation's SSH service reads those updates from the master and sends them over the network to `ssh` on the laptop. Your terminal app draws the changes in the right pane. The pane terminal and the server that holds its master have stayed on the same side of the network throughout.
+
+Close the laptop terminal while it shows the split. Once SSH detects the disconnect, the old login terminal hangs up and its tmux client can exit. The pane terminals belong to the server on the workstation. It can keep reading their output as long as the workstation and server stay up. Rebooting that machine would end the session. To reconnect after the dropped login, open a new terminal on the laptop. Run the same SSH command at its prompt and, once you have a fresh workstation prompt, run `tmux attach -t agent` there.
+
+<figure>
+
+![A lost SSH connection ends the old login PTY and client. After the next login, solid arrows carry keys and screen updates between the laptop, the new login PTY and the running tmux server. The new client hands over its terminal on a dashed socket. The pane PTYs and programs remain on the remote machine.](../../assets/blog/how-terminal-multiplexers-work/mux-ssh-drop.png)
+
+<figcaption>Start at the lower laptop. The solid green path runs over SSH to the new login PTY and from there to the tmux server. Keys go toward the server and screen updates come back along the same path. The dashed arrow from the new tmux client shows the socket it uses to pass the terminal handle at attach. On the right, the server still holds the pane PTYs for the programs you left running. The crossed-out client above belonged to the old login.</figcaption>
+</figure>
+
+In the reattached split on the laptop, look for the active pane. If the agent pane is active, press `Ctrl-b`, then Left Arrow to select the shell. At the left-hand prompt, run `tty`. In the diagram's example you'll read `/dev/pts/4`, the terminal you measured on the workstation before you split the window. Both SSH logins gave you access to that shell. Losing the first login cost you the view through its outer terminal. The tmux server kept the terminal the shell was using, along with the agent's terminal on the other side of the divider. You can type your next command at the prompt where you left off.
